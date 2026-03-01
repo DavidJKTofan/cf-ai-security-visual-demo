@@ -70,7 +70,7 @@ export const uc2 = {
       type: 'coming-soon',
       column: 'center',
       comingSoon: true,
-      product: 'Cloudflare DLP (Coming Soon)',
+      product: 'Cloudflare DLP for MCP Portal (Coming Soon)',
       description: 'Data Loss Prevention scanning for MCP tool inputs and outputs. Will detect sensitive data flowing through MCP tool invocations. Currently in development.',
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/data-loss-prevention/',
     },

@@ -263,14 +263,36 @@ export class FlowEngine {
     const prevBtn = this._panel.querySelector('[data-action="prev"]');
     const resetBtn = this._panel.querySelector('[data-action="reset"]');
 
-    if (playBtn) playBtn.addEventListener('click', () => this.togglePlay());
-    if (nextBtn) nextBtn.addEventListener('click', () => this.next());
-    if (prevBtn) prevBtn.addEventListener('click', () => this.prev());
-    if (resetBtn) resetBtn.addEventListener('click', () => this.reset());
+    // Add accessible labels to buttons
+    if (playBtn) {
+      playBtn.setAttribute('aria-label', 'Play animation');
+      playBtn.addEventListener('click', () => this.togglePlay());
+    }
+    if (nextBtn) {
+      nextBtn.setAttribute('aria-label', 'Next step');
+      nextBtn.addEventListener('click', () => this.next());
+    }
+    if (prevBtn) {
+      prevBtn.setAttribute('aria-label', 'Previous step');
+      prevBtn.addEventListener('click', () => this.prev());
+    }
+    if (resetBtn) {
+      resetBtn.setAttribute('aria-label', 'Reset to overview');
+      resetBtn.addEventListener('click', () => this.reset());
+    }
 
-    // Node click => tooltip
+    // Mark the step info panel as a live region for screen readers
+    const stepInfo = this._panel.querySelector('.panel-step-info');
+    if (stepInfo) {
+      stepInfo.setAttribute('aria-live', 'polite');
+      stepInfo.setAttribute('aria-atomic', 'true');
+    }
+
+    // Node click/tap => tooltip
     this._container.querySelectorAll('.flow-node').forEach(el => {
-      el.addEventListener('click', (e) => {
+      const handler = (e) => {
+        // Prevent ghost clicks on touch devices
+        e.preventDefault();
         const nodeId = el.dataset.id;
         const node = this.nodes.find(n => n.id === nodeId);
         if (node) {
@@ -278,11 +300,23 @@ export class FlowEngine {
             detail: { node, targetEl: el }
           }));
         }
+      };
+      el.addEventListener('click', handler);
+
+      // Allow keyboard activation (Enter/Space) since nodes have role="button"
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handler(e);
+        }
       });
     });
 
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
+      // Don't intercept if user is typing in an input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
       if (e.key === 'ArrowRight' || e.key === ' ') {
         e.preventDefault();
         this.next();
@@ -293,6 +327,55 @@ export class FlowEngine {
         this.reset();
       }
     });
+
+    // Touch swipe gestures on the panel for mobile navigation
+    this._bindSwipeGestures();
+  }
+
+  /**
+   * Bind horizontal swipe gestures on the side panel.
+   * Swipe left = next step, swipe right = previous step.
+   * Uses a minimum threshold to avoid conflicts with vertical scrolling.
+   */
+  _bindSwipeGestures() {
+    const panel = this._panel;
+    if (!panel) return;
+
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+
+    const SWIPE_THRESHOLD = 50; // min px for a swipe
+    const ANGLE_THRESHOLD = 30; // max degrees from horizontal
+
+    panel.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      tracking = true;
+    }, { passive: true });
+
+    panel.addEventListener('touchend', (e) => {
+      if (!tracking || e.changedTouches.length !== 1) return;
+      tracking = false;
+
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+
+      // Only count as swipe if horizontal motion exceeds threshold
+      // and the angle is mostly horizontal (not a vertical scroll)
+      if (absDx < SWIPE_THRESHOLD) return;
+      const angle = Math.atan2(absDy, absDx) * (180 / Math.PI);
+      if (angle > ANGLE_THRESHOLD) return;
+
+      if (dx < 0) {
+        this.next();  // Swipe left = next
+      } else {
+        this.prev();  // Swipe right = prev
+      }
+    }, { passive: true });
   }
 
   // ── Navigation ──
@@ -426,7 +509,7 @@ export class FlowEngine {
         <div class="step-info-placeholder">
           <span class="placeholder-icon">&#9654;</span>
           <p>Press <strong>Play</strong> or use the <strong>arrow keys</strong> to step through the request flow.</p>
-          <p style="font-size: 0.75rem; margin-top: 0.5rem; color: var(--text-muted);">Click any node for details.</p>
+          <p style="font-size: 0.8125rem; margin-top: 0.5rem; color: var(--text-muted);">Tap any node for details.</p>
         </div>
       `;
       return;
@@ -459,6 +542,7 @@ export class FlowEngine {
     const playBtn = this._panel.querySelector('[data-action="play"]');
     if (!playBtn) return;
     playBtn.textContent = this.isPlaying ? 'Pause' : 'Play';
+    playBtn.setAttribute('aria-label', this.isPlaying ? 'Pause animation' : 'Play animation');
   }
 
   // ── Packet Animation ──

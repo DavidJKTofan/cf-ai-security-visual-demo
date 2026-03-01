@@ -179,6 +179,7 @@ export const uc3 = {
     { id: 'e-llm-dlp-resp', from: 'llm-openai', to: 'dlp-aig', label: 'Response scan', direction: 'rtl' },
     { id: 'e-dlp-workers', from: 'dlp-aig', to: 'workers-middleware', label: '', direction: 'ltr' },
     { id: 'e-workers-app', from: 'workers-middleware', to: 'app-agent', label: 'Processed', direction: 'rtl' },
+    { id: 'e-workers-dev', from: 'workers-middleware', to: 'developer', label: 'Processed', direction: 'rtl' },
   ],
 
   steps: [
@@ -267,8 +268,8 @@ export const uc3 = {
       product: 'Cloudflare AI Gateway',
       description: 'The processed, scanned, and validated response is delivered back to the originating application or developer tool. The entire round-trip was controlled through a single AI Gateway endpoint.',
       why: 'Full round-trip observability: every request and response is logged with latency, cost, tokens used, cache status, DLP findings, and guardrail evaluations — all from a single integration point.',
-      activeNodes: ['workers-middleware', 'app-agent'],
-      activeEdges: ['e-workers-app'],
+      activeNodes: ['workers-middleware', 'app-agent', 'developer'],
+      activeEdges: ['e-workers-app', 'e-workers-dev'],
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/',
     },
   ],

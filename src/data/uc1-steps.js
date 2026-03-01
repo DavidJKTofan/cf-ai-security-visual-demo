@@ -157,6 +157,7 @@ export const uc1 = {
     // Response path
     { id: 'e-genai-aig-resp', from: 'genai-service', to: 'ai-gateway', label: 'Response', direction: 'rtl' },
     { id: 'e-aig-dlp-resp', from: 'ai-gateway', to: 'dlp', label: '', direction: 'rtl' },
+    { id: 'e-dlp-emp-resp', from: 'dlp', to: 'employee', label: '', direction: 'rtl' },
     // CASB out-of-band path
     { id: 'e-casb-genai', from: 'casb', to: 'genai-service', label: 'API scan', direction: 'rtl' },
     { id: 'e-casb-dlp', from: 'casb', to: 'dlp', label: 'DLP for files', direction: 'rtl' },
@@ -253,17 +254,25 @@ export const uc1 = {
       activeNodes: ['genai-service'],
       activeEdges: [],
     },
-    // ── Response path (step 11) ──
+    // ── Response path (steps 11–12) ──
     {
       title: 'AI Gateway DLP scans response',
       product: 'Cloudflare AI Gateway (DLP)',
-      description: 'The response from the GenAI service returns through AI Gateway. AI Gateway\'s DLP feature scans responses for sensitive data. The scanned response passes through the DLP engine for detection and policy enforcement before returning to the employee.',
+      description: 'The response from the GenAI service returns through AI Gateway. AI Gateway\'s DLP feature scans responses for sensitive data. The scanned response passes through the DLP engine for detection and policy enforcement.',
       why: 'AI models can inadvertently return sensitive data from their training or context. Response-path DLP ensures no unexpected data leakage reaches the employee.',
-      activeNodes: ['genai-service', 'ai-gateway', 'dlp', 'employee'],
+      activeNodes: ['genai-service', 'ai-gateway', 'dlp'],
       activeEdges: ['e-genai-aig-resp', 'e-aig-dlp-resp'],
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/features/dlp/',
     },
-    // ── Out-of-band: CASB (steps 12–13) ──
+    {
+      title: 'Response delivered to employee',
+      product: 'Cloudflare One',
+      description: 'The scanned, policy-evaluated response is delivered back to the employee\'s device. The complete round-trip was secured: every layer of Cloudflare One inspected, logged, and enforced policy on both the request and response.',
+      why: 'Full round-trip security ensures that both outbound prompts and inbound AI responses are protected. The employee receives a clean response that has passed through DLP scanning in both directions.',
+      activeNodes: ['dlp', 'employee'],
+      activeEdges: ['e-dlp-emp-resp'],
+    },
+    // ── Out-of-band: CASB (steps 13–14) ──
     {
       title: 'CASB scans SaaS posture (out-of-band)',
       product: 'Cloudflare CASB',
