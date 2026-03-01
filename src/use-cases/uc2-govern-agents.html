@@ -3,11 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  
+  <!-- Primary Meta Tags -->
+  <title>Govern AI Agents and MCP - Cloudflare AI Security (Unofficial)</title>
+  <meta name="title" content="Govern AI Agents and MCP - Cloudflare AI Security (Unofficial)">
+  <meta name="description" content="Unofficial educational demo: interactive flow diagram of Cloudflare securing AI agents via MCP protocol. Not affiliated with or endorsed by Cloudflare.">
+  <meta name="keywords" content="Cloudflare, AI agents, MCP, Model Context Protocol, agentic AI, machine-to-machine auth, AI governance, educational demo">
+  <meta name="author" content="Community Demo (Not affiliated with Cloudflare.)">
+  <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0d1117">
-  <title>UC2: Govern AI Agents - Cloudflare AI Security</title>
+  <meta name="color-scheme" content="dark">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://ai-security.automatic-demo.com/use-cases/uc2-govern-agents.html">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ai-security.automatic-demo.com/use-cases/uc2-govern-agents.html">
+  <meta property="og:title" content="Govern AI Agents and MCP - Cloudflare AI Security (Unofficial)">
+  <meta property="og:description" content="Unofficial educational demo: interactive flow diagram of Cloudflare securing AI agents via MCP protocol. Not affiliated with or endorsed by Cloudflare.">
+  <meta property="og:image" content="https://ai-security.automatic-demo.com/og-image.png">
+  <meta property="og:site_name" content="Cloudflare AI Security (Unofficial Demo)">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://ai-security.automatic-demo.com/use-cases/uc2-govern-agents.html">
+  <meta name="twitter:title" content="Govern AI Agents and MCP - Cloudflare AI Security (Unofficial)">
+  <meta name="twitter:description" content="Unofficial educational demo: interactive flow diagram of Cloudflare securing AI agents via MCP protocol. Not affiliated with or endorsed by Cloudflare.">
+  <meta name="twitter:image" content="https://ai-security.automatic-demo.com/og-image.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/favicon.png">
+  
+  <!-- Web App Manifest -->
+  <link rel="manifest" href="/site.webmanifest">
+  
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="/styles/theme.css">
   <link rel="stylesheet" href="/styles/base.css">
   <link rel="stylesheet" href="/styles/diagram.css">
+  
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Govern AI Agents and MCP",
+    "description": "How Cloudflare secures agentic AI communication via MCP protocol with identity verification and policy enforcement.",
+    "step": [
+      {"@type": "HowToStep", "name": "Agent Initiates Request", "text": "AI agent initiates MCP tool call"},
+      {"@type": "HowToStep", "name": "Identity Verification", "text": "Cloudflare Access verifies machine-to-machine auth"},
+      {"@type": "HowToStep", "name": "MCP Portal Routing", "text": "MCP Server Portal routes and logs requests"},
+      {"@type": "HowToStep", "name": "DLP Inspection", "text": "Gateway HTTP and DLP scan MCP payloads"},
+      {"@type": "HowToStep", "name": "Tool Execution", "text": "Request reaches target MCP remote server"}
+    ],
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Cloudflare AI Security (Unofficial Demo)",
+      "url": "https://ai-security.automatic-demo.com/"
+    },
+    "disclaimer": "Unofficial community demo for educational purposes only. Not affiliated with or endorsed by Cloudflare."
+  }
+  </script>
 </head>
 <body>
   <div class="diagram-page">
