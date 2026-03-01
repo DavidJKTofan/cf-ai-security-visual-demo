@@ -1,6 +1,6 @@
 /**
  * UC1 — Secure Workforce Use of GenAI
- * Cloudflare One SASE: Gateway (DNS → Network → HTTP), RBI, DLP, Access, AI Gateway, CASB (out-of-band)
+ * Cloudflare One SASE: Gateway (DNS → Egress → Network → HTTP), RBI, DLP, Access, AI Gateway, CASB (out-of-band)
  *
  * Enforcement order verified against:
  *   https://developers.cloudflare.com/cloudflare-one/traffic-policies/order-of-enforcement/
@@ -43,6 +43,17 @@ export const uc1 = {
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/traffic-policies/dns-policies/',
     },
     {
+      id: 'egress',
+      label: 'Egress Policies',
+      sublabel: 'Source IP control',
+      icon: '\u{1F6EB}',
+      type: 'cloudflare',
+      column: 'center',
+      product: 'Cloudflare Gateway (Egress)',
+      description: 'Egress policies control which source IP is used for outbound traffic. Dedicated egress IPs let you allowlist Cloudflare traffic in SaaS AI providers.',
+      docsUrl: 'https://developers.cloudflare.com/cloudflare-one/traffic-policies/egress-policies/',
+    },
+    {
       id: 'gateway-network',
       label: 'Gateway Network',
       sublabel: 'L4 TCP/UDP policies',
@@ -50,7 +61,7 @@ export const uc1 = {
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare Gateway',
-      description: 'Network-layer (L4) policies evaluated after DNS. Filters TCP/UDP connections by IP, port, and SNI. Can block connections to AI service IPs even if DNS was not used for resolution.',
+      description: 'Network-layer (L4) policies evaluated after egress. Filters TCP/UDP connections by IP, port, and SNI. Can block connections to AI service IPs even if DNS was not used for resolution.',
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/traffic-policies/network-policies/',
     },
     {
@@ -61,7 +72,7 @@ export const uc1 = {
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare Gateway',
-      description: 'HTTP-layer proxy inspects and applies policies to web traffic. Sub-order: Do Not Inspect → Isolate (RBI) → Allow/Block (with sanctioned/unsanctioned app status from the App Library) → DLP/AV scan on request body.',
+      description: 'HTTP-layer proxy inspects and applies policies to web traffic. Sub-order: Do Not Inspect → Isolate (RBI) → Allow/Block (with sanctioned/unsanctioned status from the App Library + Confidence Scores) → DLP/AV scan on request body. Shadow AI discovery surfaces unapproved AI tool usage.',
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/traffic-policies/http-policies/',
     },
     {
@@ -83,7 +94,7 @@ export const uc1 = {
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare DLP',
-      description: 'Scans outbound request body for sensitive content (PII, source code, credentials, financial data). Evaluated last in the HTTP policy chain — after Allow/Block decisions. Supports AI prompt topic classification. Also scans AI Gateway responses on the return path.',
+      description: 'Scans outbound request body for sensitive content. Evaluated last in the HTTP policy chain. AI Prompt Protection classifies prompts by content (PII, source code, credentials, financial data) and intent (jailbreak, malicious code). Full prompt logging available.',
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/data-loss-prevention/',
     },
     {
@@ -105,7 +116,7 @@ export const uc1 = {
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare AI Gateway',
-      description: 'Observes and controls AI API calls with logging, rate limiting, and caching. Provides analytics on AI usage patterns. DLP feature scans both prompts and responses for sensitive data.',
+      description: 'Observes and controls AI API calls with logging, rate limiting, and caching. Provides analytics on AI usage patterns. DLP scans both prompts and responses. Usage data feeds the AI Security Report dashboard.',
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/',
     },
     // Right column — Destinations
@@ -135,7 +146,8 @@ export const uc1 = {
   edges: [
     // Inline request path
     { id: 'e-emp-dns', from: 'employee', to: 'gateway-dns', label: 'DNS query', direction: 'ltr' },
-    { id: 'e-dns-net', from: 'gateway-dns', to: 'gateway-network', label: '', direction: 'ltr' },
+    { id: 'e-dns-egress', from: 'gateway-dns', to: 'egress', label: '', direction: 'ltr' },
+    { id: 'e-egress-net', from: 'egress', to: 'gateway-network', label: '', direction: 'ltr' },
     { id: 'e-net-http', from: 'gateway-network', to: 'gateway-http', label: '', direction: 'ltr' },
     { id: 'e-http-rbi', from: 'gateway-http', to: 'rbi', label: 'Isolate?', direction: 'ltr' },
     { id: 'e-rbi-dlp', from: 'rbi', to: 'dlp', label: 'Body scan', direction: 'ltr' },
@@ -151,7 +163,7 @@ export const uc1 = {
   ],
 
   steps: [
-    // ── Inline request path (steps 1–9) ──
+    // ── Inline request path (steps 1–10) ──
     {
       title: 'Employee sends request',
       product: 'Cloudflare WARP / Connectivity',
@@ -164,16 +176,25 @@ export const uc1 = {
     {
       title: 'Gateway DNS filtering',
       product: 'Cloudflare Gateway (DNS)',
-      description: 'The DNS query hits Gateway\'s DNS resolver first. DNS policies are evaluated against the domain — blocking known unsanctioned AI domains at the DNS layer. However, DNS alone is not sufficient: if a user knows the IP, a TCP connection can still be established independently.',
+      description: 'The DNS query hits Gateway\'s DNS resolver first. DNS policies block or allow resolution for AI SaaS domains. DNS alone is not sufficient — must be paired with Network and HTTP policies.',
       why: 'DNS filtering is the fastest first checkpoint for blocking known-bad domains, but must be paired with Network and HTTP policies for complete coverage.',
-      activeNodes: ['gateway-dns', 'gateway-network'],
-      activeEdges: ['e-dns-net'],
+      activeNodes: ['gateway-dns', 'egress'],
+      activeEdges: ['e-dns-egress'],
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/traffic-policies/dns-policies/',
+    },
+    {
+      title: 'Egress policies assign source IP',
+      product: 'Cloudflare Gateway (Egress)',
+      description: 'Egress policies select which source IP is used for outbound connections. Dedicated egress IPs can be allowlisted in AI SaaS providers or self-hosted apps to ensure traffic is only accepted from Cloudflare.',
+      why: 'Dedicated egress IPs let you enforce that AI SaaS apps only accept traffic originating from your Cloudflare tenant — closing off direct-access bypasses.',
+      activeNodes: ['egress', 'gateway-network'],
+      activeEdges: ['e-egress-net'],
+      docsUrl: 'https://developers.cloudflare.com/cloudflare-one/traffic-policies/egress-policies/',
     },
     {
       title: 'Network policies evaluated',
       product: 'Cloudflare Gateway (Network)',
-      description: 'Network-layer (L4) policies are evaluated next. These filter TCP/UDP connections by destination IP, port, and SNI. Network policies can block connections to AI service IPs even when DNS filtering was bypassed.',
+      description: 'Network-layer (L4) policies filter TCP/UDP connections by destination IP, port, and SNI. Can block connections to AI service IPs even when DNS was bypassed.',
       why: 'Network policies close the gap left by DNS-only filtering. They enforce controls at the transport layer before any HTTP content is exchanged.',
       activeNodes: ['gateway-network', 'gateway-http'],
       activeEdges: ['e-net-http'],
@@ -182,8 +203,8 @@ export const uc1 = {
     {
       title: 'HTTP policies: inspect, isolate, allow/block',
       product: 'Cloudflare Gateway (HTTP)',
-      description: 'HTTP-layer inspection begins. The sub-order within HTTP policies is: (1) Do Not Inspect rules checked first, (2) Isolate policies evaluated — high-risk AI tools can be sent to Remote Browser Isolation, (3) Allow/Block decisions with sanctioned vs. unsanctioned app status from the App Library.',
-      why: 'HTTP-layer inspection provides the deepest visibility — full URL paths, headers, and application-level controls. The App Library\'s sanctioned/unsanctioned classification lets you enforce granular AI app policies.',
+      description: 'HTTP-layer inspection begins. Sub-order: (1) Do Not Inspect, (2) Isolate (RBI), (3) Allow/Block using app status from the App Library and Application Confidence Scores. Shadow AI discovery surfaces unapproved AI tool usage in the AI security report.',
+      why: 'HTTP-layer inspection provides the deepest visibility — full URL paths, headers, and application-level controls. Confidence Scores automate risk assessment of AI apps at scale.',
       activeNodes: ['gateway-http', 'rbi'],
       activeEdges: ['e-http-rbi'],
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/traffic-policies/http-policies/',
@@ -198,10 +219,10 @@ export const uc1 = {
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/policies/gateway/http-policies/isolate-policy/',
     },
     {
-      title: 'DLP scans outbound prompt data',
+      title: 'DLP + AI Prompt Protection',
       product: 'Cloudflare DLP',
-      description: 'Data Loss Prevention scans the outbound request body — the last step in HTTP policy enforcement. Detects PII, source code, credentials, financial information, and malicious intent (jailbreak attempts). AI Prompt Protection provides content and intent analysis.',
-      why: 'DLP is the final gatekeeper before data leaves the corporate boundary. It prevents employees from accidentally or intentionally sharing sensitive data with external AI services.',
+      description: 'DLP scans outbound request bodies — last in HTTP enforcement. AI Prompt Protection classifies prompts by content (PII, source code, credentials, financial data) and intent (jailbreak, malicious code, PII extraction). Full prompt logging available for forensics.',
+      why: 'DLP is the final gatekeeper before data leaves the corporate boundary. Topic-based classification lets you build granular per-group policies — e.g. block engineering from sharing source code with AI but allow HR to query PII.',
       activeNodes: ['dlp', 'access'],
       activeEdges: ['e-rbi-dlp', 'e-dlp-access'],
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/data-loss-prevention/',
@@ -218,7 +239,7 @@ export const uc1 = {
     {
       title: 'AI Gateway logs API calls',
       product: 'Cloudflare AI Gateway',
-      description: 'AI Gateway logs, rate-limits, and optionally caches AI API calls. Provides observability into prompt/response patterns, costs, and usage analytics.',
+      description: 'AI Gateway logs, rate-limits, and caches AI API calls. Provides observability into prompt/response patterns, costs, and usage analytics. Feeds data into the AI Security Report dashboard.',
       why: 'Centralized visibility and control over all AI API interactions, with cost tracking, rate limiting to prevent abuse, and caching to optimize repeated queries.',
       activeNodes: ['ai-gateway', 'genai-service'],
       activeEdges: ['e-aig-genai'],
@@ -232,7 +253,7 @@ export const uc1 = {
       activeNodes: ['genai-service'],
       activeEdges: [],
     },
-    // ── Response path (step 10) ──
+    // ── Response path (step 11) ──
     {
       title: 'AI Gateway DLP scans response',
       product: 'Cloudflare AI Gateway (DLP)',
@@ -242,7 +263,7 @@ export const uc1 = {
       activeEdges: ['e-genai-aig-resp', 'e-aig-dlp-resp'],
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/features/dlp/',
     },
-    // ── Out-of-band: CASB (steps 11–12) ──
+    // ── Out-of-band: CASB (steps 12–13) ──
     {
       title: 'CASB scans SaaS posture (out-of-band)',
       product: 'Cloudflare CASB',

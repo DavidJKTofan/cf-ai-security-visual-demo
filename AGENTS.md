@@ -55,7 +55,7 @@ All Cloudflare product names, capabilities, and beta/coming-soon statuses **must
 
 1. **Before every change** involving a Cloudflare product, feature, or capability, query the `cloudflare-docs` MCP server using `cloudflare-docs_search_cloudflare_documentation` with a relevant search term (e.g. "AI Gateway DLP", "CASB integrations", "Firewall for AI").
 2. **Cross-reference** the MCP results with the official docs site at https://developers.cloudflare.com/ — fetch specific pages with `webfetch` when the MCP snippet is insufficient.
-3. **Mark features accurately**: "Coming Soon" if not yet available, "Beta" if the docs say beta/early access, "closed beta" + plan requirement if restricted. Never present unreleased capabilities as GA.
+3. **Mark features accurately**: "Coming Soon" if not yet available. Do NOT add Beta / Closed Beta / Early Access / plan-tier flags — keep labels clean.
 4. **Do not hallucinate** product capabilities. If the docs do not confirm a feature, do not include it.
 5. **After making changes**, re-verify by searching the docs again to confirm the final text matches the current state of the product.
 
@@ -63,40 +63,44 @@ All Cloudflare product names, capabilities, and beta/coming-soon statuses **must
 
 UC1 ("Secure Workforce Use of GenAI") follows the documented Gateway enforcement order.
 
-**Inline request path (steps 1–9):**
+**Inline request path (steps 1–10):**
 
 1. **Employee device** → Multiple connectivity options: WARP (preferred), PAC files, clientless RBI, agentless DNS, Cloudflare WAN, WARP Connector
 2. **Gateway DNS** → DNS filtering (first checkpoint, but standalone — must pair with HTTP)
-3. **Gateway Network** → L4 TCP/UDP policies (closes DNS bypass gap)
-4. **Gateway HTTP** → Do Not Inspect → Isolate (RBI) → Allow/Block (sanctioned/unsanctioned via App Library)
-5. **RBI** → Isolate policies render in secure cloud browser (part of HTTP enforcement)
-6. **DLP** → Scans outbound request body (last in HTTP policy chain)
-7. **Access** → Identity verification (OIDC/SAML), applies to SaaS or self-hosted apps
-8. **AI Gateway** → Logging, rate limiting, caching of AI API calls
-9. **GenAI service** → Request reaches external AI provider
+3. **Egress policies** → Assign dedicated source IPs to egress traffic
+4. **Gateway Network** → L4 TCP/UDP policies (closes DNS bypass gap)
+5. **Gateway HTTP** → Do Not Inspect → Isolate (RBI) → Allow/Block (sanctioned/unsanctioned via App Library, Application Confidence Scores)
+6. **RBI** → Isolate policies render in secure cloud browser (part of HTTP enforcement)
+7. **DLP** → Scans outbound request body with AI Prompt Protection (topic classification: Content + Intent categories, full prompt logging)
+8. **Access** → Identity verification (OIDC/SAML), applies to SaaS or self-hosted apps
+9. **AI Gateway** → Logging, rate limiting, caching of AI API calls; AI Security Report dashboard
+10. **GenAI service** → Request reaches external AI provider
 
-**Response path (step 10):**
+**Response path (step 11):**
 
-10. **AI Gateway DLP (Beta)** → Scans response for sensitive data, routes through DLP node
+11. **AI Gateway DLP** → Scans response for sensitive data, routes through DLP node
 
-**Out-of-band CASB (steps 11–12):**
+**Out-of-band CASB (steps 12–13):**
 
-11. **CASB** → Agentless API integrations with ChatGPT, Claude, Gemini — posture scanning (misconfigs, shadow IT, GenAI-specific risks)
-12. **CASB + DLP** → Detects sensitive data in uploaded chat attachments or files within GenAI platforms (prompt scanning coming soon)
+12. **CASB** → Agentless API integrations with ChatGPT, Claude, Gemini — posture scanning (misconfigs, shadow IT, GenAI-specific risks)
+13. **CASB + DLP** → Detects sensitive data in uploaded chat attachments or files within GenAI platforms (prompt scanning coming soon)
 
 Key corrections made:
+- Added Egress policies between DNS and Network (documented enforcement order)
 - Added Gateway Network policies (were missing entirely)
 - RBI is part of Gateway HTTP enforcement, not a separate post-CASB step
-- DLP is last in HTTP enforcement chain, not between Access and CASB
+- DLP is last in HTTP enforcement chain, not between Access and CASB; enriched with AI Prompt Protection
 - CASB is out-of-band/API-driven, separated as its own flow section at end of steps (NOT inline)
 - CASB + DLP integration for scanning files at rest added as final step
-- Sanctioned/unsanctioned app classification is a Gateway HTTP feature (App Library), not CASB
-- Response DLP is via AI Gateway DLP (Beta), routes through DLP node
+- Sanctioned/unsanctioned app classification is a Gateway HTTP feature (App Library + Confidence Scores), not CASB
+- Response DLP is via AI Gateway DLP, routes through DLP node
 - Step 1 expanded with full connectivity options from docs
+- AI Security Report dashboard added to AI Gateway step
 
 Edge label fixes applied:
 - `e-aig-dlp-resp` label removed (was "DLP scan") — this same-column skip edge from `ai-gateway` back to `dlp` caused the label to overlap the `access` node. Step 10 text explains the DLP scan sufficiently.
 - `e-http-dlp` was previously replaced with sequential `e-rbi-dlp` (rbi → dlp, "Body scan") to fix the same type of collision.
+- `e-waf-analytics` label removed (was "Events") — this same-column skip edge from `waf` down to `security-analytics` caused the label to overlap the `firewall-ai` node text. Step 10 text explains the event flow sufficiently.
 
 Viewport fit:
 - Center column uses `justify-content: space-between` to auto-distribute nodes within available viewport height
@@ -143,9 +147,9 @@ Both integrate via a **single unified endpoint** — one base URL change (one li
 1. **Origins → AI Gateway Endpoint** → Both origins send requests to AI Gateway unified endpoint (OpenAI-compatible /chat/completions)
 2. **Rate Limiting** → Per-user/per-model rate limits to control costs and prevent abuse
 3. **Caching** → Exact-match caching to reduce redundant LLM calls
-4. **Guardrails (Beta)** → Content filtering, toxicity, jailbreak, PII detection on prompts
-5. **DLP (Beta)** → AI Gateway DLP scans outbound prompts for sensitive data
-6. **Dynamic Routing (Beta)** → Conditional routing, A/B testing, rate/budget limits, automatic fallback across multiple providers (OpenAI, Anthropic, Google AI, Workers AI)
+4. **Guardrails** → Content filtering, toxicity, jailbreak, PII detection on prompts
+5. **DLP** → AI Gateway DLP scans outbound prompts for sensitive data
+6. **Dynamic Routing** → Conditional routing, A/B testing, rate/budget limits, automatic fallback across multiple providers (OpenAI, Anthropic, Google AI, Workers AI)
 
 **LLM processing (step 7):**
 
@@ -153,12 +157,12 @@ Both integrate via a **single unified endpoint** — one base URL change (one li
 
 **Response path (steps 8–10):**
 
-8. **DLP Response Scan (Beta)** → AI Gateway DLP scans LLM response for sensitive data (PII, credentials, proprietary information generated by the model)
+8. **DLP Response Scan** → AI Gateway DLP scans LLM response for sensitive data (PII, credentials, proprietary information generated by the model)
 9. **Workers Middleware** → Optional post-processing (formatting, redaction, logging, analytics)
 10. **Response → Application** → Final response returned to the originating app
 
 Key product notes:
-- AI Gateway Guardrails, DLP, Dynamic Routing: Beta
+- AI Gateway Guardrails, DLP, Dynamic Routing
 - DLP scans BOTH prompts (outbound) AND responses (inbound) per docs
 - Dynamic Routing supports conditional logic, A/B percentage splits, per-key rate/budget limits, automatic fallback
 - Workers middleware is optional (for response transformation)
@@ -179,14 +183,16 @@ UC4 ("Protect AI-Powered Apps") covers protecting YOUR AI-powered application fr
 3. **Bot Management** → ML-based bot detection, JS fingerprinting, behavioral analysis
 4. **WAF** → Managed rulesets, custom rules, OWASP protection
 5. **Rate Limiting** → Configurable rate limits per endpoint/IP/session
-6. **Firewall for AI** → Prompt injection detection, topic restriction, PII redaction (closed beta, Enterprise)
-7. **API Shield** → Schema validation, mTLS, sequence enforcement for AI API endpoints
+6. **Firewall for AI** → Prompt injection detection, PII detection via cf.llm fields, cf-llm endpoint label
+7. **API Shield** → Schema validation, mTLS, JWT validation; API Discovery (ML-based) with cf-llm label for GenAI endpoints; API Posture Management auto-labels risk signals
 8. **Your AI Application** → Clean requests reach your origin AI app
-9. **Security Analytics** → Centralized logging/dashboard for all security events (Cloudflare product, center column)
-10. **Response to End User** → Insights loop back; response delivered
+9. **Sensitive Data Detection** → WAF managed ruleset scans response bodies for PII, financial data, secrets (zero latency, log-only)
+10. **Security Analytics** → Centralized logging/dashboard for all security events; filter on cf-llm for AI-specific visibility
 
-Key product notes:
-- Firewall for AI: closed beta, Enterprise only
+Key corrections made:
+- Sensitive Data Detection is part of the WAF node (not a separate node) — response routes back to WAF for the SDD step
+- Firewall for AI: cf.llm fields populate detection results usable in WAF custom rules
+- API Shield: API Discovery uses ML + session identifiers; cf-llm managed label identifies LLM-powered endpoints
 - Security Analytics is a Cloudflare product (rendered in center column, not origin column)
 - The flow emphasizes Cloudflare as a reverse proxy protecting the origin
 
@@ -194,7 +200,7 @@ Key product notes:
 
 - Primary: `#F38020` (Cloudflare orange)
 - Background: `#0d1117` (dark)
-- Node types: `user` `#3B82F6` | `cloudflare` `#F38020` | `ai` `#10B981` | `resource` `#8B5CF6` | `coming-soon` dashed border, muted
+- Node types: `user` `#3B82F6` | `cloudflare` `#F38020` | `ai` `#10B981` | `resource` `#8B5CF6` | `coming-soon` `#EAB308` (amber)
 - Font: Inter / system-sans
 
 ## Additional Project Files
