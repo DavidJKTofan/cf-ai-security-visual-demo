@@ -22,12 +22,12 @@ export const uc1 = {
     {
       id: 'employee',
       label: 'Employee Device',
-      sublabel: 'WARP, PAC, RBI, WAN, DNS',
+      sublabel: 'WARP, PAC, RBI, WAN, Appliance, DNS',
       icon: '\u{1F4BB}',
       type: 'user',
       column: 'left',
       product: 'Cloudflare WARP / Connectivity',
-      description: 'Employee endpoint connecting to Cloudflare via one of several on-ramp methods: WARP client (preferred, supports DNS/Network/HTTP policies), PAC files (HTTP only), clientless Browser Isolation, agentless DNS filtering, or network-level on-ramps like Cloudflare WAN (GRE/IPsec) and WARP Connector.',
+      description: 'Employee endpoint connecting to Cloudflare via one of several on-ramp methods: WARP client (preferred, supports DNS/Network/HTTP policies), PAC files (HTTP only), clientless Browser Isolation, agentless DNS filtering, or network-level on-ramps like WARP Connector, Cloudflare WAN (formerly called Magic WAN) via GRE/IPsec tunnels and Cloudflare One Appliance (formerly called Magic WAN Connector).',
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/networks/connectivity-options/',
     },
     // Center column — Cloudflare stack (in enforcement order)
@@ -145,7 +145,7 @@ export const uc1 = {
 
   edges: [
     // Inline request path
-    { id: 'e-emp-dns', from: 'employee', to: 'gateway-dns', label: 'DNS query', direction: 'ltr' },
+    { id: 'e-emp-dns', from: 'employee', to: 'gateway-dns', label: 'DNS, Network & HTTPS', direction: 'ltr' },
     { id: 'e-dns-egress', from: 'gateway-dns', to: 'egress', label: '', direction: 'ltr' },
     { id: 'e-egress-net', from: 'egress', to: 'gateway-network', label: '', direction: 'ltr' },
     { id: 'e-net-http', from: 'gateway-network', to: 'gateway-http', label: '', direction: 'ltr' },
