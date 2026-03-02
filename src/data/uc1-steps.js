@@ -2,9 +2,20 @@
  * UC1 — Secure Workforce Use of GenAI
  * Cloudflare One SASE: Gateway (DNS → Egress → Network → HTTP), RBI, DLP, Access, AI Gateway, CASB (out-of-band)
  *
+ * Two user types:
+ *   1. General Employees — Use GenAI via browser (ChatGPT, Claude web UI, etc.)
+ *   2. Developers — Use AI coding assistants (OpenCode, Cursor, etc.) that make API calls through AI Gateway
+ *
+ * Both go through Cloudflare One (Gateway DNS → Egress → Network → HTTP → DLP → Access).
+ * Developers additionally route their AI API calls through AI Gateway for rate limiting, caching, guardrails, and DLP.
+ *
  * Enforcement order verified against:
  *   https://developers.cloudflare.com/cloudflare-one/traffic-policies/order-of-enforcement/
  *   DNS policies → Egress policies → Network policies → HTTP policies (Do Not Inspect → Isolate → Allow/Block → DLP/AV)
+ *
+ * AI Gateway features:
+ *   https://developers.cloudflare.com/ai-gateway/features/
+ *   Rate limiting, caching, guardrails (toxicity, jailbreak, PII), DLP (prompts + responses), dynamic routing
  *
  * CASB is API-driven / out-of-band and does NOT operate inline on request traffic.
  *   https://developers.cloudflare.com/cloudflare-one/cloud-and-saas-findings/
@@ -29,6 +40,17 @@ export const uc1 = {
       product: 'Cloudflare WARP / Connectivity',
       description: 'Employee endpoint connecting to Cloudflare via one of several on-ramp methods: WARP client (preferred, supports DNS/Network/HTTP policies), PAC files (HTTP only), clientless Browser Isolation, agentless DNS filtering, or network-level on-ramps like WARP Connector, Cloudflare WAN (formerly called Magic WAN) via GRE/IPsec tunnels and Cloudflare One Appliance (formerly called Magic WAN Connector).',
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/networks/connectivity-options/',
+    },
+    {
+      id: 'developer',
+      label: 'Developer',
+      sublabel: 'AI coding assistants',
+      icon: '\u{1F468}\u{200D}\u{1F4BB}',
+      type: 'user',
+      column: 'left',
+      product: 'AI Gateway for Developers',
+      description: 'Software engineers using AI coding assistants (OpenCode, Cursor, Claude Code, etc.). Like all employees, developers route through Cloudflare One for web traffic. When their AI coding tool is configured to use AI Gateway\'s OpenAI-compatible endpoint as the base URL (a one-line change), they gain rate limiting, caching, guardrails, DLP on prompts and responses, and usage analytics.',
+      docsUrl: 'https://developers.cloudflare.com/ai-gateway/',
     },
     // Center column — Cloudflare stack (in enforcement order)
     {
@@ -144,8 +166,10 @@ export const uc1 = {
   ],
 
   edges: [
-    // Inline request path
+    // Inline request path — Employee
     { id: 'e-emp-dns', from: 'employee', to: 'gateway-dns', label: 'DNS, Network & HTTPS', direction: 'ltr' },
+    // Inline request path — Developer (same Cloudflare One stack)
+    { id: 'e-dev-dns', from: 'developer', to: 'gateway-dns', label: '', direction: 'ltr' },
     { id: 'e-dns-egress', from: 'gateway-dns', to: 'egress', label: '', direction: 'ltr' },
     { id: 'e-egress-net', from: 'egress', to: 'gateway-network', label: '', direction: 'ltr' },
     { id: 'e-net-http', from: 'gateway-network', to: 'gateway-http', label: '', direction: 'ltr' },
@@ -154,10 +178,12 @@ export const uc1 = {
     { id: 'e-dlp-access', from: 'dlp', to: 'access', label: '', direction: 'ltr' },
     { id: 'e-access-aig', from: 'access', to: 'ai-gateway', label: '', direction: 'ltr' },
     { id: 'e-aig-genai', from: 'ai-gateway', to: 'genai-service', label: '', direction: 'ltr' },
-    // Response path
+    // Response path — Employee
     { id: 'e-genai-aig-resp', from: 'genai-service', to: 'ai-gateway', label: 'Response', direction: 'rtl' },
     { id: 'e-aig-dlp-resp', from: 'ai-gateway', to: 'dlp', label: '', direction: 'rtl' },
     { id: 'e-dlp-emp-resp', from: 'dlp', to: 'employee', label: '', direction: 'rtl' },
+    // Response path — Developer (AI Gateway direct response)
+    { id: 'e-aig-dev-resp', from: 'ai-gateway', to: 'developer', label: '', direction: 'rtl' },
     // CASB out-of-band path
     { id: 'e-casb-genai', from: 'casb', to: 'genai-service', label: 'API scan', direction: 'rtl' },
     { id: 'e-casb-dlp', from: 'casb', to: 'dlp', label: 'DLP for files', direction: 'rtl' },
@@ -166,12 +192,12 @@ export const uc1 = {
   steps: [
     // ── Inline request path (steps 1–10) ──
     {
-      title: 'Employee sends request',
+      title: 'Employees & Developers connect',
       product: 'Cloudflare WARP / Connectivity',
-      description: 'The employee\'s managed device connects to Cloudflare\'s network via the WARP client (preferred — supports DNS, Network, and HTTP policies).',
-      why: 'Multiple connectivity options ensure every device and network can be secured. WARP provides the richest policy support; agentless methods cover unmanaged devices and IoT.',
-      activeNodes: ['employee', 'gateway-dns'],
-      activeEdges: ['e-emp-dns'],
+      description: 'All employees\' managed devices connect to Cloudflare\'s network via the WARP client (preferred — supports DNS, Network, and HTTP policies). This includes developers using AI coding assistants (OpenCode, Cursor, Claude Code) — their web traffic and AI API calls both route through Cloudflare One.',
+      why: 'Every employee — including software engineers using AI coding tools — connects through the a Cloudflare One on-ramp. This ensures consistent security policies across all workforce AI usage, whether browsing ChatGPT or using an AI coding assistant.',
+      activeNodes: ['employee', 'developer', 'gateway-dns'],
+      activeEdges: ['e-emp-dns', 'e-dev-dns'],
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/networks/connectivity-options/',
     },
     {
@@ -240,8 +266,8 @@ export const uc1 = {
     {
       title: 'AI Gateway logs API calls',
       product: 'Cloudflare AI Gateway',
-      description: 'AI Gateway logs, rate-limits, and caches AI API calls. Provides observability into prompt/response patterns, costs, and usage analytics. Feeds data into the AI Security Report dashboard.',
-      why: 'Centralized visibility and control over all AI API interactions, with cost tracking, rate limiting to prevent abuse, and caching to optimize repeated queries.',
+      description: 'AI Gateway logs, rate-limits, and caches AI API calls. For developers using AI coding assistants (OpenCode, Cursor, Claude Code), these benefits apply when the tool has been configured to route requests through AI Gateway\'s OpenAI-compatible endpoint — a one-line base URL change. Provides observability into prompt/response patterns, costs, and usage analytics. Feeds data into the AI Security Report dashboard.',
+      why: 'Centralized visibility and control over all AI API interactions, with cost tracking, rate limiting to prevent abuse, and caching to optimize repeated queries. Developers benefit from AI Gateway when their coding tools are configured to use AI Gateway\'s unified endpoint as the base URL.',
       activeNodes: ['ai-gateway', 'genai-service'],
       activeEdges: ['e-aig-genai'],
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/',
@@ -259,18 +285,18 @@ export const uc1 = {
       title: 'AI Gateway DLP scans response',
       product: 'Cloudflare AI Gateway (DLP)',
       description: 'The response from the GenAI service returns through AI Gateway. AI Gateway\'s DLP feature scans responses for sensitive data. The scanned response passes through the DLP engine for detection and policy enforcement.',
-      why: 'AI models can inadvertently return sensitive data from their training or context. Response-path DLP ensures no unexpected data leakage reaches the employee.',
+      why: 'AI models can inadvertently return sensitive data from their training or context. Response-path DLP ensures no unexpected data leakage reaches the employee or developer.',
       activeNodes: ['genai-service', 'ai-gateway', 'dlp'],
       activeEdges: ['e-genai-aig-resp', 'e-aig-dlp-resp'],
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/features/dlp/',
     },
     {
-      title: 'Response delivered to employee',
-      product: 'Cloudflare One',
-      description: 'The scanned, policy-evaluated response is delivered back to the employee\'s device. The complete round-trip was secured: every layer of Cloudflare One inspected, logged, and enforced policy on both the request and response.',
-      why: 'Full round-trip security ensures that both outbound prompts and inbound AI responses are protected. The employee receives a clean response that has passed through DLP scanning in both directions.',
-      activeNodes: ['dlp', 'employee'],
-      activeEdges: ['e-dlp-emp-resp'],
+      title: 'Response delivered to users',
+      product: 'Cloudflare One + AI Gateway',
+      description: 'The scanned, policy-evaluated response is delivered back to both employees (via DLP) and developers (from AI Gateway). The complete round-trip was secured: every layer of Cloudflare One inspected, logged, and enforced policy on both the request and response.',
+      why: 'Full round-trip security ensures that both outbound prompts and inbound AI responses are protected. Every user — whether browsing ChatGPT or using an AI coding assistant — receives a clean response that has passed through DLP scanning.',
+      activeNodes: ['dlp', 'ai-gateway', 'employee', 'developer'],
+      activeEdges: ['e-dlp-emp-resp', 'e-aig-dev-resp'],
     },
     // ── Out-of-band: CASB (steps 13–14) ──
     {
