@@ -106,7 +106,7 @@ export const uc1 = {
       column: 'center',
       product: 'Cloudflare Browser Isolation',
       description: 'Part of Gateway HTTP enforcement. Isolate policies are evaluated second (after Do Not Inspect). For high-risk or unmanaged AI tools, RBI executes the page in a secure cloud browser. Can disable copy/paste, uploads/downloads, and keyboard input.',
-      docsUrl: 'https://developers.cloudflare.com/cloudflare-one/policies/gateway/http-policies/isolate-policy/',
+      docsUrl: 'https://developers.cloudflare.com/cloudflare-one/remote-browser-isolation/isolation-policies/',
     },
     {
       id: 'dlp',
@@ -128,7 +128,7 @@ export const uc1 = {
       column: 'center',
       product: 'Cloudflare Access',
       description: 'Zero Trust identity verification via OIDC/SAML. Applies to SaaS apps (Access for SaaS) or self-hosted/private apps behind Access. Gateway Allow does not bypass Access policies.',
-      docsUrl: 'https://developers.cloudflare.com/cloudflare-one/policies/access/',
+      docsUrl: 'https://developers.cloudflare.com/cloudflare-one/access-controls/policies/',
     },
     {
       id: 'ai-gateway',
@@ -244,7 +244,7 @@ export const uc1 = {
       why: 'RBI provides a containment layer — users can view AI tools without the risk of data exfiltration through clipboard, downloads, or local browser exploits. It is evaluated as part of Gateway HTTP enforcement.',
       activeNodes: ['rbi', 'gateway-http'],
       activeEdges: ['e-http-rbi'],
-      docsUrl: 'https://developers.cloudflare.com/cloudflare-one/policies/gateway/http-policies/isolate-policy/',
+      docsUrl: 'https://developers.cloudflare.com/cloudflare-one/remote-browser-isolation/isolation-policies/',
       owasp: ['LLM02:2025 Sensitive Information Disclosure'],
     },
     {
@@ -264,7 +264,7 @@ export const uc1 = {
       why: 'Identity-aware policies ensure only authorized users with appropriate roles can access specific AI tools. Gateway Allow does not bypass Access policies — both must pass.',
       activeNodes: ['access', 'ai-gateway'],
       activeEdges: ['e-access-aig'],
-      docsUrl: 'https://developers.cloudflare.com/cloudflare-one/policies/access/',
+      docsUrl: 'https://developers.cloudflare.com/cloudflare-one/access-controls/policies/',
       owasp: ['LLM06:2025 Excessive Agency'],
     },
     {
