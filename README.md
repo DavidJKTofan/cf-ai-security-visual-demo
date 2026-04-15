@@ -1,6 +1,6 @@
 # Cloudflare AI Security - Interactive Visual Demo
 
-An interactive, modular frontend web application that visualizes 7 Cloudflare AI security use cases. Each use case features a step-through request-flow diagram showing how requests travel through Cloudflare's stack, with per-step explanations of which product acts and why.
+An interactive, modular frontend web application that visualizes 9 Cloudflare AI security use cases. Each use case features a step-through request-flow diagram showing how requests travel through Cloudflare's stack, with per-step explanations of which product acts and why.
 
 ## Use Cases
 
@@ -21,6 +21,13 @@ An interactive, modular frontend web application that visualizes 7 Cloudflare AI
 | 6 | **Secure AI Code Execution** | Dynamic Workers (Worker Loader), Codemode, Workers RPC, AI Gateway, Agents SDK |
 | 7 | **Secure AI-to-AI Communication** | Agents SDK (Durable Objects), Access + mTLS, MCP Server Portals, Workflows, AI Search, Queues |
 
+### Developing with AI
+
+| # | Use Case | Cloudflare Products |
+|---|----------|-------------------|
+| 8 | **API Key Management & Unified Billing** | AI Gateway (BYOK, Secrets Store, Unified Billing, Spend Limits, ZDR, Analytics) |
+| 9 | **Dynamic Routing** | AI Gateway (Dynamic Routing, Conditional, Percentage Split, Rate/Budget Limits, BYOK) |
+
 ## How It Works
 
 Each use case presents an interactive diagram with three spatial columns:
@@ -35,7 +42,7 @@ Users can:
 - **Read the side panel** for each step's title, acting product, description, and "why it matters" context
 
 Three primary flow archetypes are visualized:
-1. **Human -> AI**: User-initiated requests flowing through Cloudflare controls to AI services (UC1, UC4)
+1. **Human -> AI**: User-initiated requests flowing through Cloudflare controls to AI services (UC1, UC4, UC8, UC9)
 2. **Agentic AI -> Resources**: AI agent-initiated calls flowing through Cloudflare controls to downstream APIs, data, or tools (UC2, UC5)
 3. **Agent -> Agent**: AI-to-AI orchestration with identity, durable execution, and shared infrastructure (UC6, UC7)
 
@@ -43,7 +50,7 @@ Three primary flow archetypes are visualized:
 
 ```
 src/
-  index.html                          Landing page with 7 use case cards
+  index.html                          Landing page with 9 use case cards
   use-cases/
     uc1-genai-workforce.html          UC1: Secure Workforce Use of GenAI
     uc2-govern-agents.html            UC2: Govern AI Agents (MCP)
@@ -52,6 +59,8 @@ src/
     uc5-self-hosted-agents.html       UC5: Secure Self-Hosted AI Agents
     uc6-code-execution.html           UC6: Secure AI Code Execution
     uc7-multi-agent.html              UC7: Secure AI-to-AI Communication
+    uc8-unified-billing.html          UC8: API Key Management & Unified Billing
+    uc9-dynamic-routing.html          UC9: Dynamic Routing
   components/
     flow-engine.js                    Shared step-through animation controller
     tooltip.js                        Per-node contextual overlay
@@ -68,6 +77,8 @@ src/
     uc5-steps.js                      UC5 nodes, edges, step definitions
     uc6-steps.js                      UC6 nodes, edges, step definitions
     uc7-steps.js                      UC7 nodes, edges, step definitions
+    uc8-steps.js                      UC8 nodes, edges, step definitions
+    uc9-steps.js                      UC9 nodes, edges, step definitions
 wrangler.jsonc                        Cloudflare Workers Static Assets config
 package.json
 ```
@@ -148,6 +159,9 @@ UC2 (Govern AI Agents) and UC7 (Secure AI-to-AI Communication) have the most ASI
 **AI Gateway & Agents**
 - [AI Gateway Documentation](https://developers.cloudflare.com/ai-gateway/)
 - [AI Gateway Worker Binding Methods](https://developers.cloudflare.com/ai-gateway/integrations/worker-binding-methods/)
+- [AI Gateway BYOK (Secrets Store)](https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/)
+- [AI Gateway Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/)
+- [AI Gateway Dynamic Routing](https://developers.cloudflare.com/ai-gateway/features/dynamic-routing/)
 - [Agents SDK](https://developers.cloudflare.com/agents/)
 - [MCP Server Portals](https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/mcp-portals/)
 
