@@ -136,8 +136,29 @@ This project deploys as a purely static site via [Cloudflare Workers Static Asse
 ```bash
 npm install         # Install dependencies (wrangler)
 npm run dev         # Start local development server
-npm run deploy      # Deploy to Cloudflare Workers
+npm run configure   # Substitute SITE_URL across all files (see below)
+npm run deploy      # Configure domain (if SITE_URL set) then deploy
 ```
+
+### Deploying Your Own Fork
+
+All domain references (canonical URLs, OG meta tags, sitemap, robots.txt, and `wrangler.jsonc` routes) are automatically updated by a pre-deploy script. You never need to edit any HTML or config files manually.
+
+**Option A — inline env var (simplest):**
+```bash
+SITE_URL=https://my-domain.example.com npm run deploy
+```
+
+**Option B — `.env` file:**
+```bash
+cp .env.example .env
+# Edit .env and set SITE_URL=https://my-domain.example.com
+npm run deploy
+```
+
+If `SITE_URL` is not set, the script is a no-op and the existing domain in the files is used as-is.
+
+> **Note:** The `routes` entry in `wrangler.jsonc` binds the Worker to your custom domain inside Cloudflare's dashboard. Remove or update it if you are deploying to a `*.workers.dev` subdomain instead.
 
 ## Design System
 

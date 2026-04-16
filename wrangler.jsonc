@@ -11,7 +11,7 @@
 	"workers_dev": false,
 	"routes": [
 		{
-			"pattern": "ai-security.automatic-demo.com",
+			"pattern": "orange-ai.serioustek.net",
 			"custom_domain": true
 		}
 	]

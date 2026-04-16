@@ -1,11 +1,11 @@
 # Cloudflare AI Security Visual Demo
-# https://ai-security.automatic-demo.com
+# https://orange-ai.serioustek.net
 
 User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://ai-security.automatic-demo.com/sitemap.xml
+Sitemap: https://orange-ai.serioustek.net/sitemap.xml
 
 # Crawl-delay for polite crawling (optional, respected by some bots)
 Crawl-delay: 1
