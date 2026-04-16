@@ -1,6 +1,11 @@
-# Cloudflare AI Security - Interactive Visual Demo
+# Cloudflare AI - Interactive Visual Demo
 
-An interactive, modular frontend web application that visualizes 14 Cloudflare AI use cases. Each use case features a step-through request-flow diagram showing how requests travel through Cloudflare's stack, with per-step explanations of which product acts and why.
+An interactive, modular frontend web application that visualizes 14 Cloudflare AI use cases across two categories:
+
+- **[AI Security](src/ai-security.html)** (UC1–7) — how Cloudflare secures AI workloads: governing workforce GenAI usage, protecting AI-powered applications, securing self-hosted agents, and orchestrating safe multi-agent communication.
+- **[AI Builder](src/ai-builder.html)** (UC8–14) — how to build AI applications on Cloudflare: API key management, dynamic routing, RAG pipelines, voice agents, persistent chat, autonomous scheduling, and web-browsing agents.
+
+Each use case features a step-through request-flow diagram showing how requests travel through Cloudflare's stack, with per-step explanations of which product acts and why.
 
 ## Use Cases
 
