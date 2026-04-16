@@ -142,23 +142,33 @@ npm run deploy      # Configure domain (if SITE_URL set) then deploy
 
 ### Deploying Your Own Fork
 
+There are two ways to deploy a fork — choose whichever fits your workflow:
+
+#### Option 1 — "Deploy to Cloudflare" button (easiest)
+
+Click the button above. Cloudflare's web UI will walk you through authenticating and deploying directly from GitHub. No local tooling, no auth tokens, no SSL issues. The domain will default to a `*.workers.dev` subdomain.
+
+#### Option 2 — Local `npm run deploy`
+
 All domain references (canonical URLs, OG meta tags, sitemap, robots.txt, and `wrangler.jsonc` routes) are automatically updated by a pre-deploy script. You never need to edit any HTML or config files manually.
 
-**Option A — inline env var (simplest):**
-```bash
-SITE_URL=https://my-domain.example.com npm run deploy
-```
-
-**Option B — `.env` file:**
 ```bash
 cp .env.example .env
-# Edit .env and set SITE_URL=https://my-domain.example.com
+# Set SITE_URL and CLOUDFLARE_API_TOKEN in .env
 npm run deploy
 ```
 
-If `SITE_URL` is not set, the script is a no-op and the existing domain in the files is used as-is.
+**Authentication:** Wrangler needs Cloudflare credentials. Either run `wrangler login` once (opens a browser), or set `CLOUDFLARE_API_TOKEN` in your `.env` file (recommended for automation and corporate networks):
 
-> **Note:** The `routes` entry in `wrangler.jsonc` binds the Worker to your custom domain inside Cloudflare's dashboard. Remove or update it if you are deploying to a `*.workers.dev` subdomain instead.
+1. Go to https://dash.cloudflare.com/profile/api-tokens
+2. Create a token using the **"Edit Cloudflare Workers"** template
+3. Add to `.env`: `CLOUDFLARE_API_TOKEN=your_token_here`
+
+> **Corporate / managed networks:** If `wrangler login` fails with an SSL certificate error, the API token approach bypasses the OAuth flow entirely and resolves the issue.
+
+If `SITE_URL` is not set, the domain configure step is skipped and files remain unchanged.
+
+> **Note:** The `routes` entry in `wrangler.jsonc` binds the Worker to a custom domain in the Cloudflare dashboard. Remove it if deploying to a `*.workers.dev` subdomain instead.
 
 ## Design System
 

@@ -18,6 +18,24 @@
 const fs   = require('fs');
 const path = require('path');
 
+// ── 0. Load .env if present ───────────────────────────────────────────────────
+// Populates process.env with any vars defined in .env that aren't already set.
+// This makes SITE_URL and CLOUDFLARE_* vars available without requiring the
+// caller to export them manually. Already-set env vars always take precedence.
+(function loadDotEnv() {
+  const envFile = path.resolve(__dirname, '..', '.env');
+  if (!fs.existsSync(envFile)) return;
+  for (const line of fs.readFileSync(envFile, 'utf8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    const val = trimmed.slice(eqIdx + 1).trim();
+    if (key && !(key in process.env)) process.env[key] = val;
+  }
+})();
+
 // ── 1. Read SITE_URL ──────────────────────────────────────────────────────────
 const rawSiteUrl = process.env.SITE_URL;
 if (!rawSiteUrl) {
