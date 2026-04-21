@@ -274,6 +274,28 @@
       border: 1px solid rgba(139, 92, 246, 0.2);
     }
 
+    .uc-card-audience {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: clamp(0.5625rem, 1.1vw, 0.6875rem);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      width: fit-content;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      border: 1px solid var(--border-light);
+      letter-spacing: 0.02em;
+    }
+
+    .uc-card-audience::before {
+      content: "\1F465";
+      font-size: 0.85em;
+      opacity: 0.75;
+    }
+
     .landing-footer {
       padding: clamp(0.625rem, 1.5vw, 1rem) clamp(1rem, 3vw, 2rem);
       padding-bottom: max(clamp(0.625rem, 1.5vw, 1rem), env(safe-area-inset-bottom));
@@ -330,6 +352,7 @@
         <!-- UC8 -->
         <a class="uc-card" href="/use-cases/uc8-unified-billing.html">
           <span class="uc-card-number">Use Case 8</span>
+          <span class="uc-card-audience">Developers / FinOps</span>
           <span class="uc-card-flow-type human-ai">&#128100; App / Dev &rarr; Cloudflare &rarr; &#129302; AI Provider</span>
           <h3>API Key Management &amp; Unified Billing</h3>
           <p>Centralize AI provider credentials via BYOK (Secrets Store) or eliminate them entirely with Unified Billing &mdash; single Cloudflare invoice, spend limits, and Zero Data Retention.</p>
@@ -346,6 +369,7 @@
         <!-- UC9 -->
         <a class="uc-card" href="/use-cases/uc9-dynamic-routing.html">
           <span class="uc-card-number">Use Case 9</span>
+          <span class="uc-card-audience">Developers / Platform</span>
           <span class="uc-card-flow-type both-flows">&#128100; App / Admin &rarr; Cloudflare &rarr; &#129302; AI Provider</span>
           <h3>Dynamic Routing</h3>
           <p>Intelligently route AI requests across providers with conditional logic, A/B percentage splits, per-key rate and budget limits, and automatic multi-provider fallback &mdash; all without code changes.</p>
@@ -373,6 +397,7 @@
         <!-- UC10 -->
         <a class="uc-card" href="/use-cases/uc10-rag.html">
           <span class="uc-card-number">Use Case 10</span>
+          <span class="uc-card-audience">AI Engineers / Developers</span>
           <span class="uc-card-flow-type human-ai">&#128100; User / App &rarr; Cloudflare &rarr; &#129302; LLM</span>
           <h3>RAG Knowledge Base</h3>
           <p>Build retrieval-augmented generation pipelines &mdash; automated document indexing, semantic vector search, and grounded LLM responses &mdash; with AI Search, Vectorize, Workers AI, and Workers.</p>
@@ -388,6 +413,7 @@
         <!-- UC11 -->
         <a class="uc-card" href="/use-cases/uc11-voice-agent.html">
           <span class="uc-card-number">Use Case 11</span>
+          <span class="uc-card-audience">Developers</span>
           <span class="uc-card-flow-type human-ai">&#128100; User / Phone &rarr; Cloudflare &rarr; &#129302; STT / TTS</span>
           <h3>Voice AI Agent</h3>
           <p>Build real-time voice agents with speech-to-text, LLM turn processing, and sentence-chunked TTS synthesis over WebSocket &mdash; with persistent conversation history and Twilio telephony support.</p>
@@ -402,6 +428,7 @@
         <!-- UC12 -->
         <a class="uc-card" href="/use-cases/uc12-ai-chat.html">
           <span class="uc-card-number">Use Case 12</span>
+          <span class="uc-card-audience">Developers</span>
           <span class="uc-card-flow-type human-ai">&#128100; Browser Client &rarr; Cloudflare &rarr; &#129302; LLM</span>
           <h3>Persistent AI Chat Agent</h3>
           <p>Build stateful AI chat applications with automatic message persistence, resumable streams, real-time state sync via useAgentChat, and human-in-the-loop tool approval &mdash; all powered by AIChatAgent and Durable Objects.</p>
@@ -417,6 +444,7 @@
         <!-- UC13 -->
         <a class="uc-card" href="/use-cases/uc13-scheduled-agent.html">
           <span class="uc-card-number">Use Case 13</span>
+          <span class="uc-card-audience">Developers / Ops</span>
           <span class="uc-card-flow-type agent-resource">&#129302; Agent &rarr; Cloudflare &rarr; &#128230; Services</span>
           <h3>Autonomous Scheduled Agent</h3>
           <p>Build agents that schedule and execute their own work &mdash; delayed, datetime, cron, or interval &mdash; using Durable Object alarms and SQLite-persisted task queues, with AI-assisted natural language scheduling.</p>
@@ -432,6 +460,7 @@
         <!-- UC14 -->
         <a class="uc-card" href="/use-cases/uc14-browser-agent.html">
           <span class="uc-card-number">Use Case 14</span>
+          <span class="uc-card-audience">AI Engineers / Developers</span>
           <span class="uc-card-flow-type agent-resource">&#129302; Agent &rarr; Cloudflare &rarr; &#127760; Web</span>
           <h3>Browser AI Agent</h3>
           <p>Give AI agents full Chrome DevTools Protocol access via Browser Run &mdash; scrape rendered SPAs, capture screenshots and PDFs, inspect accessibility trees, and automate web workflows from natural language instructions.</p>
@@ -447,6 +476,7 @@
         <!-- UC15 -->
         <a class="uc-card" href="/use-cases/uc15-private-networking.html">
           <span class="uc-card-number">Use Case 15</span>
+          <span class="uc-card-audience">Platform / Security</span>
           <span class="uc-card-flow-type agent-resource">&#129302; Agent / Device &rarr; Cloudflare &rarr; &#128451; Private Resources</span>
           <h3>Private Networking for Agents</h3>
           <p>Give agents secure, bidirectional private access to internal databases, APIs, and MCP servers with Cloudflare Mesh and Workers VPC &mdash; no VPNs, no public endpoints, no per-service tunnels. One binding reaches your entire private network.</p>
@@ -462,6 +492,7 @@
         <!-- UC16 -->
         <a class="uc-card" href="/use-cases/uc16-durable-agents.html">
           <span class="uc-card-number">Use Case 16</span>
+          <span class="uc-card-audience">AI Engineers / Platform</span>
           <span class="uc-card-flow-type agent-resource">&#128225; Event &rarr; Think Agent (DO) &rarr; &#129527; Execution Ladder</span>
           <h3>Durable Long-Running Agents</h3>
           <p>Build agents that survive crashes, hibernate when idle, and escalate through an execution ladder (Workspace &rarr; Isolate &rarr; npm &rarr; Browser &rarr; Sandbox) &mdash; with Project Think primitives: fibers, sub-agents via Facets, tree-structured sessions, and self-authored extensions.</p>

@@ -62,6 +62,39 @@ All UC detail pages live under `src/use-cases/ucN-*.html`. UC1–UC7 pages have 
 4. Update `src/sitemap.xml` with the new UC URL entry
 5. No changes needed to `flow-engine.js`, `tooltip.js`, or `legend.js`
 
+## UC Card Audience Badges
+
+Each UC card on the two landing pages carries a small `<span class="uc-card-audience">` pill (rendered with a 👥 icon prefix via CSS `::before`) showing the primary audience(s) for that use case. Use a fixed vocabulary — 1–2 personas per card, separated by ` / `:
+
+- **Security / IT** — CISOs, SecOps, IT admins
+- **AppSec** — Application security teams
+- **Platform** — Platform / infrastructure / DevOps
+- **Developers** — General application developers
+- **AI Engineers** — ML / AI / agent builders
+- **Ops** — Operations, automation, monitoring
+- **FinOps** — Cost and vendor management
+
+Current assignments:
+
+| UC | Audience |
+|----|----------|
+| UC1 Workforce GenAI | Security / IT |
+| UC2 Govern MCP | Security / Platform |
+| UC3 Build Securely | Developers / AppSec |
+| UC4 Protect AI Apps | AppSec / Developers |
+| UC5 Self-Hosted Agents | Platform / AI Engineers |
+| UC6 Code Execution | AI Engineers / AppSec |
+| UC7 Multi-Agent | AI Engineers / Platform |
+| UC8 Billing & Keys | Developers / FinOps |
+| UC9 Dynamic Routing | Developers / Platform |
+| UC10 RAG | AI Engineers / Developers |
+| UC11 Voice Agent | Developers |
+| UC12 Chat Agent | Developers |
+| UC13 Scheduled Agent | Developers / Ops |
+| UC14 Browser Agent | AI Engineers / Developers |
+| UC15 Private Networking | Platform / Security |
+| UC16 Durable Agents | AI Engineers / Platform |
+
 ## Product Accuracy (MANDATORY)
 
 All Cloudflare product names, capabilities, and beta/coming-soon statuses **must** be verified against the Cloudflare Developer Documentation before writing or modifying any code, data, or copy. This is a hard requirement — not optional.

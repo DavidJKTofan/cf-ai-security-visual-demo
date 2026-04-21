@@ -274,6 +274,28 @@
       border: 1px solid rgba(139, 92, 246, 0.2);
     }
 
+    .uc-card-audience {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: clamp(0.5625rem, 1.1vw, 0.6875rem);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      width: fit-content;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      border: 1px solid var(--border-light);
+      letter-spacing: 0.02em;
+    }
+
+    .uc-card-audience::before {
+      content: "\1F465";
+      font-size: 0.85em;
+      opacity: 0.75;
+    }
+
     .landing-footer {
       padding: clamp(0.625rem, 1.5vw, 1rem) clamp(1rem, 3vw, 2rem);
       padding-bottom: max(clamp(0.625rem, 1.5vw, 1rem), env(safe-area-inset-bottom));
@@ -329,6 +351,7 @@
         <!-- UC1 -->
         <a class="uc-card" href="/use-cases/uc1-genai-workforce.html">
           <span class="uc-card-number">Use Case 1</span>
+          <span class="uc-card-audience">Security / IT</span>
           <span class="uc-card-flow-type human-ai">&#128100; Human &rarr; Cloudflare &rarr; &#129302; AI</span>
           <h3>Secure Workforce Use of GenAI</h3>
           <p>Discover and control how employees interact with GenAI tools like ChatGPT, Claude, and Gemini through Cloudflare One SASE.</p>
@@ -346,6 +369,7 @@
         <!-- UC2 -->
         <a class="uc-card" href="/use-cases/uc2-govern-agents.html">
           <span class="uc-card-number">Use Case 2</span>
+          <span class="uc-card-audience">Security / Platform</span>
           <span class="uc-card-flow-type agent-resource">&#129302; Agentic AI &rarr; Cloudflare &rarr; &#128450; Resources</span>
           <h3>Govern AI Agents</h3>
           <p>Secure interactions between human users and AI agents via MCP (Model Context Protocol) with Cloudflare Access controls.</p>
@@ -361,6 +385,7 @@
         <!-- UC3 -->
         <a class="uc-card" href="/use-cases/uc3-build-with-ai.html">
           <span class="uc-card-number">Use Case 3</span>
+          <span class="uc-card-audience">Developers / AppSec</span>
           <span class="uc-card-flow-type both-flows">&#128100; Human / &#129302; Agent &rarr; Cloudflare &rarr; &#129302; AI</span>
           <h3>Build Securely with AI</h3>
           <p>Build AI applications and agents with built-in controls using AI Gateway features: caching, rate limiting, guardrails, and DLP.</p>
@@ -377,6 +402,7 @@
         <!-- UC4 -->
         <a class="uc-card" href="/use-cases/uc4-protect-ai-apps.html">
           <span class="uc-card-number">Use Case 4</span>
+          <span class="uc-card-audience">AppSec / Developers</span>
           <span class="uc-card-flow-type human-ai">&#128100; End User &rarr; Cloudflare &rarr; &#129302; Your AI App</span>
           <h3>Protect AI-Powered Apps</h3>
           <p>Defend applications with AI endpoints against data exfiltration, abuse, prompt injection, and volumetric attacks.</p>
@@ -403,6 +429,7 @@
         <!-- UC5 -->
         <a class="uc-card" href="/use-cases/uc5-self-hosted-agents.html">
           <span class="uc-card-number">Use Case 5</span>
+          <span class="uc-card-audience">Platform / AI Engineers</span>
           <span class="uc-card-flow-type agent-resource">&#129302; AI Agent &rarr; Cloudflare &rarr; &#128450; Tools / APIs</span>
           <h3>Secure Self-Hosted AI Agents</h3>
           <p>Run AI agents on Cloudflare with defense-in-depth: isolated sandboxes, AI Gateway for LLM calls, and proxied external API access with credential injection.</p>
@@ -420,6 +447,7 @@
         <!-- UC6 -->
         <a class="uc-card" href="/use-cases/uc6-code-execution.html">
           <span class="uc-card-number">Use Case 6</span>
+          <span class="uc-card-audience">AI Engineers / AppSec</span>
           <span class="uc-card-flow-type both-flows">&#129302; AI Agent &rarr; Cloudflare &rarr; &#9889; Sandboxed Code</span>
           <h3>Secure AI Code Execution</h3>
           <p>Safely execute AI-generated code in isolated Dynamic Worker sandboxes with millisecond startup &mdash; 100x faster than containers.</p>
@@ -436,6 +464,7 @@
         <!-- UC7 -->
         <a class="uc-card" href="/use-cases/uc7-multi-agent.html">
           <span class="uc-card-number">Use Case 7</span>
+          <span class="uc-card-audience">AI Engineers / Platform</span>
           <span class="uc-card-flow-type agent-resource">&#129302; Agent &rarr; Cloudflare &rarr; &#129302; Agent</span>
           <h3>Secure AI-to-AI Communication</h3>
           <p>Orchestrate multiple AI agents with mTLS identity, per-tool authorization, durable execution via Workflows, and shared knowledge.</p>
