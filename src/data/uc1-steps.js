@@ -116,7 +116,7 @@ export const uc1 = {
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare DLP',
-      description: 'Scans outbound request body for sensitive content. Evaluated last in the HTTP policy chain. AI Prompt Protection classifies prompts by content (PII, source code, credentials, financial data) and intent (jailbreak, malicious code). Full prompt logging captures complete interactions with conversation_id filtering for incident investigation.',
+      description: 'Scans outbound request body for sensitive content. Evaluated last in the HTTP policy chain. AI Prompt Protection classifies prompts by content (PII, source code, credentials, financial data) and intent (jailbreak, malicious code). Full prompt logging captures complete interactions with conversation_id filtering for incident investigation. Custom DLP profiles also detect Shadow MCP traffic — JSON-RPC methods like "tools/call", "initialize", "resources/read" in POST bodies — to catch unauthorized remote MCP server usage even when hostnames and URL paths look benign.',
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/data-loss-prevention/',
     },
     {
@@ -304,7 +304,18 @@ export const uc1 = {
       activeNodes: ['dlp', 'ai-gateway', 'employee', 'developer'],
       activeEdges: ['e-dlp-emp-resp', 'e-aig-dev-resp'],
     },
-    // ── Out-of-band: CASB (steps 13–14) ──
+    // ── Shadow MCP discovery (step 13) ──
+    {
+      title: 'Shadow MCP detection in Gateway logs',
+      product: 'Cloudflare Gateway + DLP',
+      description: 'Security teams scan Gateway HTTP logs (gatewayHttpRequestsAdaptiveGroups via the GraphQL Analytics API) for MCP traffic patterns: hostnames containing "mcp", URL paths like /mcp and /sse, and DLP-based body inspection of JSON-RPC methods ("method":"tools/call", "initialize", "resources/read", etc.). Traffic is classified as Portal (authorized, matches your MCP Server Portal domains) or Shadow (unauthorized remote MCP servers — investigate, block, or redirect).',
+      why: 'Employees connecting to unauthorized remote MCP servers bypass IT oversight and expose the organization to tool injection, software supply chain risk, and data exfiltration. DLP body inspection catches MCP traffic even on non-standard domains where hostname and path patterns alone would miss it.',
+      activeNodes: ['gateway-http', 'dlp'],
+      activeEdges: [],
+      docsUrl: 'https://developers.cloudflare.com/cloudflare-one/tutorials/detect-mcp-traffic-gateway-logs/',
+      owasp: ['LLM02:2025 Sensitive Information Disclosure', 'LLM03:2025 Supply Chain', 'ASI02 Tool Misuse & Exploitation', 'ASI04 Agentic Supply Chain Vulnerabilities'],
+    },
+    // ── Out-of-band: CASB (steps 14–15) ──
     {
       title: 'CASB scans SaaS posture (out-of-band)',
       product: 'Cloudflare CASB',

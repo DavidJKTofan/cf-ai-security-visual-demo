@@ -7,7 +7,7 @@
  *   https://blog.cloudflare.com/moltworker-self-hosted-ai-agent/
  *   https://github.com/cloudflare/moltworker
  *
- * Key products: Access, Sandbox SDK / Containers, AI Gateway, Browser Rendering,
+ * Key products: Access, Sandbox SDK / Containers, AI Gateway, Browser Run,
  * R2 (persistent storage), Workers (entrypoint), Secrets Store
  *
  * External API/tool calls from the agent sandbox are proxied through the entrypoint
@@ -107,14 +107,14 @@ export const uc5 = {
     },
     {
       id: 'browser-rendering',
-      label: 'Browser Rendering',
-      sublabel: 'Headless Chromium',
+      label: 'Browser Run',
+      sublabel: 'Headless Chrome + CDP',
       icon: '\u{1F310}',
       type: 'cloudflare',
       column: 'right',
-      product: 'Cloudflare Browser Rendering',
-      description: 'Headless Chromium instances for web browsing tasks — navigating, form-filling, screenshots, and scraping. The agent accesses Browser Rendering via a CDP proxy through the entrypoint Worker, not directly from the sandbox.',
-      docsUrl: 'https://developers.cloudflare.com/browser-rendering/',
+      product: 'Cloudflare Browser Run',
+      description: 'Browser Run (formerly Browser Rendering) provides managed headless Chrome for web browsing tasks — navigation, form-filling, screenshots, extraction. The CDP endpoint is exposed directly over WebSocket, so the agent can connect via Puppeteer, Playwright, Stagehand, or raw CDP. Live View and Session Recordings provide real-time + replay observability; Human in the Loop allows an operator to take over when the agent hits a login or CAPTCHA. Access is brokered through the entrypoint Worker, not from the sandbox directly.',
+      docsUrl: 'https://developers.cloudflare.com/browser-run/cdp/',
     },
     {
       id: 'r2-storage',
@@ -204,13 +204,13 @@ export const uc5 = {
       owasp: ['LLM10:2025 Unbounded Consumption', 'ASI02 Tool Misuse & Exploitation'],
     },
     {
-      title: 'Browser Rendering for web tasks',
-      product: 'Cloudflare Browser Rendering',
-      description: 'The agent uses headless Chromium instances via Browser Rendering for web tasks — navigating pages, filling forms, taking screenshots, and extracting content. A CDP (Chrome DevTools Protocol) proxy in the Worker routes browser commands from the sandbox to Browser Rendering.',
-      why: 'Browser Rendering provides managed headless browsers without running Chromium inside the container. The CDP proxy pattern keeps browser access controlled through the Worker — the sandbox never directly accesses Browser Rendering.',
+      title: 'Browser Run for web tasks',
+      product: 'Cloudflare Browser Run',
+      description: 'The agent uses Browser Run (formerly Browser Rendering) for web tasks — navigating, filling forms, screenshots, extraction. Browser Run now exposes the Chrome DevTools Protocol endpoint directly over WebSocket, so the entrypoint Worker brokers CDP commands between the sandbox and Browser Run. Live View lets operators watch long-running browser sessions in real time; Human in the Loop allows takeover when the agent hits a login wall or CAPTCHA.',
+      why: 'Managed headless Chrome without running Chromium inside the container. The Worker-brokered CDP pattern keeps browser access controlled — the sandbox never reaches Browser Run directly. Live View and Human in the Loop turn agent failures into recoverable events instead of dead ends.',
       activeNodes: ['worker-entrypoint', 'browser-rendering'],
       activeEdges: ['e-worker-browser'],
-      docsUrl: 'https://developers.cloudflare.com/browser-rendering/',
+      docsUrl: 'https://developers.cloudflare.com/browser-run/cdp/',
     },
     {
       title: 'R2 persists agent memory',

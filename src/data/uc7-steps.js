@@ -113,7 +113,7 @@ export const uc7 = {
       type: 'cloudflare',
       column: 'right',
       product: 'Cloudflare AI Search + Vectorize',
-      description: 'AI Search provides managed, continuously updated indexes over your data sources with natural language querying — ideal for enterprise RAG patterns. Under the hood it uses Vectorize (vector database), Workers AI (embeddings), R2 (storage), and Browser Rendering (web indexing). Agents share knowledge through this unified search layer.',
+      description: 'AI Search provides managed, continuously updated indexes over your data sources with natural language querying — ideal for enterprise RAG patterns. Under the hood it uses Vectorize (vector database), Workers AI (embeddings), R2 (storage), and Browser Run (web indexing). Agents share knowledge through this unified search layer.',
       docsUrl: 'https://developers.cloudflare.com/ai-search/',
     },
     {
@@ -188,7 +188,7 @@ export const uc7 = {
     {
       title: 'Agents share knowledge via AI Search',
       product: 'Cloudflare AI Search + Vectorize',
-      description: 'Agents share knowledge through AI Search — a managed service that continuously indexes your data sources and provides natural language querying. Agents can query shared knowledge bases, company documentation, and previously gathered research. AI Search natively uses Vectorize, Workers AI, R2, and Browser Rendering under the hood, so agents get enterprise-grade RAG without managing infrastructure.',
+      description: 'Agents share knowledge through AI Search — a managed service that continuously indexes your data sources and provides natural language querying. Agents can query shared knowledge bases, company documentation, and previously gathered research. AI Search natively uses Vectorize, Workers AI, R2, and Browser Run under the hood, so agents get enterprise-grade RAG without managing infrastructure.',
       why: 'Multi-agent systems need shared context. AI Search provides managed, auto-updating indexes with natural language queries — agents share knowledge semantically without managing embeddings or vector databases directly. This enables collaborative intelligence across specialized agents.',
       activeNodes: ['agent-a', 'vectorize'],
       activeEdges: ['e-a-vectorize'],

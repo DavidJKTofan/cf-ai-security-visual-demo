@@ -4,6 +4,10 @@
 User-agent: *
 Allow: /
 
+# Cloudflare-managed /cdn-cgi/ endpoint — not part of site content.
+# See https://developers.cloudflare.com/fundamentals/reference/cdn-cgi-endpoint/#disallow-using-robotstxt
+Disallow: /cdn-cgi/
+
 # Sitemap location
 Sitemap: https://ai-security.automatic-demo.com/sitemap.xml
 

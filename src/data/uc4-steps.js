@@ -115,11 +115,11 @@ export const uc4 = {
     {
       id: 'origin-ai-app',
       label: 'Your AI Application',
-      sublabel: 'Chatbot, AI API, LLM service',
+      sublabel: 'Chatbot, AI API, MCP server',
       icon: '\u{1F3F0}',
       type: 'resource',
       column: 'right',
-      description: 'Your origin AI-powered application — a customer-facing chatbot, AI search engine, AI API endpoint, or LLM-based service. Cloudflare sits in front as a reverse proxy, protecting it from attacks.',
+      description: 'Your origin AI-powered application — a customer-facing chatbot, AI search engine, AI API endpoint, LLM-based service, or public MCP server. Cloudflare sits in front as a reverse proxy, protecting it from attacks. Cloudflare recommends every organization publish official first-party MCP servers rather than letting customers rely on unvetted third-party packages; those MCP servers are protected here just like any other HTTP endpoint.',
     },
     {
       id: 'security-analytics',
@@ -220,10 +220,10 @@ export const uc4 = {
       owasp: ['LLM01:2025 Prompt Injection', 'LLM05:2025 Improper Output Handling', 'ASI02 Tool Misuse & Exploitation'],
     },
     {
-      title: 'Clean request reaches your AI app',
+      title: 'Clean request reaches your AI app (or public MCP server)',
       product: 'Your AI Application',
-      description: 'The request has passed through all security layers. It is forwarded to your AI-powered application (chatbot, AI API, LLM endpoint) as a clean, validated, allowed request from a legitimate user.',
-      why: 'Your AI application origin receives only legitimate, policy-compliant, allowed requests. All attack traffic, bots, and malicious prompts have been filtered at Cloudflare\'s edge.',
+      description: 'The request has passed through all security layers. It is forwarded to your AI-powered application — chatbot, AI API, LLM endpoint, or public MCP server — as a clean, validated, allowed request. Public MCP servers (e.g. docs.mcp.cloudflare.com) are HTTP endpoints like any other, so AI Security for Apps scans inbound tool-call bodies for prompt injection and PII, and API Shield enforces schema and auth. This is why Cloudflare recommends every organization publish first-party MCP servers — the alternative is customers pulling unvetted third-party MCP packages with undisclosed data collection and trust assumptions.',
+      why: 'Your AI application origin receives only legitimate, policy-compliant, allowed requests. All attack traffic, bots, and malicious prompts have been filtered at Cloudflare\'s edge. Extending this posture to your public MCP servers means customers can trust your tools, and you control the code, update cadence, and security posture.',
       activeNodes: ['api-shield', 'origin-ai-app'],
       activeEdges: ['e-api-origin'],
     },

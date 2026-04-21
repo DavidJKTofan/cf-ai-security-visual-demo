@@ -7,8 +7,8 @@
   <!-- Primary Meta Tags -->
   <title>AI Builder - Cloudflare AI Interactive Demos (Unofficial)</title>
   <meta name="title" content="AI Builder - Cloudflare AI Interactive Demos (Unofficial)">
-  <meta name="description" content="Unofficial educational demo: explore 7 interactive visual walkthroughs of building AI applications on Cloudflare — API management, dynamic routing, RAG, voice agents, chat, scheduling, and web browsing. Not affiliated with or endorsed by Cloudflare.">
-  <meta name="keywords" content="Cloudflare, AI builder, AI Gateway, Agents SDK, RAG, voice AI, AI chat, Workers AI, Vectorize, AI Search, Browser Rendering, educational demo">
+  <meta name="description" content="Unofficial educational demo: explore 9 interactive visual walkthroughs of building AI applications on Cloudflare — API management, dynamic routing, RAG, voice agents, chat, scheduling, web browsing, private networking, and durable long-running agents. Not affiliated with or endorsed by Cloudflare.">
+  <meta name="keywords" content="Cloudflare, AI builder, AI Gateway, Agents SDK, RAG, voice AI, AI chat, Workers AI, Vectorize, AI Search, Browser Run, Cloudflare Mesh, Workers VPC, Project Think, educational demo">
   <meta name="author" content="Community Demo (Not affiliated with Cloudflare.)">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0d1117">
@@ -21,7 +21,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ai-security.automatic-demo.com/ai-builder">
   <meta property="og:title" content="AI Builder - Cloudflare AI Interactive Demos (Unofficial)">
-  <meta property="og:description" content="Unofficial educational demo: explore 7 interactive visual walkthroughs of building AI applications on Cloudflare — API management, dynamic routing, RAG, voice agents, chat, scheduling, and web browsing. Not affiliated with or endorsed by Cloudflare.">
+  <meta property="og:description" content="Unofficial educational demo: explore 9 interactive visual walkthroughs of building AI applications on Cloudflare — API management, dynamic routing, RAG, voice agents, chat, scheduling, web browsing, private networking, and durable long-running agents. Not affiliated with or endorsed by Cloudflare.">
   <meta property="og:image" content="https://ai-security.automatic-demo.com/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -316,7 +316,7 @@
     <main class="landing-main">
       <h1 class="landing-title">Cloudflare <span>AI Builder</span></h1>
       <p class="landing-subtitle">
-        Interactive visual walkthroughs of how to build AI applications and agents on Cloudflare &mdash; from API key management and dynamic routing to RAG pipelines, voice agents, persistent chat, autonomous scheduling, and web-browsing agents.
+        Interactive visual walkthroughs of how to build AI applications and agents on Cloudflare &mdash; from API key management and dynamic routing to RAG pipelines, voice agents, persistent chat, autonomous scheduling, web-browsing agents, private networking, and durable long-running agents.
       </p>
 
       <!-- Section 1: Developing with AI -->
@@ -365,7 +365,7 @@
       <!-- Section 2: Building AI Applications -->
       <div class="cards-section">
         <div class="cards-section-header">
-          <span class="cards-section-number">10 &ndash; 14</span>
+          <span class="cards-section-number">10 &ndash; 16</span>
           <span class="cards-section-title">Building AI Applications</span>
         </div>
         <div class="cards-grid">
@@ -433,13 +433,44 @@
         <a class="uc-card" href="/use-cases/uc14-browser-agent.html">
           <span class="uc-card-number">Use Case 14</span>
           <span class="uc-card-flow-type agent-resource">&#129302; Agent &rarr; Cloudflare &rarr; &#127760; Web</span>
-          <h3>Web-Browsing AI Agent</h3>
-          <p>Give AI agents full Chrome DevTools Protocol access via Browser Rendering &mdash; scrape rendered SPAs, capture screenshots and PDFs, inspect accessibility trees, and automate web workflows from natural language instructions.</p>
+          <h3>Browser AI Agent</h3>
+          <p>Give AI agents full Chrome DevTools Protocol access via Browser Run &mdash; scrape rendered SPAs, capture screenshots and PDFs, inspect accessibility trees, and automate web workflows from natural language instructions.</p>
           <div class="uc-card-products">
             <span class="product-tag">Agents SDK</span>
-            <span class="product-tag">Browser Rendering</span>
+            <span class="product-tag">Browser Run</span>
             <span class="product-tag">Workers AI</span>
             <span class="product-tag">R2</span>
+          </div>
+          <span class="uc-card-cta">Explore flow <span class="arrow">&rarr;</span></span>
+        </a>
+
+        <!-- UC15 -->
+        <a class="uc-card" href="/use-cases/uc15-private-networking.html">
+          <span class="uc-card-number">Use Case 15</span>
+          <span class="uc-card-flow-type agent-resource">&#129302; Agent / Device &rarr; Cloudflare &rarr; &#128451; Private Resources</span>
+          <h3>Private Networking for Agents</h3>
+          <p>Give agents secure, bidirectional private access to internal databases, APIs, and MCP servers with Cloudflare Mesh and Workers VPC &mdash; no VPNs, no public endpoints, no per-service tunnels. One binding reaches your entire private network.</p>
+          <div class="uc-card-products">
+            <span class="product-tag">Cloudflare Mesh</span>
+            <span class="product-tag">Workers VPC</span>
+            <span class="product-tag">Cloudflare One Client</span>
+            <span class="product-tag">Gateway / Access</span>
+          </div>
+          <span class="uc-card-cta">Explore flow <span class="arrow">&rarr;</span></span>
+        </a>
+
+        <!-- UC16 -->
+        <a class="uc-card" href="/use-cases/uc16-durable-agents.html">
+          <span class="uc-card-number">Use Case 16</span>
+          <span class="uc-card-flow-type agent-resource">&#128225; Event &rarr; Think Agent (DO) &rarr; &#129527; Execution Ladder</span>
+          <h3>Durable Long-Running Agents</h3>
+          <p>Build agents that survive crashes, hibernate when idle, and escalate through an execution ladder (Workspace &rarr; Isolate &rarr; npm &rarr; Browser &rarr; Sandbox) &mdash; with Project Think primitives: fibers, sub-agents via Facets, tree-structured sessions, and self-authored extensions.</p>
+          <div class="uc-card-products">
+            <span class="product-tag">Project Think</span>
+            <span class="product-tag">Agents SDK</span>
+            <span class="product-tag">Fibers</span>
+            <span class="product-tag">Dynamic Workers</span>
+            <span class="product-tag">Sandbox SDK</span>
           </div>
           <span class="uc-card-cta">Explore flow <span class="arrow">&rarr;</span></span>
         </a>

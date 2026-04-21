@@ -45,7 +45,7 @@ export const uc3 = {
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare AI Gateway',
-      description: 'The AI Gateway unified endpoint receives all LLM API requests through a single URL. Integration requires changing just the base URL — one line of code. Gateway authentication (cf-aig-authorization header) prevents unauthorized access. BYOK (Secrets Store) centrally manages provider API keys — reference by name, never pass in plaintext. Unified Billing eliminates API keys entirely with centralized Cloudflare credits.',
+      description: 'The AI Gateway unified endpoint receives all LLM API requests through a single URL. Integration requires changing just the base URL — one line of code. Gateway authentication (cf-aig-authorization header) prevents unauthorized access. BYOK (Secrets Store) centrally manages provider API keys — reference by name, never pass in plaintext. Unified Billing eliminates API keys entirely with centralized Cloudflare credits. For scaled deployments, a fronting Proxy Worker pattern (used internally by Cloudflare for 3,683+ engineers) adds Cloudflare Access JWT validation, anonymous per-user attribution via D1+KV, a /.well-known discovery endpoint for one-command client setup, automatic ZDR (store: false) injection, and hourly model-catalog refresh — all without changing client configs.',
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/',
     },
     {
@@ -186,8 +186,8 @@ export const uc3 = {
     {
       title: 'App or developer sends LLM request',
       product: 'Cloudflare AI Gateway',
-      description: 'Your application or developer\'s AI coding assistant sends an LLM API request through the AI Gateway unified endpoint — one line of code change. Gateway authentication (cf-aig-authorization) prevents unauthorized access. BYOK (Secrets Store) centrally manages provider API keys — reference by name, no plaintext. Unified Billing eliminates API keys entirely with centralized Cloudflare credits.',
-      why: 'AI Gateway provides a single control plane for all AI API calls with authenticated access, centralized key management via Secrets Store, and unified billing that removes the need for individual provider API keys entirely.',
+      description: 'Your application or developer\'s AI coding assistant sends an LLM API request through the AI Gateway unified endpoint — one line of code change. Gateway authentication (cf-aig-authorization) prevents unauthorized access. BYOK (Secrets Store) centrally manages provider API keys — reference by name, no plaintext. Unified Billing eliminates API keys entirely with centralized Cloudflare credits. At Cloudflare-internal scale (3,683+ engineers, 241B tokens/month), a small fronting Proxy Worker in front of AI Gateway validates Cloudflare Access JWTs, strips user auth headers, injects cf-aig-authorization + an anonymous UUID in cf-aig-metadata, auto-applies store: false for Zero Data Retention, and serves a /.well-known discovery endpoint so clients configure with a single opencode auth login <url> command.',
+      why: 'AI Gateway provides a single control plane for all AI API calls. The proxy-Worker-in-front pattern gives you per-user attribution, ZDR, and config-as-code distribution without exposing provider keys on developer laptops or requiring client reconfiguration when policies change — a wrangler deploy updates what 3,000+ engineers get next time they run their coding tool.',
       activeNodes: ['app-agent', 'developer', 'aig-endpoint'],
       activeEdges: ['e-app-aig', 'e-dev-aig'],
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/',

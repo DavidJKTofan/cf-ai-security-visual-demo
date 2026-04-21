@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Interactive visual demo of 7 Cloudflare AI security use cases deployed as a purely static site via Cloudflare Workers Static Assets. Vanilla HTML/CSS/JS with ES modules — no build step, no frameworks.
+Interactive visual demo of 16 Cloudflare AI use cases (7 AI Security + 9 AI Builder) deployed as a purely static site via Cloudflare Workers Static Assets. Vanilla HTML/CSS/JS with ES modules — no build step, no frameworks.
 
 ## Key Architecture Decisions
 
@@ -46,11 +46,11 @@ The site has a two-category landing model:
 
 - `src/index.html` — top-level category chooser ("AI Security" vs "AI Builder")
 - `src/ai-security.html` — lists the 7 AI security UCs (UC1–UC7)
-- `src/ai-builder.html` — lists the 7 AI builder UCs (UC8–UC14), grouped into two sections:
+- `src/ai-builder.html` — lists the 9 AI builder UCs (UC8–UC16), grouped into two sections:
   - **Developing with AI** (UC8–UC9)
-  - **Building AI Applications** (UC10–UC14)
+  - **Building AI Applications** (UC10–UC16)
 
-All UC detail pages live under `src/use-cases/ucN-*.html`. UC1–UC7 pages have a back-link to `/ai-security.html`; UC8–UC14 pages back-link to `/ai-builder.html`.
+All UC detail pages live under `src/use-cases/ucN-*.html`. UC1–UC7 pages have a back-link to `/ai-security.html`; UC8–UC16 pages back-link to `/ai-builder.html`.
 
 ## Adding a New Use Case
 
@@ -91,14 +91,19 @@ UC1 ("Secure Workforce Use of GenAI") follows the documented Gateway enforcement
 9. **AI Gateway** → Logging, rate limiting, caching of AI API calls; AI Security Report dashboard
 10. **GenAI service** → Request reaches external AI provider
 
-**Response path (step 11):**
+**Response path (steps 11–12):**
 
 11. **AI Gateway DLP** → Scans response for sensitive data, routes through DLP node
+12. **Response delivered to users** → Scanned, policy-evaluated response returned to employee (via DLP) and developer (from AI Gateway)
 
-**Out-of-band CASB (steps 12–13):**
+**Shadow MCP discovery (step 13):**
 
-12. **CASB** → Agentless API integrations with ChatGPT, Claude, Gemini — posture scanning (misconfigs, shadow IT, GenAI-specific risks)
-13. **CASB + DLP** → Detects sensitive data in uploaded chat attachments or files within GenAI platforms (prompt scanning coming soon)
+13. **Gateway + DLP** → Scan Gateway HTTP logs (gatewayHttpRequestsAdaptiveGroups) for MCP hostnames, /mcp and /sse URL paths, and DLP body inspection of JSON-RPC methods ("tools/call", "initialize", "resources/read"). Classify traffic as Portal (authorized) vs Shadow (unauthorized). Tutorial: https://developers.cloudflare.com/cloudflare-one/tutorials/detect-mcp-traffic-gateway-logs/
+
+**Out-of-band CASB (steps 14–15):**
+
+14. **CASB** → Agentless API integrations with ChatGPT, Claude, Gemini — posture scanning (misconfigs, shadow IT, GenAI-specific risks)
+15. **CASB + DLP** → Detects sensitive data in uploaded chat attachments or files within GenAI platforms (prompt scanning coming soon)
 
 Key corrections made:
 - Added Egress policies between DNS and Network (documented enforcement order)
@@ -443,24 +448,86 @@ Key product notes:
 
 ## UC14 Flow Order (verified)
 
-UC14 ("Browser AI Agent") builds web-browsing agents with CDP (Chrome DevTools Protocol) via Browser Rendering.
+UC14 ("Browser AI Agent") builds web-browsing agents with CDP (Chrome DevTools Protocol) via **Browser Run** (formerly Browser Rendering; renamed April 2026).
 
-**Architecture:** User -> AI Agent -> `createBrowserTools()` (@cloudflare/codemode) -> Browser Rendering (headless Chrome via CDP) -> Target Web -> LLM reasoning -> R2 artifacts
+**Architecture:** User / Human Operator -> AI Agent -> `createBrowserTools()` (@cloudflare/codemode) -> Browser Run (headless Chrome + direct CDP endpoint) -> Target Web (WebMCP-aware or legacy) -> LLM reasoning; Live View + Session Recordings for observability; Human-in-the-Loop for handoff; R2 for artifacts.
 
-**Flow (steps 1–7):**
+**Flow (steps 1–9):**
 
 1. **Web task sent to AI Agent** → Natural language instruction; agent stores task in SQLite
-2. **Browser tools configured and invoked** → `browser_search` (CDP spec discovery) + `browser_execute` (run CDP code); passed to `streamText()`
-3. **Headless Chrome renders page** → Via `env.BROWSER` binding; full JS execution; cookie/localStorage injection supported
-4. **Page fetched — DOM and content extracted** → Full DOM text, accessibility tree, network log, or raw CDP responses
-5. **LLM analyzes browser output** → Extracts structured data, identifies issues, decides next action
-6. **Screenshots and data stored in R2** → PNG / PDF artifacts; D1 / KV for structured data; R2 baselines for monitoring
-7. **Task result returned** → Final output, intermediate SQLite log of all browser interactions
+2. **Browser tools configured and invoked** → `browser_search` (CDP spec + WebMCP discovery) + `browser_execute` (run CDP code); tools passed to `streamText()`
+3. **Browser Run starts a headless Chrome session** → CDP endpoint exposed directly via WebSocket (`wss://api.cloudflare.com/.../browser-rendering/devtools/browser`); 120 concurrent browsers per account; experimental pool (`wrangler browser create --lab`) runs Chrome beta for WebMCP testing
+4. **Agent navigates — WebMCP accelerates where supported** → WebMCP-aware sites (Chromium 146+) expose tools via `navigator.modelContext`; legacy sites use CDP-based DOM traversal; cookie/localStorage injection supports auth-gated pages
+5. **LLM analyzes output** → DOM excerpts, screenshots, WebMCP tool outputs, accessibility tree, network log
+6. **Live View streams the session in real time** → `devtoolsFrontendURL` or dashboard Live Sessions tab; Session Recordings (rrweb-format JSON, replay with rrweb-player) captured when launching with `recording: true`
+7. **Human-in-the-Loop handoff** → On CAPTCHA, login, or edge case, operator opens Live View, takes control, and hands back; no restart needed
+8. **Artifacts stored in R2** → Screenshots, PDFs, `/crawl` endpoint outputs (HTML, Markdown, structured JSON); signed-agent behavior with Web Bot Auth; respects robots.txt and AI Crawl Control
+9. **Task result returned** → Final output + full SQLite audit log of tool calls, pages visited, human interventions
 
 Key product notes:
-- Browse the web: Beta per docs (https://developers.cloudflare.com/agents/api-reference/browse-the-web/); labels kept clean per AGENTS.md policy
-- Requires `@cloudflare/codemode` + Browser Rendering binding + Worker Loader binding
-- Browser Rendering now exposes full CDP endpoint — any CDP-compatible client (Puppeteer, Playwright, chrome-devtools-mcp) can connect
+- **Browser Run** (renamed April 2026 during Agents Week from "Browser Rendering"): https://developers.cloudflare.com/browser-run/ and https://blog.cloudflare.com/browser-run-for-ai-agents/
+- CDP endpoint now exposed directly — connect from any language/environment (Node.js, Puppeteer, Playwright, MCP clients), not just Workers
+- MCP Client Support: Claude Desktop, Cursor, Codex, OpenCode via `chrome-devtools-mcp` package
+- WebMCP (Chromium 146+): `navigator.modelContext` + `navigator.modelContextTesting` APIs for site-declared agent tools
+- Live View + Session Recordings = real-time + replay observability
+- Human in the Loop: today via Live View; next: agent-initiated handoff signal
+- `/crawl` endpoint: signed agent, non-customizable User-Agent, does NOT bypass bot protections or CAPTCHAs
+- Concurrency: 120 concurrent browsers (4x increase from 30); 10 req/sec for Quick Actions
+- "Browse the web" Agents SDK docs: https://developers.cloudflare.com/agents/api-reference/browse-the-web/
+
+## UC15 Flow Order (verified)
+
+UC15 ("Private Networking for Agents") gives agents secure, bidirectional private access to internal resources with Cloudflare Mesh and Workers VPC.
+
+**Architecture:** Developer Laptop / Personal Device / Workers Agent -> Cloudflare One Client or Workers VPC binding -> Cloudflare Mesh (global backbone, 330+ cities) -> Mesh Nodes on Linux / VMs / Home hardware -> Private resources (staging DBs, internal APIs, home agent, multi-cloud VPCs). Gateway, Access, DLP, and device posture apply to Mesh traffic automatically.
+
+**Flow (steps 1–8):**
+
+1. **Devices and servers join one private network** → Cloudflare One Client (formerly WARP Client) on laptops/phones; Mesh nodes (formerly WARP Connector) on Linux servers / VMs / home hardware
+2. **Traffic routes through Cloudflare's global backbone** → 330+ cities; solves NAT traversal; HA mode with active-passive failover via shared tokens
+3. **Existing Cloudflare One policies apply automatically** → Gateway (DNS/Network/HTTP), Access, DLP, device posture — no extra config
+4. **Local coding agent reaches staging via Mesh** → Claude Code / Cursor / OpenCode on laptop reaches `postgres-staging`, internal APIs, internal MCP servers over private IPs
+5. **Personal agent on home hardware, reachable from anywhere** → OpenClaw / local Codex on Mac mini reachable from mobile + work laptop via Mesh
+6. **Workers agent gets the entire Mesh via one binding** → `vpc_networks: [{ binding: "MESH", network_id: "cf1:network", remote: true }]`
+7. **Workers agent calls internal databases and MCPs** → `env.MESH.fetch("http://10.0.1.50/api/data")`; no pre-registration
+8. **Mesh vs Tunnel: when to use which** → Tunnel = unidirectional reverse proxy for a specific service; Mesh = bidirectional many-to-many network for broad agent/developer access
+
+Key product notes:
+- Cloudflare Mesh: https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-mesh/ and https://blog.cloudflare.com/mesh/
+- Workers VPC: https://developers.cloudflare.com/workers-vpc/ (complements existing Tunnel bindings)
+- Free tier: 50 nodes + 50 users per account; included with Cloudflare One SASE
+- Reserved keyword `cf1:network` binds to the account's Mesh
+- **Renames**: WARP Connector → Cloudflare Mesh node; WARP Client → Cloudflare One Client
+- Roadmap: Hostname routing (summer 2026), Mesh DNS (later 2026), identity-aware routing per-node/per-device/per-agent, Mesh Docker image for Kubernetes/Compose/CI
+
+## UC16 Flow Order (verified)
+
+UC16 ("Durable Long-Running Agents") introduces the Project Think primitives: fibers, sub-agents via Facets, the Session API for tree-structured messages, sandboxed code execution via the execution ladder, and self-authored extensions.
+
+**Architecture:** User / Event -> Think Agent (Durable Object + SQLite) -> `runFiber()` for durable execution, `Session API` for tree conversations, `subAgent()` for delegation -> Execution Ladder: Workspace (Tier 0) -> Dynamic Worker Isolate + npm (Tier 1–2) -> Browser Run (Tier 3) -> Sandbox SDK (Tier 4) -> Self-Authored Extensions.
+
+**Flow (steps 1–9):**
+
+1. **Event wakes the agent from hibernation** → HTTP, WebSocket, DO alarm, email, or RPC from parent; platform loads state, hands agent the event
+2. **Session API loads the conversation tree** → Tree-structured messages (parent_id per message), forking, non-destructive compaction, FTS5 search, persistent memory via context blocks + `set_context`
+3. **Durable execution via `runFiber()`** → Registered in SQLite, checkpointable via `ctx.stash({...})`, recoverable via `onFiberRecovered`; SDK keeps agent alive automatically during fiber
+4. **Tier 0: Workspace** → Durable virtual filesystem (SQLite + R2) via `@cloudflare/shell`; `createWorkspaceTools(this.workspace)` wired into tool set
+5. **Tier 1–2: Sandboxed code + npm** → Code Mode (`@cloudflare/codemode`) runs LLM-generated JS in Dynamic Worker V8 isolate with `globalOutbound: null`; `@cloudflare/worker-bundler` fetches + bundles npm packages on demand
+6. **Tier 3–4: Browser Run + Sandbox SDK** → Browser Run (Tier 3) via CDP for non-agent-friendly sites; Sandbox SDK (Tier 4, GA) for full containers with git/compilers/test runners synced bidirectionally with Workspace
+7. **Sub-agents delegate work with typed RPC** → `this.subAgent(ResearchAgent, "research")` spawns child DOs colocated via Facets; own isolated SQLite; function-call RPC latency; TypeScript catches misuse at compile time
+8. **Self-authored extensions** → Agent authors TypeScript with declared permissions; `ExtensionManager` bundles + loads into Dynamic Worker + registers tools; persists in DO storage through hibernation
+9. **Agent responds via resumable stream, then hibernates** → Stream Manager buffers in DO for reconnects; zero cost when idle; wakes on next trigger with all state intact
+
+Key product notes:
+- Project Think: experimental; API surface stable but evolving (https://github.com/cloudflare/agents/blob/main/docs/think/index.md)
+- Think base class: `@cloudflare/think` (https://blog.cloudflare.com/project-think/)
+- Fibers: https://developers.cloudflare.com/agents/api-reference/durable-execution/
+- Sub-agents (Facets): https://developers.cloudflare.com/agents/api-reference/sub-agents/
+- Sessions: https://developers.cloudflare.com/agents/api-reference/sessions/
+- Scaling math: 10,000 agents × 1% activity = ~100 active DO instances at any moment (vs. 10,000 always-on VMs)
+- Think speaks the same WebSocket protocol as `@cloudflare/ai-chat`; existing UI components work unchanged
+- Sandbox SDK: GA as of Agents Week (https://blog.cloudflare.com/sandbox-ga/)
+- Lifecycle hooks: `beforeTurn`, `beforeToolCall`, `afterToolCall`, `onStepFinish`, `onChatResponse`
 
 ## Design Tokens
 
@@ -476,7 +543,7 @@ Two OWASP frameworks are mapped to Cloudflare product nodes across all 7 use cas
 ### Frameworks
 
 1. **OWASP Top 10 for LLMs 2025** — https://genai.owasp.org/llm-top-10/
-2. **OWASP Top 10 for Agentic Applications 2026** — https://owasp.org/www-project-top-10-for-agentic-applications/
+2. **OWASP Top 10 for Agentic Applications 2026** — https://genai.owasp.org/initiatives/agentic-security-initiative/
 
 ### Implementation
 
@@ -495,8 +562,9 @@ Two OWASP frameworks are mapped to Cloudflare product nodes across all 7 use cas
 | 8 | Access | LLM06 | — |
 | 9 | AI Gateway | LLM02, LLM10 | ASI02 |
 | 11 | AI Gateway DLP (response) | LLM02 | — |
-| 13 | CASB | LLM02 | — |
-| 14 | CASB + DLP | LLM02 | — |
+| 13 | Shadow MCP detection (Gateway + DLP) | LLM02, LLM03 | ASI02, ASI04 |
+| 14 | CASB | LLM02 | — |
+| 15 | CASB + DLP | LLM02 | — |
 
 ### UC2 OWASP Mappings (primary agentic UC)
 
@@ -623,10 +691,31 @@ Two OWASP frameworks are mapped to Cloudflare product nodes across all 7 use cas
 | Step | Product | LLM Labels | ASI Labels |
 |------|---------|------------|------------|
 | 2 | `createBrowserTools()` (browser_search / browser_execute) | — | ASI02, ASI05 |
-| 3 | Headless Chrome (Browser Rendering) | — | ASI05 |
+| 3 | Browser Run (headless Chrome + CDP) | — | ASI05 |
 | 5 | LLM analysis of browser output | LLM01, LLM09 | ASI01 |
-| 6 | Screenshots / artifacts in R2 | LLM02 | — |
-| 7 | Task result returned | — | ASI10 |
+| 7 | Human-in-the-Loop handoff | — | ASI01, ASI03 |
+| 8 | Screenshots / artifacts in R2 | LLM02 | — |
+| 9 | Task result returned | — | ASI10 |
+
+### UC15 OWASP Mappings
+
+| Step | Product | LLM Labels | ASI Labels |
+|------|---------|------------|------------|
+| 3 | Cloudflare One policies on Mesh traffic | — | ASI02, ASI03, ASI10 |
+| 4 | Local coding agent reaches staging | — | ASI02 |
+| 6 | Workers VPC binding (cf1:network) | — | ASI02 |
+| 7 | Workers agent calls internal services | LLM02 | ASI02 |
+
+### UC16 OWASP Mappings
+
+| Step | Product | LLM Labels | ASI Labels |
+|------|---------|------------|------------|
+| 2 | Session API (tree messages, memory) | LLM02 | ASI10 |
+| 3 | Durable execution via `runFiber()` | — | ASI08, ASI10 |
+| 5 | Tier 1–2: Sandboxed code + npm | LLM06 | ASI05 |
+| 6 | Tier 3–4: Browser Run + Sandbox SDK | — | ASI05 |
+| 7 | Sub-agents (Facets + typed RPC) | — | ASI02, ASI04 |
+| 8 | Self-authored extensions | LLM06 | ASI05 |
 
 ### ASI Label Rationale
 
