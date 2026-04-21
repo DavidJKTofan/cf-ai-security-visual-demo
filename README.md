@@ -1,8 +1,14 @@
-# Cloudflare AI Security - Interactive Visual Demo
+# Cloudflare AI Security - Interactive Visual Demos
 
-An interactive, modular frontend web application that visualizes 7 Cloudflare AI security use cases. Each use case features a step-through request-flow diagram showing how requests travel through Cloudflare's stack, with per-step explanations of which product acts and why.
+An interactive, modular frontend web application that visualizes 14 Cloudflare AI use cases across two categories: **AI Security** (UC1–UC7) and **AI Builder** (UC8–UC14). Each use case features a step-through request-flow diagram showing how requests travel through Cloudflare's stack, with per-step explanations of which product acts and why.
 
-## Use Cases
+The site has a two-category landing model:
+
+- `/` — top-level category chooser
+- `/ai-security` — 7 AI security use cases (UC1–UC7)
+- `/ai-builder` — 7 AI builder use cases (UC8–UC14), grouped into **Developing with AI** (UC8–UC9) and **Building AI Applications** (UC10–UC14)
+
+## AI Security Use Cases
 
 ### Secure AI Usage & Applications
 
@@ -21,6 +27,25 @@ An interactive, modular frontend web application that visualizes 7 Cloudflare AI
 | 6 | **Secure AI Code Execution** | Dynamic Workers (Worker Loader), Codemode, Workers RPC, AI Gateway, Agents SDK |
 | 7 | **Secure AI-to-AI Communication** | Agents SDK (Durable Objects), Access + mTLS, MCP Server Portals, Workflows, AI Search, Queues |
 
+## AI Builder Use Cases
+
+### Developing with AI
+
+| # | Use Case | Cloudflare Products |
+|---|----------|-------------------|
+| 8 | **API Key Management & Unified Billing** | AI Gateway (BYOK, Unified Billing, Spend Limits, Zero Data Retention), Secrets Store, Logpush |
+| 9 | **Dynamic Routing** | AI Gateway (Dynamic Routing, Conditional / Percentage / Rate / Budget nodes, BYOK fallback chains, Analytics) |
+
+### Building AI Applications
+
+| # | Use Case | Cloudflare Products |
+|---|----------|-------------------|
+| 10 | **RAG Knowledge Base** | AI Search (AutoRAG), Vectorize, Workers AI, Workers, AI Gateway |
+| 11 | **Voice AI Agent** | Agents SDK (`@cloudflare/voice`, `withVoice`), Workers AI (Deepgram Flux STT, Aura-1 TTS), Durable Objects, Twilio adapter |
+| 12 | **Persistent AI Chat Agent** | Agents SDK (AIChatAgent, `useAgentChat`), Durable Objects (SQLite state, resumable streams), Workers AI |
+| 13 | **Scheduled AI Agent** | Agents SDK (`this.schedule()`, cron / datetime / interval), Durable Object alarms, Workers AI |
+| 14 | **Browser AI Agent** | Agents SDK (`createBrowserTools()`), Browser Rendering (Chrome DevTools Protocol), R2, Workers AI |
+
 ## How It Works
 
 Each use case presents an interactive diagram with three spatial columns:
@@ -34,16 +59,19 @@ Users can:
 - **Click any node** to see a tooltip with product description and documentation link
 - **Read the side panel** for each step's title, acting product, description, and "why it matters" context
 
-Three primary flow archetypes are visualized:
-1. **Human -> AI**: User-initiated requests flowing through Cloudflare controls to AI services (UC1, UC4)
-2. **Agentic AI -> Resources**: AI agent-initiated calls flowing through Cloudflare controls to downstream APIs, data, or tools (UC2, UC5)
+Flow archetypes visualized across the 14 use cases:
+1. **Human -> AI**: User-initiated requests flowing through Cloudflare controls to AI services (UC1, UC4, UC10, UC11, UC12)
+2. **Agentic AI -> Resources**: AI agent-initiated calls flowing through Cloudflare controls to downstream APIs, data, or tools (UC2, UC5, UC13, UC14)
 3. **Agent -> Agent**: AI-to-AI orchestration with identity, durable execution, and shared infrastructure (UC6, UC7)
+4. **App / Developer -> AI Provider**: Application code and developer tooling calling AI providers through a managed gateway (UC3, UC8, UC9)
 
 ## Project Structure
 
 ```
 src/
-  index.html                          Landing page with 7 use case cards
+  index.html                          Top-level category chooser (AI Security / AI Builder)
+  ai-security.html                    AI Security category landing (UC1-UC7)
+  ai-builder.html                     AI Builder category landing (UC8-UC14)
   use-cases/
     uc1-genai-workforce.html          UC1: Secure Workforce Use of GenAI
     uc2-govern-agents.html            UC2: Govern AI Agents (MCP)
@@ -52,6 +80,13 @@ src/
     uc5-self-hosted-agents.html       UC5: Secure Self-Hosted AI Agents
     uc6-code-execution.html           UC6: Secure AI Code Execution
     uc7-multi-agent.html              UC7: Secure AI-to-AI Communication
+    uc8-unified-billing.html          UC8: API Key Management & Unified Billing
+    uc9-dynamic-routing.html          UC9: Dynamic Routing
+    uc10-rag.html                     UC10: RAG Knowledge Base
+    uc11-voice-agent.html             UC11: Voice AI Agent
+    uc12-ai-chat.html                 UC12: Persistent AI Chat Agent
+    uc13-scheduled-agent.html         UC13: Scheduled AI Agent
+    uc14-browser-agent.html           UC14: Browser AI Agent
   components/
     flow-engine.js                    Shared step-through animation controller
     tooltip.js                        Per-node contextual overlay
@@ -61,13 +96,8 @@ src/
     theme.css                         Design tokens (Cloudflare orange #F38020)
     diagram.css                       Diagram layout, nodes, edges, panel
   data/
-    uc1-steps.js                      UC1 nodes, edges, step definitions
-    uc2-steps.js                      UC2 nodes, edges, step definitions
-    uc3-steps.js                      UC3 nodes, edges, step definitions
-    uc4-steps.js                      UC4 nodes, edges, step definitions
-    uc5-steps.js                      UC5 nodes, edges, step definitions
-    uc6-steps.js                      UC6 nodes, edges, step definitions
-    uc7-steps.js                      UC7 nodes, edges, step definitions
+    uc1-steps.js   ...  uc14-steps.js Nodes, edges, and step definitions for each UC
+  sitemap.xml, robots.txt, site.webmanifest, favicon.*, og-image.png
 wrangler.jsonc                        Cloudflare Workers Static Assets config
 package.json
 ```
@@ -75,8 +105,9 @@ package.json
 ## Architecture
 
 - **Vanilla JS** - No frameworks, no build step. ES modules loaded natively in the browser.
-- **Modular** - Adding a new use case requires only a new `ucN-steps.js` data file and a new HTML page. Zero changes to the shared engine.
+- **Modular** - Adding a new use case requires only a new `ucN-steps.js` data file, a new HTML page, and a card on the appropriate category landing (`ai-security.html` or `ai-builder.html`). Zero changes to the shared engine.
 - **FlowEngine** is fully reusable: feed it `{ steps, nodes, edges }` and it renders the complete interactive diagram with SVG edge paths, animated packet dots, and step-through controls.
+- **Clean URLs** - Internal navigation links use extensionless paths (e.g. `/ai-security`, `/use-cases/uc12-ai-chat`). Cloudflare Workers Static Assets `html_handling: "auto-trailing-slash"` (default) serves `src/foo.html` directly at `/foo` — canonical URLs, sitemap entries, and back-links all point to the non-redirecting form.
 
 ## Deployment
 
@@ -133,7 +164,7 @@ Covers risks specific to autonomous AI agent systems — tool misuse, identity a
 
 - **Official page**: https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/
 
-UC2 (Govern AI Agents) and UC7 (Secure AI-to-AI Communication) have the most ASI labels as the primary agentic use cases. UC5 and UC6 map sandbox isolation to ASI05 (Unexpected Code Execution). All use cases include selective labels where applicable threats exist.
+UC2 (Govern AI Agents) and UC7 (Secure AI-to-AI Communication) have the most ASI labels as the primary agentic use cases. UC5, UC6, and UC14 (Browser Agent) map sandbox and browser isolation to ASI05 (Unexpected Code Execution). UC13 (Scheduled Agent) and UC11 (Voice Agent) surface ASI10 (Rogue Agents) for autonomous and long-lived agent behavior. All use cases include selective labels where applicable threats exist.
 
 ## References
 
@@ -157,6 +188,21 @@ UC2 (Govern AI Agents) and UC7 (Secure AI-to-AI Communication) have the most ASI
 - [Sandbox SDK](https://developers.cloudflare.com/sandbox/)
 - [Workflows](https://developers.cloudflare.com/workflows/)
 - [AI Search](https://developers.cloudflare.com/ai-search/)
+- [Vectorize](https://developers.cloudflare.com/vectorize/)
+- [Workers AI](https://developers.cloudflare.com/workers-ai/)
+- [Durable Objects](https://developers.cloudflare.com/durable-objects/)
+- [Browser Rendering (CDP)](https://developers.cloudflare.com/browser-rendering/)
+- [R2 Object Storage](https://developers.cloudflare.com/r2/)
+
+**Agents SDK — UC8–UC14 primitives**
+- [AI Gateway Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/)
+- [AI Gateway BYOK (Secrets Store)](https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/)
+- [AI Gateway Dynamic Routing](https://developers.cloudflare.com/ai-gateway/features/dynamic-routing/)
+- [Voice Agents (`@cloudflare/voice`)](https://developers.cloudflare.com/agents/api-reference/voice/)
+- [Chat Agents (`AIChatAgent`, `useAgentChat`)](https://developers.cloudflare.com/agents/api-reference/chat-agents/)
+- [Schedule Tasks](https://developers.cloudflare.com/agents/api-reference/schedule-tasks/)
+- [Browse the Web](https://developers.cloudflare.com/agents/api-reference/browse-the-web/)
+- [Human-in-the-Loop](https://developers.cloudflare.com/agents/concepts/human-in-the-loop/)
 
 **Infrastructure**
 - [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/)

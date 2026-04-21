@@ -40,12 +40,27 @@ This project uses [Workers Static Assets](https://developers.cloudflare.com/work
 
 For a purely static site, only `assets.directory` is needed in `wrangler.jsonc`. No `main` entry point or Worker script is required.
 
+## Landing Page Structure
+
+The site has a two-category landing model:
+
+- `src/index.html` — top-level category chooser ("AI Security" vs "AI Builder")
+- `src/ai-security.html` — lists the 7 AI security UCs (UC1–UC7)
+- `src/ai-builder.html` — lists the 7 AI builder UCs (UC8–UC14), grouped into two sections:
+  - **Developing with AI** (UC8–UC9)
+  - **Building AI Applications** (UC10–UC14)
+
+All UC detail pages live under `src/use-cases/ucN-*.html`. UC1–UC7 pages have a back-link to `/ai-security.html`; UC8–UC14 pages back-link to `/ai-builder.html`.
+
 ## Adding a New Use Case
 
 1. Create `src/data/ucN-steps.js` exporting `{ id, title, subtitle, nodes, edges, steps }`
-2. Create `src/use-cases/ucN-name.html` following the pattern of existing UC pages
-3. Add a card to `src/index.html`
-4. No changes needed to `flow-engine.js`, `tooltip.js`, or `legend.js`
+2. Create `src/use-cases/ucN-name.html` following the pattern of existing UC pages (back-link target depends on category)
+3. Add a card to the correct category landing page:
+   - AI security UCs → `src/ai-security.html`
+   - AI builder UCs → `src/ai-builder.html`
+4. Update `src/sitemap.xml` with the new UC URL entry
+5. No changes needed to `flow-engine.js`, `tooltip.js`, or `legend.js`
 
 ## Product Accuracy (MANDATORY)
 
@@ -290,6 +305,163 @@ Key product notes:
 - Workflows: durable execution that survives failures, supports human-in-the-loop via waitForEvent
 - Queues: prevents cascading failures through asynchronous message passing
 
+## UC8 Flow Order (verified)
+
+UC8 ("API Key Management & Unified Billing") centralizes AI provider credential management and billing through AI Gateway.
+
+**Architecture:** App / Developer -> AI Gateway (cf-aig-authorization) -> BYOK (Secrets Store) or Unified Billing -> Spend Limits + ZDR -> Provider -> Analytics
+
+**Flow (steps 1–7):**
+
+1. **App sends request** → `cf-aig-authorization` header only; no provider keys in app code
+2. **BYOK path** → Provider keys stored in Secrets Store, referenced by name in AI Gateway Provider Keys
+3. **Unified Billing path** → Cloudflare-managed provider credentials; single Cloudflare invoice
+4. **Spend limits** → Daily / weekly / monthly caps; auto top-up option
+5. **Zero Data Retention (ZDR)** → Unified Billing routes through ZDR-capable endpoints (OpenAI, Anthropic)
+6. **Request forwarded to provider** → AI Gateway injects credentials; full provider API compatibility
+7. **Usage and cost logged** → Per-request provider, model, token count, latency, cost; Logpush to R2/S3/SIEM
+
+Key product notes:
+- Unified Billing: open beta; supports OpenAI, Anthropic, Google AI Studio, Google Vertex AI, xAI, Groq (https://developers.cloudflare.com/ai-gateway/features/unified-billing/)
+- BYOK via Secrets Store: GA (https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/)
+- ZDR: currently supported for OpenAI and Anthropic with Unified Billing credentials; does not control AI Gateway's own logging
+- Workers AI models (prefix `@cf/`) are NOT charged via Unified Billing — they bill via Workers AI pricing
+
+## UC9 Flow Order (verified)
+
+UC9 ("Dynamic Routing") routes AI requests across providers with a visual flow editor — zero code change.
+
+**Architecture:** App (route name as model) + Platform Admin (visual editor) -> AI Gateway -> Conditional -> Percentage -> Rate/Budget Limits -> Model Node -> Providers (primary + fallbacks)
+
+**Flow (steps 1–9):**
+
+1. **Zero code change** → Application sends OpenAI-compatible call with `model: "dynamic/<route-name>"`
+2. **Admin builds flow visually** → Nodes saved as versioned drafts; deploy or roll back from the Versions tab
+3. **AI Gateway dispatches** → Authentication required; provider keys configured via BYOK
+4. **Conditional node** → Evaluates Custom Metadata, headers, or body fields (e.g., `user_plan == "paid"`)
+5. **Percentage split** → A/B testing, gradual rollouts
+6. **Rate / budget limits** → Per-key request count and cost quotas; automatic fallback on exceed
+7. **Primary provider called** → BYOK credential from Secrets Store
+8. **Automatic fallback** → Anthropic, Workers AI, or any configured provider; `cf-aig-step` identifies winning step
+9. **Response logged** → All routing decisions, fallbacks, token counts, costs in AI Gateway Analytics
+
+Key product notes:
+- Dynamic Routing: GA (https://developers.cloudflare.com/ai-gateway/features/dynamic-routing/)
+- Requires BYOK configured on the gateway
+- Supports cascading fallback chains across 20+ providers
+- `cf-aig-step` response header identifies which step served the request
+
+## UC10 Flow Order (verified)
+
+UC10 ("RAG Knowledge Base") builds retrieval-augmented generation pipelines with AI Search, Vectorize, and Workers AI.
+
+**Architecture:** Two phases — **Ingest:** Documents -> AI Search (chunk + embed + index) -> Vectorize. **Query:** User -> Workers -> AI Search (query embed + top-K) -> Worker (prompt assembly) -> Workers AI or external LLM -> Response.
+
+**Flow (steps 1–7):**
+
+1. **Documents ingested** → AI Search indexing pipeline accepts text, Markdown, HTML, PDFs
+2. **Embeddings stored in Vectorize** → Managed automatically by AI Search; globally distributed nearest-neighbor search
+3. **User query arrives at RAG Worker** → Runs at the same edge PoP as Vectorize
+4. **Semantic search** → AI Search embeds query, returns top-K chunks with metadata and similarity scores
+5. **Context injected into LLM prompt** → Worker assembles final prompt with grounding instructions and citations
+6. **LLM generates grounded response** → Workers AI or external LLM via AI Gateway
+7. **Grounded response returned** → With source citations, streamed via SSE or WebSocket
+
+Key product notes:
+- AI Search (AutoRAG): open beta; fully-managed RAG with automatic Vectorize provisioning (https://developers.cloudflare.com/ai-search/)
+- Vectorize: GA vector database (https://developers.cloudflare.com/vectorize/)
+- AI Search instances created after April 16, 2026 include a built-in managed vector index
+- AI Search continuously syncs index with R2 source data
+
+## UC11 Flow Order (verified)
+
+UC11 ("Voice AI Agent") builds real-time voice agents with STT, LLM turns, and streaming TTS over WebSocket.
+
+**Architecture:** Browser / Twilio (binary PCM) -> Voice Agent DO (`withVoice` mixin) -> WorkersAIFluxSTT -> onTurn (LLM) -> WorkersAITTS (sentence-chunked) -> Streamed audio back
+
+**Flow (steps 1–8):**
+
+1. **Client connects via WebSocket** → `useVoiceAgent` React hook or `VoiceClient`; DO per call for isolated state
+2. **Mic audio streamed to STT** → Continuous per-call transcriber session; model-driven turn detection
+3. **Transcript triggers `onTurn`** → LLM called with full SQLite conversation context + tools
+4. **LLM response synthesized** → Sentence-chunked; audio begins streaming before LLM finishes
+5. **Audio streamed back + interruption handling** → User speech during playback cancels in-flight TTS
+6. **Conversation persisted** → Automatic SQLite persistence; full history on reconnect
+7. **Telephony** → Twilio Media Streams / SIP bridge PSTN calls to the same WebSocket pipeline
+8. **Turn complete** → Pipeline metrics (STT/LLM/TTS timing) exposed for monitoring
+
+Key product notes:
+- Voice Agents: Beta per docs (https://developers.cloudflare.com/agents/api-reference/voice/); labels kept clean per AGENTS.md policy
+- Built-in Workers AI STT: `WorkersAIFluxSTT` (`@cf/deepgram/flux`, for `withVoice`) and `WorkersAINova3STT` (`@cf/deepgram/nova-3`, for `withVoiceInput`)
+- Built-in Workers AI TTS: `WorkersAITTS` (`@cf/deepgram/aura-1`)
+- Third-party: `@cloudflare/voice-deepgram`, `@cloudflare/voice-elevenlabs`, `@cloudflare/voice-twilio`
+- Note: `WorkersAITTS` returns MP3 — Twilio adapter needs a PCM-capable provider (e.g., ElevenLabs `outputFormat: "pcm_16000"`)
+
+## UC12 Flow Order (verified)
+
+UC12 ("Persistent AI Chat Agent") builds stateful chat applications with `AIChatAgent` and `useAgentChat`.
+
+**Architecture:** Browser (`useAgentChat`) -> AIChatAgent DO -> SQLite State -> `onChatMessage` / `streamText` -> Workers AI / OpenAI / Anthropic -> Stream Manager -> Resumable stream back
+
+**Flow (steps 1–7):**
+
+1. **Client connects — conversation resumed** → Per-user DO instance; SQLite history auto-loaded
+2. **User message persisted to SQLite** → Append before LLM call
+3. **Streaming response initiated** → Stream manager buffers in DO for resumable streaming across disconnects
+4. **LLM called with full context** → `streamText` via AI SDK; Workers AI, OpenAI, Anthropic, Gemini
+5. **Server-side tools executed** → Direct access to DO SQLite + service bindings
+6. **Human-in-the-loop approval** → Tools with `needsApproval` pause for `addToolApprovalResponse`
+7. **Client-side tools + real-time state sync** → Client tools execute in browser; `onStateUpdate` broadcasts agent state
+
+Key product notes:
+- `@cloudflare/ai-chat` package built on AI SDK + Durable Objects (https://developers.cloudflare.com/agents/api-reference/chat-agents/)
+- Hierarchy: DurableObject > Server > Agent > AIChatAgent
+- Resumable streams: disconnected clients resume mid-stream without data loss
+- Deprecated APIs (v0.8+): `addToolResult` → `addToolOutput`; per-tool `needsApproval` replaces global filter
+
+## UC13 Flow Order (verified)
+
+UC13 ("Scheduled AI Agent") builds autonomous agents that wake on a schedule with `this.schedule()` and DO alarms.
+
+**Architecture:** User / App -> Agent (`this.schedule`) -> SQLite schedule table -> DO alarm -> Task Runner -> Workers AI + External services -> Reschedule / retry
+
+**Flow (steps 1–7):**
+
+1. **Instruction received — schedule registered** → `this.schedule(60, ...)`, `this.schedule(new Date(...), ...)`, or `this.schedule("0 * * * *", ...)`
+2. **Natural language scheduling** → `getSchedulePrompt()` + LLM extracts structured schedule; validated against `scheduleSchema` (Zod)
+3. **Tasks persisted with DO alarms** → Stored in `cf_agents_schedules` SQLite table; agent hibernates between runs
+4. **DO alarm fires — task executed** → Named callback invoked with serialized payload; full Worker bindings available
+5. **AI inference within scheduled task** → Workers AI (on-network) for summarization, classification, digest generation
+6. **External services called** → Email, Slack, SMS, webhooks, Queues, R2, D1 writes
+7. **Reschedule, retry, or self-destruct** → Callbacks can adjust their own schedule based on outcomes
+
+Key product notes:
+- Four modes: delayed (`schedule(seconds, ...)`), datetime, cron, interval (`scheduleEvery`)
+- Cron schedules are idempotent by default; delayed/datetime support opt-in `{ idempotent: true }` (v0.8+)
+- Calling `schedule()` in `onStart()` without `idempotent: true` emits a warning
+- Underlying primitive: Durable Object alarms (https://developers.cloudflare.com/durable-objects/api/alarms/)
+
+## UC14 Flow Order (verified)
+
+UC14 ("Browser AI Agent") builds web-browsing agents with CDP (Chrome DevTools Protocol) via Browser Rendering.
+
+**Architecture:** User -> AI Agent -> `createBrowserTools()` (@cloudflare/codemode) -> Browser Rendering (headless Chrome via CDP) -> Target Web -> LLM reasoning -> R2 artifacts
+
+**Flow (steps 1–7):**
+
+1. **Web task sent to AI Agent** → Natural language instruction; agent stores task in SQLite
+2. **Browser tools configured and invoked** → `browser_search` (CDP spec discovery) + `browser_execute` (run CDP code); passed to `streamText()`
+3. **Headless Chrome renders page** → Via `env.BROWSER` binding; full JS execution; cookie/localStorage injection supported
+4. **Page fetched — DOM and content extracted** → Full DOM text, accessibility tree, network log, or raw CDP responses
+5. **LLM analyzes browser output** → Extracts structured data, identifies issues, decides next action
+6. **Screenshots and data stored in R2** → PNG / PDF artifacts; D1 / KV for structured data; R2 baselines for monitoring
+7. **Task result returned** → Final output, intermediate SQLite log of all browser interactions
+
+Key product notes:
+- Browse the web: Beta per docs (https://developers.cloudflare.com/agents/api-reference/browse-the-web/); labels kept clean per AGENTS.md policy
+- Requires `@cloudflare/codemode` + Browser Rendering binding + Worker Loader binding
+- Browser Rendering now exposes full CDP endpoint — any CDP-compatible client (Puppeteer, Playwright, chrome-devtools-mcp) can connect
+
 ## Design Tokens
 
 - Primary: `#F38020` (Cloudflare orange)
@@ -391,6 +563,70 @@ Two OWASP frameworks are mapped to Cloudflare product nodes across all 7 use cas
 | 4 | AI Gateway (shared) | LLM10, LLM03 | — |
 | 6 | Queues (async) | — | ASI08 |
 | 7 | Workflows (durable) | — | ASI08 |
+
+### UC8 OWASP Mappings
+
+| Step | Product | LLM Labels | ASI Labels |
+|------|---------|------------|------------|
+| 1 | AI Gateway (cf-aig-authorization) | LLM02 | — |
+| 2 | BYOK / Secrets Store | LLM02 | — |
+| 4 | Spend Limits | LLM10 | ASI08 |
+| 5 | Zero Data Retention | LLM02 | — |
+| 7 | Analytics & Cost Logs | LLM10 | ASI10 |
+
+### UC9 OWASP Mappings
+
+| Step | Product | LLM Labels | ASI Labels |
+|------|---------|------------|------------|
+| 4 | Conditional node | — | ASI04 |
+| 6 | Rate & Budget Limits | LLM10 | — |
+| 8 | Automatic fallback | LLM03 | ASI04, ASI08 |
+| 9 | Routing logged | — | ASI10 |
+
+### UC10 OWASP Mappings
+
+| Step | Product | LLM Labels | ASI Labels |
+|------|---------|------------|------------|
+| 2 | Vectorize (embeddings) | LLM08 | — |
+| 4 | AI Search (semantic search) | LLM08 | — |
+| 5 | Context injection (Workers) | LLM01, LLM09 | — |
+| 7 | Grounded response | LLM09 | — |
+
+### UC11 OWASP Mappings
+
+| Step | Product | LLM Labels | ASI Labels |
+|------|---------|------------|------------|
+| 3 | onTurn (LLM call) | LLM01, LLM07 | ASI01 |
+| 6 | SQLite conversation persistence | LLM02 | ASI10 |
+| 7 | Twilio telephony | — | ASI02, ASI03 |
+
+### UC12 OWASP Mappings
+
+| Step | Product | LLM Labels | ASI Labels |
+|------|---------|------------|------------|
+| 2 | SQLite message persistence | LLM02 | — |
+| 4 | LLM via AI SDK (Workers AI / OpenAI / Anthropic) | LLM01, LLM07 | — |
+| 5 | Server-side tools | — | ASI02, ASI05 |
+| 6 | Human-in-the-loop approval (`needsApproval`) | — | ASI01, ASI02, ASI03 |
+
+### UC13 OWASP Mappings
+
+| Step | Product | LLM Labels | ASI Labels |
+|------|---------|------------|------------|
+| 1 | `this.schedule()` registration | — | ASI02, ASI03 |
+| 2 | Natural language scheduling (LLM) | LLM01 | ASI01 |
+| 4 | DO alarm fires — task executed | — | ASI08, ASI10 |
+| 6 | External services called | — | ASI02, ASI10 |
+
+### UC14 OWASP Mappings
+
+| Step | Product | LLM Labels | ASI Labels |
+|------|---------|------------|------------|
+| 2 | `createBrowserTools()` (browser_search / browser_execute) | — | ASI02, ASI05 |
+| 3 | Headless Chrome (Browser Rendering) | — | ASI05 |
+| 5 | LLM analysis of browser output | LLM01, LLM09 | ASI01 |
+| 6 | Screenshots / artifacts in R2 | LLM02 | — |
+| 7 | Task result returned | — | ASI10 |
 
 ### ASI Label Rationale
 

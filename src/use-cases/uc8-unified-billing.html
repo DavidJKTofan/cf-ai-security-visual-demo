@@ -5,31 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   
   <!-- Primary Meta Tags -->
-  <title>Secure AI Code Execution - Cloudflare AI Security (Unofficial)</title>
-  <meta name="title" content="Secure AI Code Execution - Cloudflare AI Security (Unofficial)">
-  <meta name="description" content="Unofficial educational demo: interactive flow diagram of secure AI code execution with Dynamic Workers and Codemode. Not affiliated with or endorsed by Cloudflare.">
-  <meta name="keywords" content="Cloudflare, Dynamic Workers, Codemode, AI sandbox, code execution, V8 isolates, AI agents, Workers RPC, educational demo">
+  <title>API Key Management &amp; Unified Billing - Cloudflare AI Security (Unofficial)</title>
+  <meta name="title" content="API Key Management &amp; Unified Billing - Cloudflare AI Security (Unofficial)">
+  <meta name="description" content="Unofficial educational demo: interactive flow diagram of Cloudflare AI Gateway BYOK and Unified Billing for centralized AI provider credential and cost management. Not affiliated with or endorsed by Cloudflare.">
+  <meta name="keywords" content="Cloudflare, AI Gateway, BYOK, Secrets Store, Unified Billing, AI provider keys, spend limits, ZDR, Zero Data Retention, educational demo">
   <meta name="author" content="Community Demo (Not affiliated with Cloudflare.)">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0d1117">
   <meta name="color-scheme" content="dark">
   
   <!-- Canonical URL -->
-  <link rel="canonical" href="https://ai-security.automatic-demo.com/use-cases/uc6-code-execution.html">
+  <link rel="canonical" href="https://ai-security.automatic-demo.com/use-cases/uc8-unified-billing.html">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="article">
-  <meta property="og:url" content="https://ai-security.automatic-demo.com/use-cases/uc6-code-execution.html">
-  <meta property="og:title" content="Secure AI Code Execution - Cloudflare AI Security (Unofficial)">
-  <meta property="og:description" content="Unofficial educational demo: interactive flow diagram of secure AI code execution. Not affiliated with or endorsed by Cloudflare.">
+  <meta property="og:url" content="https://ai-security.automatic-demo.com/use-cases/uc8-unified-billing.html">
+  <meta property="og:title" content="API Key Management &amp; Unified Billing - Cloudflare AI Security (Unofficial)">
+  <meta property="og:description" content="Unofficial educational demo: interactive flow diagram of Cloudflare AI Gateway BYOK and Unified Billing for centralized AI provider credential and cost management. Not affiliated with or endorsed by Cloudflare.">
   <meta property="og:image" content="https://ai-security.automatic-demo.com/og-image.png">
   <meta property="og:site_name" content="Cloudflare AI Security (Unofficial Demo)">
   
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://ai-security.automatic-demo.com/use-cases/uc6-code-execution.html">
-  <meta name="twitter:title" content="Secure AI Code Execution - Cloudflare AI Security (Unofficial)">
-  <meta name="twitter:description" content="Unofficial educational demo: interactive flow diagram of secure AI code execution. Not affiliated with or endorsed by Cloudflare.">
+  <meta name="twitter:url" content="https://ai-security.automatic-demo.com/use-cases/uc8-unified-billing.html">
+  <meta name="twitter:title" content="API Key Management &amp; Unified Billing - Cloudflare AI Security (Unofficial)">
+  <meta name="twitter:description" content="Unofficial educational demo: interactive flow diagram of Cloudflare AI Gateway BYOK and Unified Billing for centralized AI provider credential and cost management. Not affiliated with or endorsed by Cloudflare.">
   <meta name="twitter:image" content="https://ai-security.automatic-demo.com/og-image.png">
   
   <!-- Favicon -->
@@ -50,13 +50,15 @@
   {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    "name": "Secure AI Code Execution",
-    "description": "How to safely execute AI-generated code in isolated Dynamic Worker sandboxes with Codemode.",
+    "name": "API Key Management & Unified Billing with Cloudflare AI Gateway",
+    "description": "How to centralize AI provider credentials and billing using BYOK (Secrets Store) and Unified Billing via Cloudflare AI Gateway.",
     "step": [
-      {"@type": "HowToStep", "name": "AI Generates Code", "text": "Agent generates JavaScript code via Codemode"},
-      {"@type": "HowToStep", "name": "Dynamic Worker Created", "text": "Isolated V8 isolate starts in milliseconds"},
-      {"@type": "HowToStep", "name": "Network Blocked", "text": "globalOutbound: null blocks all network access"},
-      {"@type": "HowToStep", "name": "Tools via RPC", "text": "Sandboxed code calls tools through Workers RPC"}
+      {"@type": "HowToStep", "name": "Authenticate to AI Gateway", "text": "App sends request with cf-aig-authorization — no provider keys in code"},
+      {"@type": "HowToStep", "name": "BYOK via Secrets Store", "text": "Provider API keys stored and referenced by name, never in plaintext"},
+      {"@type": "HowToStep", "name": "Unified Billing", "text": "Cloudflare-managed credentials eliminate per-provider API key management"},
+      {"@type": "HowToStep", "name": "Spend Limits", "text": "Daily, weekly, or monthly caps prevent unexpected charges"},
+      {"@type": "HowToStep", "name": "Zero Data Retention", "text": "ZDR routes Unified Billing traffic through provider-side non-retaining endpoints"},
+      {"@type": "HowToStep", "name": "Centralized Analytics", "text": "Usage, cost, and token counts logged across all providers in one place"}
     ],
     "isPartOf": {
       "@type": "WebSite",
@@ -71,20 +73,20 @@
   <div class="diagram-page">
     <!-- Header -->
     <header class="diagram-header">
-      <a class="back-link" href="/ai-security">&larr; AI Security</a>
-      <span class="uc-badge">UC 6</span>
-      <h1>Secure AI Code Execution</h1>
+      <a class="back-link" href="/ai-builder">&larr; AI Builder</a>
+      <span class="uc-badge">UC 8</span>
+      <h1>API Key Management &amp; Unified Billing</h1>
     </header>
 
     <!-- Flow archetypes -->
     <div class="flow-archetype-labels">
       <div class="archetype-label">
-        <span class="archetype-arrow both-flows"></span>
-        Agent &rarr; Sandbox (code generation to execution)
+        <span class="archetype-arrow human-ai"></span>
+        App / Developer &rarr; AI Gateway &rarr; AI Provider
       </div>
       <div class="archetype-label">
         <span class="archetype-arrow agent-resource"></span>
-        Response path (result &rarr; agent)
+        Provider &rarr; Analytics &rarr; App (response path)
       </div>
     </div>
 
@@ -96,13 +98,13 @@
           <svg class="flow-edges"></svg>
           <div class="flow-columns">
             <div class="flow-column col-left">
-              <div class="column-label">Code Source</div>
+              <div class="column-label">App / Developer</div>
             </div>
             <div class="flow-column col-center">
-              <div class="column-label">Cloudflare Execution</div>
+              <div class="column-label">Cloudflare AI Gateway</div>
             </div>
             <div class="flow-column col-right">
-              <div class="column-label">Results</div>
+              <div class="column-label">AI Providers</div>
             </div>
           </div>
         </div>
@@ -135,15 +137,15 @@
     import { FlowEngine } from '/components/flow-engine.js';
     import { Tooltip } from '/components/tooltip.js';
     import { Legend } from '/components/legend.js';
-    import { uc6 } from '/data/uc6-steps.js';
+    import { uc8 } from '/data/uc8-steps.js';
 
     const tooltip = new Tooltip();
     const legend = new Legend(document.getElementById('legend'));
 
     const engine = new FlowEngine({
-      steps: uc6.steps,
-      nodes: uc6.nodes,
-      edges: uc6.edges,
+      steps: uc8.steps,
+      nodes: uc8.nodes,
+      edges: uc8.edges,
     });
 
     engine.mount(
