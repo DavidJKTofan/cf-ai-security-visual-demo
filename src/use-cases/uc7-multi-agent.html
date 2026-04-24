@@ -41,6 +41,9 @@
   <link rel="manifest" href="/site.webmanifest">
   
   <!-- Stylesheets -->
+  <!-- Theme: apply saved preference before paint -->
+  <script>(function(){var t=localStorage.getItem("theme")||(matchMedia("(prefers-color-scheme:light)").matches?"light":"dark");document.documentElement.setAttribute("data-theme",t)})()</script>
+
   <link rel="stylesheet" href="/styles/theme.css">
   <link rel="stylesheet" href="/styles/base.css">
   <link rel="stylesheet" href="/styles/diagram.css">
@@ -151,5 +154,6 @@
       document.querySelector('.diagram-panel')
     );
   </script>
+  <script type="module" src="/components/theme-toggle.js"></script>
 </body>
 </html>
