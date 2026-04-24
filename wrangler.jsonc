@@ -2,17 +2,18 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "cf-ai-security-visual-demo",
 	"compatibility_date": "2026-03-01",
+	"account_id": "2d4a0681682a0636adb204232e94b6f0",
 	"assets": {
-		"directory": "./src"
+		"directory": "./src",
 	},
 	"observability": {
-		"enabled": true
+		"enabled": true,
 	},
-	"workers_dev": false,
+	"workers_dev": true,
 	"routes": [
 		{
-			"pattern": "ai-security.automatic-demo.com",
-			"custom_domain": true
-		}
-	]
+			"pattern": "cf-ai.bpillsbury.com",
+			"custom_domain": true,
+		},
+	],
 }

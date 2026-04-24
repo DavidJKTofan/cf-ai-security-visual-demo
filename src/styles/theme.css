@@ -14,8 +14,8 @@
 
   /* Text */
   --text-primary: #e6edf3;
-  --text-secondary: #8b949e;
-  --text-muted: #6e7681;
+  --text-secondary: #334155;
+  --text-muted: #4a5568;
 
   /* Borders */
   --border-color: #30363d;
@@ -53,4 +53,38 @@
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
+}
+
+/* === Light Mode Overrides === */
+[data-theme="light"] {
+  /* Backgrounds */
+  --bg-primary: #f5f6f8;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #ebedf0;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f1f3;
+
+  /* Text */
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+
+  /* Borders */
+  --border-color: #d1d5db;
+  --border-light: #e5e7eb;
+
+  /* Accent bg opacities — slightly stronger for light backgrounds */
+  --color-user-bg: rgba(59, 130, 246, 0.10);
+  --color-device-bg: rgba(59, 130, 246, 0.10);
+  --color-cloudflare-bg: rgba(243, 128, 32, 0.10);
+  --color-ai-service-bg: rgba(16, 185, 129, 0.10);
+  --color-resource-bg: rgba(139, 92, 246, 0.10);
+  --color-warning-bg: rgba(245, 158, 11, 0.10);
+  --color-coming-soon-bg: rgba(234, 179, 8, 0.10);
+
+  /* Shadows — softer for light mode */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.10);
+  --shadow-glow-orange: 0 0 20px rgba(243, 128, 32, 0.12);
 }
