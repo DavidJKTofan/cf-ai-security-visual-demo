@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Interactive visual demo of 16 Cloudflare AI use cases (7 AI Security + 9 AI Builder) deployed as a purely static site via Cloudflare Workers Static Assets. Vanilla HTML/CSS/JS with ES modules — no build step, no frameworks.
+Interactive visual demo of Cloudflare's AI platform: **17 walkthroughs** total — 16 use cases (7 AI Security UC1–UC7 + 9 AI Builder UC8–UC16) plus **UC0**, a featured Reference Architecture that combines elements from every other UC into a single end-to-end walkthrough of how Cloudflare runs AI Code Review and its internal AI engineering stack on its own products. Deployed as a purely static site via Cloudflare Workers Static Assets. Vanilla HTML/CSS/JS with ES modules — no build step, no frameworks.
 
 ## Key Architecture Decisions
 
@@ -42,15 +42,63 @@ For a purely static site, only `assets.directory` is needed in `wrangler.jsonc`.
 
 ## Landing Page Structure
 
-The site has a two-category landing model:
+The site has a two-category landing model with a featured reference architecture on top:
 
-- `src/index.html` — top-level category chooser ("AI Security" vs "AI Builder")
+- `src/index.html` — top-level page; features the **UC0 Reference Architecture** hero card above the two category cards ("AI Security" vs "AI Builder")
 - `src/ai-security.html` — lists the 7 AI security UCs (UC1–UC7)
 - `src/ai-builder.html` — lists the 9 AI builder UCs (UC8–UC16), grouped into two sections:
   - **Developing with AI** (UC8–UC9)
   - **Building AI Applications** (UC10–UC16)
 
-All UC detail pages live under `src/use-cases/ucN-*.html`. UC1–UC7 pages have a back-link to `/ai-security.html`; UC8–UC16 pages back-link to `/ai-builder.html`.
+All UC detail pages live under `src/use-cases/ucN-*.html`. UC0 (Reference Architecture) back-links to `/`; UC1–UC7 pages back-link to `/ai-security`; UC8–UC16 pages back-link to `/ai-builder`.
+
+## UC0 Reference Architecture (the comprehensive walkthrough)
+
+UC0 ("Cloudflare's Internal AI Engineering Stack") is the featured end-to-end walkthrough that combines elements from every other UC into a single coherent reference architecture. It mirrors the two Agents Week blog posts:
+
+- https://blog.cloudflare.com/ai-code-review/
+- https://blog.cloudflare.com/internal-ai-engineering-stack/
+
+**Narrative:** A Cloudflare engineer opens a merge request, which triggers every layer of the AI engineering stack — Access → Proxy Worker → Coordinator → Sub-reviewers → MCP Portal → Backstage → Codex/AGENTS.md → AI Gateway → Frontier providers / Workers AI → Cache + Failback → MR comment.
+
+**Files:**
+- Data: `src/data/uc0-stack-steps.js` (17 nodes, 20 edges, 16 steps)
+- Page: `src/use-cases/uc0-internal-stack.html`
+- Featured card lives at the top of `src/index.html` with orange-glow `.featured-hero` styling and 5 headline stats (3,683 engineers, $1.19/review, 85.7% cache hit, +58% MRs/week, 241B tokens/month). A small "As of April 2026 · 30-day window" pill sits next to the stats label for date clarity. The scoreboard step's title and product tag reflect the same date context.
+
+**Headline numbers (verified against the two blog posts):**
+- 3,683 internal users (60% company-wide, 93% across R&D)
+- 131,246 review runs across 48,095 MRs in 5,169 repos (30 days)
+- $1.19 avg cost per review · $0.98 median · $4.45 P99
+- 85.7% cache hit rate
+- 159,103 total findings (≈8.7K critical, ≈65K warnings)
+- 241.37B tokens through AI Gateway, 51.83B through Workers AI (30 days)
+- +58% MRs/week on a 4-week rolling average (~5,600 → 8,700+; peaked at 10,952)
+- 13 MCP servers, 182+ tools, single OAuth via Access
+- Code Mode at portal layer: 52 tools → 2 portal tools = ~9,400 → ~600 tokens (94% reduction); Cloudflare API MCP server: 1,300+ endpoints in <1,000 tokens (99.9% reduction)
+- Dynamic Workers: open beta, $0.002/worker/day (waived in beta), unlimited concurrency
+- Sandbox SDK GA: 15K concurrent lite / 6K basic / 1K+ larger instances per account; ~2s snapshot restore; Outbound Workers for zero-trust credential injection; PTY · code interpreters · preview URLs · inotify watching · Active-CPU pricing
+- Defense-in-depth: V8 sandbox + Memory Protection Keys (PKU) hardware isolation, custom 2nd-layer Linux sandbox, V8 patches deployed faster than Chrome itself
+- Built by ONE engineer in ONE afternoon, fine-tuned over 2 weeks
+- 0.6% break-glass override rate (288 / 48,095 MRs)
+
+**Step ordering:**
+1. Engineer opens MR — CI component triggers
+2. Cloudflare Access authenticates (Zero Trust JWT)
+3. Proxy Worker — discovery, JWT validation, anonymization, ZDR auto-injection
+4. Risk tier classification (trivial/lite/full) + coordinator spawn
+5. Up to 7 specialised sub-reviewers run concurrently
+6. Sub-reviewers query Backstage via MCP Server Portal
+7. Code Mode collapses 52 tool schemas into 2 (94% token reduction; ~9,400 → ~600 tokens for 4 connected MCP servers)
+8. **Project Think Execution Ladder** — Tier 0 Workspace · Tier 1 Dynamic Worker isolate · Tier 2 npm at runtime · Tier 3 Browser Run · Tier 4 Sandbox SDK (full Linux container); backs safe code execution for sub-reviewers today and powers the next-gen background agents tomorrow
+9. AGENTS.md + Engineering Codex provide repo + org standards as agent skills
+10. AI Gateway routes each LLM call with BYOK + anonymous metadata + ZDR
+11. Cache hit rate 85.7% — shared context file means 7x savings vs duplication
+12. Model tier selection — Opus/GPT-5.4 (coordinator), Sonnet/GPT-5.3 (heavy), Kimi K2.5 on Workers AI (text-heavy)
+13. Circuit breakers + failback chains handle provider 429/503
+14. Coordinator judges (dedupe, re-categorize, severity); Agent Memory makes re-reviews stateful; posts verdict to GitLab
+15. Telemetry to Review Tracker Worker (Prometheus, Logpush)
+16. The scoreboard — titled "as of April 2026", with a sibling-system callout to Project Glasswing (Mythos Preview applied to deep vuln research) and Project Think background agents as what's next
 
 ## Adding a New Use Case
 
@@ -61,6 +109,18 @@ All UC detail pages live under `src/use-cases/ucN-*.html`. UC1–UC7 pages have 
    - AI builder UCs → `src/ai-builder.html`
 4. Update `src/sitemap.xml` with the new UC URL entry
 5. No changes needed to `flow-engine.js`, `tooltip.js`, or `legend.js`
+
+### Step description formatting
+
+`step.description` and `step.why` strings are rendered as rich text by `FlowEngine._formatRichText()`:
+
+- `\n\n` (double newline) → paragraph break (`<p>…</p>`)
+- `\n` (single newline) → soft line break (`<br>`)
+- Plain strings without newlines render as a single paragraph (existing behavior, unchanged)
+
+Use bulleted lists by prefixing lines with `• ` (real bullet character) separated by `\n`. Use this freely for long structured content (tier ladders, numbered procedures, outcome scoreboards). Keep the leading paragraph short and front-load the key fact, then list details. Style rules in `src/styles/diagram.css` (`.step-description p + p`, `.step-why p + p`) handle paragraph spacing automatically.
+
+Content source is trusted (static JS modules), so direct HTML composition is safe — do not introduce user-supplied data into `description`/`why` without escaping.
 
 ## UC Card Audience Badges
 

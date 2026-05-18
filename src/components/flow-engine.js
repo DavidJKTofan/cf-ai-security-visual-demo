@@ -500,6 +500,19 @@ export class FlowEngine {
     this.onStepChange(this.currentStep, step);
   }
 
+  /**
+   * Format authored description text: `\n\n` becomes paragraph breaks
+   * and single `\n` becomes a soft line break. Source is trusted (static JS modules).
+   */
+  _formatRichText(text) {
+    if (!text) return '';
+    return text
+      .split(/\n\n+/)
+      .map(p => p.replace(/\n/g, '<br>'))
+      .map(p => `<p>${p}</p>`)
+      .join('');
+  }
+
   _renderStepInfo(step) {
     const infoEl = this._panel.querySelector('.panel-step-info');
     if (!infoEl) return;
@@ -537,11 +550,11 @@ export class FlowEngine {
           <span class="step-title">${step.title}</span>
         </div>
         ${step.product ? `<span class="step-product">${step.product}</span>` : ''}
-        <div class="step-description">${step.description}</div>
+        <div class="step-description">${this._formatRichText(step.description)}</div>
         ${step.why ? `
           <div class="step-why">
             <div class="step-why-label">Why it matters</div>
-            <p>${step.why}</p>
+            ${this._formatRichText(step.why)}
           </div>
         ` : ''}
         ${owaspHtml}

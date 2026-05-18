@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <!-- Primary Meta Tags -->
+  <title>Cloudflare's Internal AI Engineering Stack — Reference Architecture (Unofficial)</title>
+  <meta name="title" content="Cloudflare's Internal AI Engineering Stack — Reference Architecture (Unofficial)">
+  <meta name="description" content="Unofficial educational demo: interactive walkthrough of how Cloudflare runs AI Code Review and the full internal AI Engineering Stack on its own products — Access, AI Gateway, Workers AI, MCP Portal, Code Mode, and more. Not affiliated with or endorsed by Cloudflare.">
+  <meta name="keywords" content="Cloudflare, AI Engineering Stack, AI Code Review, AI Gateway, Workers AI, MCP Portal, Backstage, OpenCode, Kimi K2.5, reference architecture, educational demo">
+  <meta name="author" content="Community Demo (Not affiliated with Cloudflare.)">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="color-scheme" content="dark">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://ai-security.automatic-demo.com/use-cases/uc0-internal-stack.html">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ai-security.automatic-demo.com/use-cases/uc0-internal-stack.html">
+  <meta property="og:title" content="Cloudflare's Internal AI Engineering Stack — Reference Architecture (Unofficial)">
+  <meta property="og:description" content="Unofficial educational demo: interactive walkthrough of how Cloudflare runs AI Code Review and the full internal AI Engineering Stack on its own products.">
+  <meta property="og:image" content="https://ai-security.automatic-demo.com/og-image.png">
+  <meta property="og:site_name" content="Cloudflare AI (Unofficial Demo)">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://ai-security.automatic-demo.com/use-cases/uc0-internal-stack.html">
+  <meta name="twitter:title" content="Cloudflare's Internal AI Engineering Stack — Reference Architecture (Unofficial)">
+  <meta name="twitter:description" content="Unofficial educational demo: interactive walkthrough of how Cloudflare runs AI Code Review and the full internal AI Engineering Stack on its own products.">
+  <meta name="twitter:image" content="https://ai-security.automatic-demo.com/og-image.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/favicon.png">
+
+  <!-- Web App Manifest -->
+  <link rel="manifest" href="/site.webmanifest">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/styles/theme.css">
+  <link rel="stylesheet" href="/styles/base.css">
+  <link rel="stylesheet" href="/styles/diagram.css">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Cloudflare's Internal AI Engineering Stack",
+    "description": "How Cloudflare runs AI Code Review and the full internal AI Engineering Stack on its own products — Access, AI Gateway, Workers AI, MCP Portal, Code Mode, Backstage.",
+    "step": [
+      {"@type": "HowToStep", "name": "Engineer opens MR", "text": "Developer opens merge request; GitLab CI component triggers the review."},
+      {"@type": "HowToStep", "name": "Cloudflare Access", "text": "Zero Trust SSO authenticates the CI job and issues a JWT."},
+      {"@type": "HowToStep", "name": "Proxy Worker", "text": "Discovery endpoint, JWT validation, anonymous UUID, ZDR auto-injection."},
+      {"@type": "HowToStep", "name": "Risk tier + Coordinator", "text": "OpenCode coordinator classifies the MR and spawns specialized reviewers."},
+      {"@type": "HowToStep", "name": "Sub-reviewers", "text": "Up to 7 concurrent OpenCode sessions: Security, Code Quality, Performance, Docs, Codex, Release, AGENTS.md."},
+      {"@type": "HowToStep", "name": "MCP Portal + Backstage", "text": "Sub-reviewers query 13 MCP servers / 182+ tools for ownership, deps, schemas."},
+      {"@type": "HowToStep", "name": "Code Mode", "text": "Portal collapses 34 tool schemas into 2 portal-level tools."},
+      {"@type": "HowToStep", "name": "Project Think Execution Ladder", "text": "Five-tier safe code execution: Workspace, Isolate, npm, Browser Run, Sandbox SDK."},
+      {"@type": "HowToStep", "name": "AGENTS.md + Codex", "text": "Per-repo context and org-wide engineering standards as agent skills."},
+      {"@type": "HowToStep", "name": "AI Gateway", "text": "BYOK + anonymous UUID + Zero Data Retention + 85.7% cache hit rate."},
+      {"@type": "HowToStep", "name": "Model tiers + Workers AI", "text": "Opus 4.7 / GPT-5.4 for coordinator; Sonnet / GPT-5.3 Codex for heavy lift; Kimi K2.5 on Workers AI for text-heavy work."},
+      {"@type": "HowToStep", "name": "Failback chains", "text": "Hystrix-style circuit breakers and per-family failback handle provider outages."},
+      {"@type": "HowToStep", "name": "Coordinator judges + posts verdict", "text": "Dedupe, re-categorize, severity rubric, MR comment posted to GitLab."},
+      {"@type": "HowToStep", "name": "Telemetry", "text": "Review Tracker Worker captures Prometheus metrics, token costs, findings."},
+      {"@type": "HowToStep", "name": "Scoreboard", "text": "131K reviews, $1.19 avg, 85.7% cache hit, +58% MRs/week, 93% R&D adoption."}
+    ],
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Cloudflare AI (Unofficial Demo)",
+      "url": "https://ai-security.automatic-demo.com/"
+    },
+    "disclaimer": "Unofficial community demo for educational purposes only. Not affiliated with or endorsed by Cloudflare."
+  }
+  </script>
+</head>
+<body>
+  <div class="diagram-page">
+    <!-- Header -->
+    <header class="diagram-header">
+      <a class="back-link" href="/">&larr; Home</a>
+      <span class="uc-badge">Reference</span>
+      <h1>Cloudflare's Internal AI Engineering Stack</h1>
+    </header>
+
+    <!-- Flow archetypes -->
+    <div class="flow-archetype-labels">
+      <div class="archetype-label">
+        <span class="archetype-arrow human-ai"></span>
+        Engineer &rarr; CI &rarr; Cloudflare AI Stack
+      </div>
+      <div class="archetype-label">
+        <span class="archetype-arrow agent-resource"></span>
+        Coordinator &rarr; Sub-reviewers &rarr; LLM providers
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="diagram-content">
+      <!-- Canvas -->
+      <div class="diagram-canvas">
+        <div class="flow-container">
+          <svg class="flow-edges"></svg>
+          <div class="flow-columns">
+            <div class="flow-column col-left">
+              <div class="column-label">Engineer + GitLab CI</div>
+            </div>
+            <div class="flow-column col-center">
+              <div class="column-label">Cloudflare AI Engineering Stack</div>
+            </div>
+            <div class="flow-column col-right">
+              <div class="column-label">Frontier Providers + Output</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side Panel -->
+      <aside class="diagram-panel">
+        <div class="panel-controls">
+          <button class="btn btn-primary" data-action="play">Play</button>
+          <button class="btn btn-secondary" data-action="prev" disabled>&larr;</button>
+          <button class="btn btn-secondary" data-action="next">&rarr;</button>
+          <button class="btn btn-secondary" data-action="reset">Reset</button>
+          <span class="step-counter">0 / 16</span>
+        </div>
+        <div class="panel-step-info">
+          <div class="step-info-placeholder">
+            <span class="placeholder-icon">&#9654;</span>
+            <p>Press <strong>Play</strong> or use the <strong>arrow keys</strong> to step through the full reference architecture.</p>
+            <p style="font-size: 0.8125rem; margin-top: 0.5rem; color: var(--text-muted);">Tap any node for details. 16 steps covering AI Code Review + the full internal AI Engineering Stack, including the Project Think Execution Ladder.</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Legend -->
+    <footer class="diagram-legend" id="legend"></footer>
+  </div>
+
+  <script type="module">
+    import { FlowEngine } from '/components/flow-engine.js';
+    import { Tooltip } from '/components/tooltip.js';
+    import { Legend } from '/components/legend.js';
+    import { uc0 } from '/data/uc0-stack-steps.js';
+
+    const tooltip = new Tooltip();
+    const legend = new Legend(document.getElementById('legend'));
+
+    const engine = new FlowEngine({
+      steps: uc0.steps,
+      nodes: uc0.nodes,
+      edges: uc0.edges,
+    });
+
+    engine.mount(
+      document.querySelector('.diagram-canvas'),
+      document.querySelector('.diagram-panel')
+    );
+  </script>
+</body>
+</html>
