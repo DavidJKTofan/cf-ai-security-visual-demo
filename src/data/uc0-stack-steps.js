@@ -32,7 +32,7 @@
 export const uc0 = {
   id: 'uc0',
   title: "Cloudflare's Internal AI Engineering Stack",
-  subtitle: 'Reference architecture: how 3,683 engineers ship code with AI Code Review on Cloudflare',
+  subtitle: "Reference architecture: how Cloudflare ships code with AI Code Review on Cloudflare's platform",
 
   nodes: [
     // === LEFT COLUMN — Origins ===
@@ -43,7 +43,7 @@ export const uc0 = {
       icon: '\u{1F468}\u{200D}\u{1F4BB}',
       type: 'user',
       column: 'left',
-      description: '3,683 active engineers (60% company-wide, 93% of R&D) use OpenCode and other MCP-compatible coding assistants. Onboarding is one command — no API keys, no manual MCP setup, no config files. The same engineers opened 48,095 MRs in 30 days; the 4-week rolling MR average climbed from ~5,600/week to over 8,700/week (+58%) as AI adoption grew.',
+      description: '3,683 active internal users (60% company-wide, 93% of R&D) use OpenCode and other MCP-compatible coding assistants. Onboarding is one command — no API keys, no manual MCP setup, no config files. The AI Code Review post reports 48,095 MRs in 30 days; the 4-week rolling MR average climbed from ~5,600/week to over 8,700/week (+58%) as AI adoption grew.',
     },
     {
       id: 'gitlab-mr',
@@ -269,7 +269,7 @@ export const uc0 = {
       title: 'Cloudflare Access secures the engineer-facing stack',
       product: 'Cloudflare Access',
       description: 'OpenCode authenticates through the same Access SSO every engineer already uses. cloudflared returns a signed JWT, and the proxy Worker validates it before forwarding LLM calls. No API keys exist on developer laptops — provider credentials live only in Secrets Store or server-side configuration. The same Access boundary fronts the MCP Server Portal and the internal services agents touch.',
-      why: 'Zero-trust auth is non-negotiable when 3,683 engineers and their agents are calling frontier LLMs and internal tools. The pattern is reusable for customers: centralize identity at the edge, keep credentials server-side, and let policy changes apply without reconfiguring every AI client.',
+      why: 'Zero-trust auth is non-negotiable when 3,683 internal users and their agents are calling frontier LLMs and internal tools. The pattern is reusable for customers: centralize identity at the edge, keep credentials server-side, and let policy changes apply without reconfiguring every AI client.',
       activeNodes: ['gitlab-mr', 'access'],
       activeEdges: ['e-mr-access'],
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/',
@@ -279,7 +279,7 @@ export const uc0 = {
       title: 'Proxy Worker handles discovery, JWT, and anonymization',
       product: 'Cloudflare Workers',
       description: 'A tiny Hono Worker in front of AI Gateway does three things:\n\n1. Serves /.well-known/opencode discovery — one `opencode auth login <url>` configures providers, MCP servers, agents, commands, and permissions.\n2. Validates the Access JWT on every LLM call, strips client auth headers, injects cf-aig-authorization (gateway credential server-side only) and cf-aig-metadata with an anonymous UUID (email → UUID via D1 + KV).\n3. Hourly cron refreshes the OpenAI model catalog and applies provider-side retention controls such as `store: false` where supported.\n\nSame pattern at Sandbox Tier 4: Outbound Workers inject credentials at the network layer so the agent never holds a raw key.',
-      why: 'The proxy Worker is the programmable control plane: identity in, policy and routing decisions in code, provider credentials out of the client. A `wrangler deploy` updates what 3,000+ engineers get next session — no client reconfiguration, no plaintext keys in flight.',
+      why: 'The proxy Worker is the programmable control plane: identity in, policy and routing decisions in code, provider credentials out of the client. A `wrangler deploy` updates what 3,000+ internal users get next session — no client reconfiguration, no plaintext keys in flight.',
       activeNodes: ['access', 'proxy-worker'],
       activeEdges: ['e-access-proxy'],
       docsUrl: 'https://blog.cloudflare.com/internal-ai-engineering-stack/',
@@ -402,7 +402,7 @@ export const uc0 = {
       title: 'The scoreboard — as of April 2026',
       product: 'Outcomes (30-day window, March 10 – April 9, 2026)',
       description: '30-day snapshot: 3,683 active users, 131,246 reviews across 48,095 MRs, $1.19 average cost per review, 85.7% cached-token rate, +58% MRs/week, 3m 39s median review time, and only 0.6% break-glass overrides.',
-      why: 'For customers, the point is not to copy Cloudflare\'s exact AI Code Review workflow. The point is that the same primitives let you shape your own safe AI development process. Configure Cloudflare Access for identity, a Worker proxy for discovery and policy logic, AI Gateway for provider keys, routing, metadata, caching, retention controls, and cost visibility, Workers AI or frontier providers for model choice, MCP Server Portals for governed tool access, Dynamic Workers or Sandbox SDK for isolated code execution, and Logpush/analytics for audit and spend reporting. Then adapt the workflow to your SDLC: code review, secure coding assistants, agent governance, compliance checks, release automation, or another process unique to your business.',
+      why: 'All figures in this walkthrough are from public Cloudflare Blog posts, primarily "The AI engineering stack we built internally — on the platform we ship" and "Orchestrating AI Code Review at scale." For customers, the point is not to copy Cloudflare\'s exact AI Code Review workflow. The point is that the same primitives let you shape your own safe AI development process. Configure Cloudflare Access for identity, a Worker proxy for discovery and policy logic, AI Gateway for provider keys, routing, metadata, caching, retention controls, and cost visibility, Workers AI or frontier providers for model choice, MCP Server Portals for governed tool access, Dynamic Workers or Sandbox SDK for isolated code execution, and Logpush/analytics for audit and spend reporting. Then adapt the workflow to your SDLC: code review, secure coding assistants, agent governance, compliance checks, release automation, or another process unique to your business.',
       activeNodes: ['developer', 'gitlab-mr', 'access', 'proxy-worker', 'coordinator', 'sub-reviewers', 'mcp-portal', 'backstage', 'codex', 'execution-ladder', 'ai-gateway', 'workers-ai', 'tracker', 'anthropic', 'openai', 'google', 'mr-output'],
       activeEdges: [],
       docsUrl: 'https://blog.cloudflare.com/internal-ai-engineering-stack/',
