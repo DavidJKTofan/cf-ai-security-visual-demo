@@ -91,7 +91,7 @@ export const uc2 = {
       type: 'cloudflare',
       column: 'center',
       product: 'Dynamic Workers / Codemode',
-      description: 'Dynamic Workers spin up isolated V8 sandboxes for MCP tool execution via Codemode. MCP Server Portals natively support portal-level Code Mode: add ?codemode=search_and_execute to the portal URL and all upstream tools collapse into two portal tools — portal_codemode_search (discover tools via codemode.tools()) and portal_codemode_execute (call tools as codemode.toolName(args) via a sandboxed Dynamic Worker). Tool dispatch uses Workers RPC; the sandbox has network isolation (globalOutbound: null) and never holds credentials.',
+      description: 'Dynamic Workers spin up isolated V8 sandboxes for MCP tool execution via Codemode. MCP Server Portals natively support portal-level Code Mode: add ?codemode=search_and_execute to the portal URL and the portal advertises a small code interface instead of listing every upstream MCP tool. The agent writes JavaScript against typed codemode.* methods, generated code runs in an isolated Dynamic Worker, and credentials stay out of model context.',
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/mcp-portals/#code-mode',
     },
     {
@@ -201,8 +201,8 @@ export const uc2 = {
     {
       title: 'Portal Code Mode sandboxes tool execution',
       product: 'MCP Portal + Dynamic Workers',
-      description: 'MCP Server Portals support portal-level Code Mode — append ?codemode=search_and_execute to the portal URL. All upstream tools (potentially hundreds across many MCP servers) collapse into two portal-level tools: portal_codemode_search (LLM writes JavaScript calling codemode.tools() to discover and filter) and portal_codemode_execute (LLM writes JavaScript calling codemode.serverName_toolName(args) to invoke). Each execute call runs in a fresh Dynamic Worker isolate with network isolation (globalOutbound: null). Tool dispatch uses Workers RPC — the sandbox never holds credentials. Cloudflare measured a 94% token reduction on its own internal portal (52 tools → 2, ~9,400 → ~600 tokens).',
-      why: 'Classic MCP loads every tool schema upfront, consuming context before the model starts working. Portal Code Mode scales cleanly — the client always sees two tools no matter how many MCP servers are connected behind the portal. Sandboxed execution keeps tool invocation safe and auditable, bridging the security boundary via typed Workers RPC.',
+      description: 'MCP Server Portals support portal-level Code Mode — append ?codemode=search_and_execute to the portal URL. Instead of listing every upstream tool from every connected MCP server, the portal advertises a small model-facing code interface. The agent writes JavaScript against typed codemode.* methods, and the generated code runs in an isolated Dynamic Worker environment so credentials and environment variables stay out of model context. For context optimization, the related optimize_context=search_and_execute mode exposes query and execute tools so agents discover tool definitions on demand.',
+      why: 'Classic MCP loads every tool schema upfront, consuming context before the model starts working. Portal Code Mode scales cleanly because the model-facing surface stays small as more MCP servers are connected behind the portal. Sandboxed execution keeps tool invocation safe and auditable, bridging the security boundary via typed Workers RPC.',
       activeNodes: ['cf-gateway', 'worker-isolate'],
       activeEdges: ['e-gateway-isolate'],
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/mcp-portals/#code-mode',

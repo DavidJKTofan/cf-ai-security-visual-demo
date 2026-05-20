@@ -45,7 +45,7 @@ export const uc3 = {
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare AI Gateway',
-      description: 'The AI Gateway unified endpoint receives all LLM API requests through a single URL. Integration requires changing just the base URL — one line of code. Gateway authentication (cf-aig-authorization header) prevents unauthorized access. BYOK (Secrets Store) centrally manages provider API keys — reference by name, never pass in plaintext. Unified Billing eliminates API keys entirely with centralized Cloudflare credits. For scaled deployments, a fronting Proxy Worker pattern (used internally by Cloudflare for 3,683+ engineers) adds Cloudflare Access JWT validation, anonymous per-user attribution via D1+KV, a /.well-known discovery endpoint for one-command client setup, automatic ZDR (store: false) injection, and hourly model-catalog refresh — all without changing client configs.',
+      description: 'The AI Gateway unified endpoint receives all LLM API requests through a single URL. Integration requires changing just the base URL — one line of code. Gateway authentication (cf-aig-authorization header) prevents unauthorized access. BYOK (Secrets Store) centrally manages provider API keys — reference by name, never pass in plaintext. Unified Billing eliminates API keys entirely with centralized Cloudflare credits and supports ZDR on eligible routes. For scaled deployments, a fronting Proxy Worker pattern (used internally by Cloudflare for 3,683+ engineers) adds Cloudflare Access JWT validation, anonymous per-user attribution via D1+KV, a /.well-known discovery endpoint for one-command client setup, provider-side retention controls such as store: false where supported, and hourly model-catalog refresh — all without changing client configs.',
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/',
     },
     {
@@ -67,7 +67,7 @@ export const uc3 = {
       type: 'cloudflare',
       column: 'center',
       product: 'AI Gateway Caching',
-      description: 'Caches responses from AI providers. Supports both exact-match caching and semantic caching (similar but not identical prompts). Reduces latency, saves costs, and increases throughput. Supports custom cache keys and TTL configuration.',
+      description: 'Caches identical responses from AI providers. AI Gateway response caching is exact-match by default, with custom cache keys and TTL configuration for workflows that need more control. Reduces latency, saves costs, and increases throughput for repeated prompts or controlled prompt patterns.',
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/features/caching/',
     },
     {
@@ -186,8 +186,8 @@ export const uc3 = {
     {
       title: 'App or developer sends LLM request',
       product: 'Cloudflare AI Gateway',
-      description: 'Your application or developer\'s AI coding assistant sends an LLM API request through the AI Gateway unified endpoint — one line of code change. Gateway authentication (cf-aig-authorization) prevents unauthorized access. BYOK (Secrets Store) centrally manages provider API keys — reference by name, no plaintext. Unified Billing eliminates API keys entirely with centralized Cloudflare credits. At Cloudflare-internal scale (3,683+ engineers, 241B tokens/month), a small fronting Proxy Worker in front of AI Gateway validates Cloudflare Access JWTs, strips user auth headers, injects cf-aig-authorization + an anonymous UUID in cf-aig-metadata, auto-applies store: false for Zero Data Retention, and serves a /.well-known discovery endpoint so clients configure with a single opencode auth login <url> command.',
-      why: 'AI Gateway provides a single control plane for all AI API calls. The proxy-Worker-in-front pattern gives you per-user attribution, ZDR, and config-as-code distribution without exposing provider keys on developer laptops or requiring client reconfiguration when policies change — a wrangler deploy updates what 3,000+ engineers get next time they run their coding tool.',
+      description: 'Your application or developer\'s AI coding assistant sends an LLM API request through the AI Gateway unified endpoint — one line of code change. Gateway authentication (cf-aig-authorization) prevents unauthorized access. BYOK (Secrets Store) centrally manages provider API keys — reference by name, no plaintext. Unified Billing eliminates API keys entirely with centralized Cloudflare credits and supports ZDR on eligible routes. At Cloudflare-internal scale (3,683+ engineers, 241B tokens/month), a small fronting Proxy Worker in front of AI Gateway validates Cloudflare Access JWTs, strips user auth headers, injects cf-aig-authorization + an anonymous UUID in cf-aig-metadata, applies provider-side retention controls such as store: false where supported, and serves a /.well-known discovery endpoint so clients configure with a single opencode auth login <url> command.',
+      why: 'AI Gateway provides a single control plane for all AI API calls. The proxy-Worker-in-front pattern gives you per-user attribution, retention-policy enforcement where supported, and config-as-code distribution without exposing provider keys on developer laptops or requiring client reconfiguration when policies change — a wrangler deploy updates what 3,000+ engineers get next time they run their coding tool.',
       activeNodes: ['app-agent', 'developer', 'aig-endpoint'],
       activeEdges: ['e-app-aig', 'e-dev-aig'],
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/',
@@ -206,8 +206,8 @@ export const uc3 = {
     {
       title: 'Cache check',
       product: 'AI Gateway Caching',
-      description: 'AI Gateway checks for cached responses. Supports both exact-match caching and semantic caching — returning cached responses for similar (not just identical) prompts. On cache hit, the response is returned immediately without calling the LLM provider. Supports custom cache keys and configurable TTL.',
-      why: 'Caching dramatically reduces latency and costs. Semantic caching extends this to similar prompts, ideal for natural language queries where users phrase the same question differently.',
+      description: 'AI Gateway checks for cached responses. Current AI Gateway response caching is exact-match: provider, endpoint, model, provider authentication header, and full request body are used to build the default cache key. On cache hit, the response is returned immediately without calling the LLM provider. Supports custom cache keys and configurable TTL.',
+      why: 'Caching dramatically reduces latency and costs for repeated prompts or controlled prompt patterns. For natural-language use cases with many variants, custom cache keys and prompt design are the levers to increase reuse while keeping responses correct.',
       activeNodes: ['rate-limit', 'cache'],
       activeEdges: ['e-rl-cache'],
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/features/caching/',

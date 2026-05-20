@@ -8,7 +8,7 @@
   <title>Cloudflare's Internal AI Engineering Stack — Reference Architecture (Unofficial)</title>
   <meta name="title" content="Cloudflare's Internal AI Engineering Stack — Reference Architecture (Unofficial)">
   <meta name="description" content="Unofficial educational demo: interactive walkthrough of how Cloudflare runs AI Code Review and the full internal AI Engineering Stack on its own products — Access, AI Gateway, Workers AI, MCP Portal, Code Mode, and more. Not affiliated with or endorsed by Cloudflare.">
-  <meta name="keywords" content="Cloudflare, AI Engineering Stack, AI Code Review, AI Gateway, Workers AI, MCP Portal, Backstage, OpenCode, Kimi K2.5, reference architecture, educational demo">
+  <meta name="keywords" content="Cloudflare, AI Engineering Stack, AI Code Review, AI Gateway, Workers AI, MCP Portal, Backstage, OpenCode, Kimi, reference architecture, educational demo">
   <meta name="author" content="Community Demo (Not affiliated with Cloudflare.)">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0d1117">
@@ -54,20 +54,20 @@
     "description": "How Cloudflare runs AI Code Review and the full internal AI Engineering Stack on its own products — Access, AI Gateway, Workers AI, MCP Portal, Code Mode, Backstage.",
     "step": [
       {"@type": "HowToStep", "name": "Engineer opens MR", "text": "Developer opens merge request; GitLab CI component triggers the review."},
-      {"@type": "HowToStep", "name": "Cloudflare Access", "text": "Zero Trust SSO authenticates the CI job and issues a JWT."},
-      {"@type": "HowToStep", "name": "Proxy Worker", "text": "Discovery endpoint, JWT validation, anonymous UUID, ZDR auto-injection."},
+      {"@type": "HowToStep", "name": "Cloudflare Access", "text": "Zero Trust SSO secures the engineer-facing proxy and MCP Portal flows."},
+      {"@type": "HowToStep", "name": "Proxy Worker", "text": "Discovery endpoint, JWT validation, anonymous UUID, server-side gateway credentials, provider-side retention controls where supported."},
       {"@type": "HowToStep", "name": "Risk tier + Coordinator", "text": "OpenCode coordinator classifies the MR and spawns specialized reviewers."},
       {"@type": "HowToStep", "name": "Sub-reviewers", "text": "Up to 7 concurrent OpenCode sessions: Security, Code Quality, Performance, Docs, Codex, Release, AGENTS.md."},
       {"@type": "HowToStep", "name": "MCP Portal + Backstage", "text": "Sub-reviewers query 13 MCP servers / 182+ tools for ownership, deps, schemas."},
-      {"@type": "HowToStep", "name": "Code Mode", "text": "Portal collapses 34 tool schemas into 2 portal-level tools."},
+      {"@type": "HowToStep", "name": "Code Mode", "text": "Portal keeps the model-facing tool surface small while upstream MCP tools grow."},
       {"@type": "HowToStep", "name": "Project Think Execution Ladder", "text": "Five-tier safe code execution: Workspace, Isolate, npm, Browser Run, Sandbox SDK."},
       {"@type": "HowToStep", "name": "AGENTS.md + Codex", "text": "Per-repo context and org-wide engineering standards as agent skills."},
-      {"@type": "HowToStep", "name": "AI Gateway", "text": "BYOK + anonymous UUID + Zero Data Retention + 85.7% cache hit rate."},
-      {"@type": "HowToStep", "name": "Model tiers + Workers AI", "text": "Opus 4.7 / GPT-5.4 for coordinator; Sonnet / GPT-5.3 Codex for heavy lift; Kimi K2.5 on Workers AI for text-heavy work."},
+      {"@type": "HowToStep", "name": "AI Gateway", "text": "BYOK, anonymous UUID metadata, centralized routing, retention controls, and cached-token economics."},
+      {"@type": "HowToStep", "name": "Model tiers + Workers AI", "text": "Opus 4.7 / GPT-5.4 for coordinator; Sonnet / GPT-5.3 Codex for heavy lift; Kimi-class open models on Workers AI for text-heavy work."},
       {"@type": "HowToStep", "name": "Failback chains", "text": "Hystrix-style circuit breakers and per-family failback handle provider outages."},
       {"@type": "HowToStep", "name": "Coordinator judges + posts verdict", "text": "Dedupe, re-categorize, severity rubric, MR comment posted to GitLab."},
       {"@type": "HowToStep", "name": "Telemetry", "text": "Review Tracker Worker captures Prometheus metrics, token costs, findings."},
-      {"@type": "HowToStep", "name": "Scoreboard", "text": "131K reviews, $1.19 avg, 85.7% cache hit, +58% MRs/week, 93% R&D adoption."}
+      {"@type": "HowToStep", "name": "Scoreboard", "text": "131K reviews, $1.19 avg, 85.7% cached-token rate, +58% MRs/week, 93% R&D adoption."}
     ],
     "isPartOf": {
       "@type": "WebSite",

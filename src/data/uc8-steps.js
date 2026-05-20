@@ -6,7 +6,8 @@
  *   1. BYOK (Bring Your Own Key) — store keys in Cloudflare Secrets Store, reference by name
  *   2. Unified Billing — Cloudflare manages provider credentials; single Cloudflare invoice
  *
- * Both paths support spend limits (daily/weekly/monthly) and Zero Data Retention (ZDR).
+ * Unified Billing supports spend limits (daily/weekly/monthly) and Zero Data Retention (ZDR)
+ * for eligible providers; BYOK centralizes customer-owned provider keys in Secrets Store.
  *
  * References:
  *   https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/
@@ -66,8 +67,8 @@ export const uc8 = {
     },
     {
       id: 'spend-limits',
-      label: 'Spend Limits & ZDR',
-      sublabel: 'Budgets + Zero Data Retention',
+      label: 'Unified Billing Limits & ZDR',
+      sublabel: 'Budgets + eligible ZDR routes',
       icon: '\u{1F6E1}',
       type: 'cloudflare',
       column: 'center',

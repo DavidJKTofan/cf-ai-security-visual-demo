@@ -56,7 +56,7 @@ export const uc6 = {
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare Codemode',
-      description: 'Codemode (@cloudflare/codemode) converts your tools (AI SDK tools or MCP tools) into typed TypeScript APIs and gives the LLM a single "write code" tool via createCodeTool(). The LLM writes an async function that calls codemode.toolName(args). DynamicWorkerExecutor wraps the Worker Loader binding to handle code normalization, sandbox creation, and result collection. MCP Server Portals ship Code Mode natively — set ?codemode=search_and_execute on the portal URL and every upstream tool collapses into portal_codemode_search + portal_codemode_execute (Cloudflare measured 94% token reduction internally).',
+      description: 'Codemode (@cloudflare/codemode) converts your tools (AI SDK tools or MCP tools) into typed TypeScript APIs and gives the LLM a single "write code" tool via createCodeTool(). The LLM writes an async function that calls codemode.toolName(args). DynamicWorkerExecutor wraps the Worker Loader binding to handle code normalization, sandbox creation, and result collection. MCP Server Portals ship Code Mode natively — set ?codemode=search_and_execute on the portal URL and the portal advertises a small code interface instead of listing every upstream MCP tool.',
       docsUrl: 'https://developers.cloudflare.com/agents/api-reference/codemode/',
     },
     {
@@ -154,8 +154,8 @@ export const uc6 = {
     {
       title: 'Codemode converts tools to TypeScript API',
       product: 'Cloudflare Codemode',
-      description: 'Codemode generates TypeScript type definitions from your tools and builds a description the LLM can read. The LLM writes an async arrow function that calls codemode.toolName(args). The code is normalized via AST parsing (acorn) for safety. For MCP deployments, MCP Server Portals offer a turnkey version: enable Code Mode with a query parameter on the portal URL and the portal collapses every upstream tool into two generic tools (portal_codemode_search, portal_codemode_execute).',
-      why: 'TypeScript APIs require far fewer tokens to describe than HTTP/OpenAPI specs — Cloudflare\'s internal portal saw a 94% token reduction (52 tools down to 2, ~9,400 → ~600 tokens). AST normalization catches formatting errors and sanitizes tool names before execution.',
+      description: 'Codemode generates TypeScript type definitions from your tools and builds a description the LLM can read. The LLM writes an async arrow function that calls codemode.toolName(args). The code is normalized via AST parsing (acorn) for safety. For MCP deployments, MCP Server Portals offer a turnkey version: enable Code Mode with a query parameter on the portal URL and the portal exposes a small code interface instead of every upstream tool schema.',
+      why: 'TypeScript APIs require far fewer tokens to describe than HTTP/OpenAPI specs. Cloudflare\'s API MCP pattern shows the extreme version: 1,300+ API endpoints exposed in under ~1,000 tokens instead of loading every endpoint schema up front. AST normalization catches formatting errors and sanitizes tool names before execution.',
       activeNodes: ['host-worker', 'codemode'],
       activeEdges: ['e-host-codemode'],
       docsUrl: 'https://developers.cloudflare.com/agents/api-reference/codemode/',
