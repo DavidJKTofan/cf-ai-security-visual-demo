@@ -33,6 +33,35 @@ export const uc0 = {
   id: 'uc0',
   title: "Cloudflare's Internal AI Engineering Stack",
   subtitle: "Reference architecture: how Cloudflare ships code with AI Code Review on Cloudflare's platform",
+  overview: {
+    eyebrow: 'Reference Architecture Summary',
+    title: 'CI-native AI Code Review, backed by Cloudflare\'s internal AI engineering stack',
+    description: 'To optimize pull request and merge request reviews for quality and efficiency, Cloudflare moved away from standard AI tools and single-prompt review approaches that were too noisy and inflexible. Instead, Cloudflare built a CI-native orchestration system around the open-source coding agent OpenCode, then wired it into the same Cloudflare platform primitives customers can use: Access, Workers, AI Gateway, Workers AI, MCP Server Portal, Code Mode, and the Agents SDK.',
+    sections: [
+      {
+        title: '1. Multi-agent, specialized review',
+        items: [
+          'Each MR can launch up to <strong>seven specialized OpenCode reviewers</strong> for security, performance, code quality, documentation, release impact, AGENTS.md freshness, and Engineering Codex compliance.',
+          'Risk tiers keep the system efficient: typo-sized changes get a lightweight pass, while security-sensitive or large MRs trigger the full reviewer set.',
+        ],
+      },
+      {
+        title: '2. Coordinator agent',
+        items: [
+          'A coordinator agent deduplicates overlapping findings, re-categorizes issues, judges severity, and filters out speculative noise.',
+          'Developers receive one structured GitLab review comment instead of seven separate agent outputs, with severe or security-relevant issues able to block merge.',
+        ],
+      },
+      {
+        title: '3. Composable platform architecture',
+        items: [
+          'Plugins isolate GitLab integration, Cloudflare AI Gateway routing, model tiers, failback chains, Engineering Codex checks, AGENTS.md context, and telemetry.',
+          'MCP Server Portal and Backstage give reviewers production context, while Code Mode and Dynamic Workers keep tool execution isolated and token-efficient.',
+        ],
+      },
+    ],
+    result: 'Across tens of thousands of internal MRs, the system reviews clean code quickly, flags concrete bugs with high signal, and reduces the old hours-long wait for first review to minutes. In the measured 30-day window it ran <strong>131,246 reviews</strong> across <strong>48,095 MRs</strong>, with a <strong>$1.19 average cost</strong> per review and an <strong>85.7% cached-token rate</strong>.',
+  },
 
   nodes: [
     // === LEFT COLUMN — Origins ===

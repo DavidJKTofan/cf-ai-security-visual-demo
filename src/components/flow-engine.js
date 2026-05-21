@@ -9,10 +9,11 @@
  */
 
 export class FlowEngine {
-  constructor({ steps, nodes, edges, onStepChange }) {
+  constructor({ steps, nodes, edges, overview, onStepChange }) {
     this.steps = steps;
     this.nodes = nodes;
     this.edges = edges;
+    this.overview = overview || null;
     this.currentStep = -1; // -1 = overview (nothing highlighted)
     this.isPlaying = false;
     this.playInterval = null;
@@ -518,13 +519,7 @@ export class FlowEngine {
     if (!infoEl) return;
 
     if (!step) {
-      infoEl.innerHTML = `
-        <div class="step-info-placeholder">
-          <span class="placeholder-icon">&#9654;</span>
-          <p>Press <strong>Play</strong> or use the <strong>arrow keys</strong> to step through the request flow.</p>
-          <p style="font-size: 0.8125rem; margin-top: 0.5rem; color: var(--text-muted);">Tap any node for details.</p>
-        </div>
-      `;
+      infoEl.innerHTML = this._renderOverviewInfo();
       return;
     }
 
@@ -563,6 +558,45 @@ export class FlowEngine {
             Docs &#8599;
           </a>
         ` : ''}
+      </div>
+    `;
+  }
+
+  _renderOverviewInfo() {
+    if (!this.overview) {
+      return `
+        <div class="step-info-placeholder">
+          <span class="placeholder-icon">&#9654;</span>
+          <p>Press <strong>Play</strong> or use the <strong>arrow keys</strong> to step through the request flow.</p>
+          <p style="font-size: 0.8125rem; margin-top: 0.5rem; color: var(--text-muted);">Tap any node for details.</p>
+        </div>
+      `;
+    }
+
+    const sections = (this.overview.sections || []).map(section => `
+      <div class="overview-section">
+        <div class="overview-section-title">${section.title}</div>
+        ${section.items && section.items.length ? `
+          <ul>
+            ${section.items.map(item => `<li>${item}</li>`).join('')}
+          </ul>
+        ` : ''}
+      </div>
+    `).join('');
+
+    return `
+      <div class="step-info-overview">
+        ${this.overview.eyebrow ? `<div class="overview-eyebrow">${this.overview.eyebrow}</div>` : ''}
+        <h2 class="overview-title">${this.overview.title}</h2>
+        ${this.overview.description ? `<div class="overview-description">${this._formatRichText(this.overview.description)}</div>` : ''}
+        ${sections}
+        ${this.overview.result ? `
+          <div class="overview-result">
+            <div class="overview-result-label">The result</div>
+            ${this._formatRichText(this.overview.result)}
+          </div>
+        ` : ''}
+        <p class="overview-start-hint">Press <strong>Play</strong> or use the <strong>arrow keys</strong> to step through the full architecture.</p>
       </div>
     `;
   }
