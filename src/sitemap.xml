@@ -2,122 +2,107 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://ai-security.automatic-demo.com/</loc>
-    <lastmod>2026-04-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
+    <lastmod>2026-06-19</lastmod>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://ai-security.automatic-demo.com/decision-map</loc>
+    <lastmod>2026-06-19</lastmod>
+    <changefreq>yearly</changefreq>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/ai-security</loc>
     <lastmod>2026-04-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.95</priority>
+    <changefreq>yearly</changefreq>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/ai-builder</loc>
     <lastmod>2026-04-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.95</priority>
+    <changefreq>yearly</changefreq>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc0-internal-stack.html</loc>
     <lastmod>2026-05-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <changefreq>yearly</changefreq>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc1-genai-workforce.html</loc>
     <lastmod>2026-03-01</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc2-govern-agents.html</loc>
     <lastmod>2026-03-01</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc3-build-with-ai.html</loc>
     <lastmod>2026-03-01</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc4-protect-ai-apps.html</loc>
     <lastmod>2026-03-01</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc5-self-hosted-agents.html</loc>
     <lastmod>2026-03-01</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc6-code-execution.html</loc>
     <lastmod>2026-03-01</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc7-multi-agent.html</loc>
     <lastmod>2026-03-01</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc8-unified-billing.html</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc9-dynamic-routing.html</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc10-rag.html</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc11-voice-agent.html</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc12-ai-chat.html</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc13-scheduled-agent.html</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc14-browser-agent.html</loc>
     <lastmod>2026-04-21</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc15-private-networking.html</loc>
     <lastmod>2026-04-21</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ai-security.automatic-demo.com/use-cases/uc16-durable-agents.html</loc>
     <lastmod>2026-04-21</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
   </url>
 </urlset>

@@ -7,10 +7,10 @@
   <!-- Primary Meta Tags -->
   <title>Cloudflare AI - Interactive Visual Demos (Unofficial)</title>
   <meta name="title" content="Cloudflare AI - Interactive Visual Demos (Unofficial)">
-  <meta name="description" content="Unofficial educational demo: explore 16 interactive visual walkthroughs of Cloudflare AI — security and AI builder use cases. Not affiliated with or endorsed by Cloudflare.">
-  <meta name="keywords" content="Cloudflare, AI security, AI builder, AI Gateway, Zero Trust, DLP, Agents SDK, RAG, voice AI, Workers AI, educational demo">
+  <meta name="description" content="Unofficial educational demo: explore a Cloudflare AI security decision map plus 17 interactive visual walkthroughs covering AI Gateway, Zero Trust, DLP, Agents SDK, Workers AI, and more.">
+  <meta name="keywords" content="Cloudflare, AI security, AI builder, decision map, AI Gateway, Zero Trust, DLP, Agents SDK, RAG, voice AI, Workers AI, educational demo">
   <meta name="author" content="Community Demo (Not affiliated with Cloudflare.)">
-  <meta name="robots" content="index, follow">
+  <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="theme-color" content="#0d1117">
   <meta name="color-scheme" content="dark">
   
@@ -21,7 +21,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ai-security.automatic-demo.com/">
   <meta property="og:title" content="Cloudflare AI - Interactive Visual Demos (Unofficial)">
-  <meta property="og:description" content="Unofficial educational demo: explore 16 interactive visual walkthroughs of Cloudflare AI — security and AI builder use cases. Not affiliated with or endorsed by Cloudflare.">
+  <meta property="og:description" content="Explore a Cloudflare AI security decision map plus 17 interactive visual walkthroughs covering AI Gateway, Zero Trust, DLP, Agents SDK, Workers AI, and more.">
   <meta property="og:image" content="https://ai-security.automatic-demo.com/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -32,7 +32,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://ai-security.automatic-demo.com/">
   <meta name="twitter:title" content="Cloudflare AI - Interactive Visual Demos (Unofficial)">
-  <meta name="twitter:description" content="Unofficial educational demo: explore 16 interactive visual walkthroughs of Cloudflare AI — security and AI builder use cases. Not affiliated with or endorsed by Cloudflare.">
+  <meta name="twitter:description" content="Explore a Cloudflare AI security decision map plus 17 interactive visual walkthroughs covering AI Gateway, Zero Trust, DLP, Agents SDK, Workers AI, and more.">
   <meta name="twitter:image" content="https://ai-security.automatic-demo.com/og-image.png">
   
   <!-- Favicon -->
@@ -54,7 +54,7 @@
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Cloudflare AI (Unofficial Demo)",
-    "description": "Unofficial educational demo of Cloudflare AI use cases. Not affiliated with or endorsed by Cloudflare.",
+    "description": "Unofficial educational demo of Cloudflare AI security and AI builder use cases, including an interactive decision map.",
     "url": "https://ai-security.automatic-demo.com/",
     "disclaimer": "This is an unofficial community demo for educational purposes only. Not affiliated with, endorsed by, or representative of Cloudflare.",
     "potentialAction": {
@@ -133,7 +133,7 @@
       grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
       gap: clamp(1rem, 2.5vw, 1.75rem);
       width: 100%;
-      max-width: 840px;
+      max-width: 1100px;
     }
 
     .category-card {
@@ -434,7 +434,7 @@
       align-items: center;
       gap: 0.75rem;
       width: 100%;
-      max-width: 840px;
+      max-width: 1100px;
       margin: 0 auto clamp(1rem, 2.5vw, 1.5rem);
       font-size: clamp(0.6875rem, 1.3vw, 0.8125rem);
       color: var(--text-muted);
@@ -477,7 +477,7 @@
     <main class="landing-main">
       <h1 class="landing-title">Cloudflare <span>AI</span></h1>
       <p class="landing-subtitle">
-        Interactive visual walkthroughs of Cloudflare&rsquo;s AI platform. Start with the reference architecture, or jump into a category.
+        Interactive visual walkthroughs of Cloudflare&rsquo;s AI platform. Start with the decision map, reference architecture, or a use-case category.
       </p>
 
       <!-- Featured Reference Architecture -->
@@ -528,9 +528,27 @@
         <span class="featured-hero-cta">Explore the reference architecture <span class="arrow">&rarr;</span></span>
       </a>
 
-      <div class="landing-section-divider">Or explore by category</div>
+      <div class="landing-section-divider">Or choose your path</div>
 
       <div class="category-grid">
+
+        <!-- Decision Map -->
+        <a class="category-card" href="/decision-map">
+          <div class="category-card-icon">&#128506;</div>
+          <span class="category-card-count">Decision Guide</span>
+          <h2>AI Security Decision Map</h2>
+          <p>Choose the right Cloudflare control by traffic path: LLM/API calls, workforce web AI, MCP tools, SaaS posture, public AI apps, custom agents, or private network access.</p>
+          <div class="category-card-tags">
+            <span class="product-tag">DLP</span>
+            <span class="product-tag">AI Gateway</span>
+            <span class="product-tag">Gateway</span>
+            <span class="product-tag">MCP Portal</span>
+            <span class="product-tag">CASB</span>
+            <span class="product-tag">WAF</span>
+            <span class="product-tag">Workers VPC</span>
+          </div>
+          <span class="category-card-cta">Open decision map <span class="arrow">&rarr;</span></span>
+        </a>
 
         <!-- AI Security -->
         <a class="category-card" href="/ai-security">

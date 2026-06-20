@@ -2,23 +2,27 @@
 
 ## Project Overview
 
-Interactive visual demo of Cloudflare's AI platform: **17 walkthroughs** total — 16 use cases (7 AI Security UC1–UC7 + 9 AI Builder UC8–UC16) plus **UC0**, a featured Reference Architecture that combines elements from every other UC into a single end-to-end walkthrough of how Cloudflare runs AI Code Review and its internal AI engineering stack on its own products. Deployed as a purely static site via Cloudflare Workers Static Assets. Vanilla HTML/CSS/JS with ES modules — no build step, no frameworks.
+Interactive visual demo of Cloudflare's AI platform: an interactive `/decision-map` plus **17 walkthroughs** total — 16 use cases (7 AI Security UC1–UC7 + 9 AI Builder UC8–UC16) plus **UC0**, a featured Reference Architecture that combines elements from every other UC into a single end-to-end walkthrough of how Cloudflare runs AI Code Review and its internal AI engineering stack on its own products. Deployed with Cloudflare Workers Static Assets and a small Worker script for Markdown-friendly alternate responses. Vanilla HTML/CSS/JS with ES modules — no frontend build step, no framework runtime.
 
 ## Key Architecture Decisions
 
-- **Static-only deployment**: No Worker script (`main`) is configured. Wrangler serves the `src/` directory directly from Cloudflare's edge via the `assets.directory` setting.
+- **Workers Static Assets + small Worker script**: Wrangler uploads `src/` via `assets.directory`. `worker/index.js` uses the `ASSETS` binding and selectively runs first for landing/category/use-case routes to add Markdown alternates and serve `.md`, `?format=markdown`, or Markdown-oriented `Accept` requests.
 - **Vanilla JS with ES modules**: All component JS uses `export`/`import` syntax loaded via `<script type="module">`.
 - **Modular data-driven design**: Each use case is defined by a data file (`src/data/ucN-steps.js`) containing nodes, edges, and steps. The shared `FlowEngine` renders any data file without modification.
+- **Decision-map page is standalone**: `src/decision-map/index.html` is a self-contained static page with inline CSS/JS. It explains when to use AI Gateway, SWG, MCP Server Portal, CASB, AI Security for Apps, Developer Platform, and Workers VPC, plus a bottom full-customer route-lane architecture.
 
 ## Project Structure
 
 ```
 src/
   index.html                          Landing page
+  decision-map/index.html             Interactive product decision map
   use-cases/                          One HTML file per use case
   components/                         Shared JS components (flow-engine, tooltip, legend)
   styles/                             CSS (base, theme, diagram)
   data/                               Step definitions per use case
+worker/
+  index.js                            ASSETS fallback + Markdown alternate responses
 wrangler.jsonc                        Workers Static Assets config
 ```
 
@@ -29,22 +33,28 @@ wrangler.jsonc                        Workers Static Assets config
 | `npm run dev` | Local development via `wrangler dev` |
 | `npm start` | Alias for `npm run dev` |
 | `npm run deploy` | Deploy to Cloudflare Workers Static Assets |
+| `node --check worker/index.js` | Syntax-check the Worker script |
+| `npm exec wrangler -- deploy --dry-run` | Validate deployment package without publishing |
 
 ## Cloudflare Workers Static Assets
 
-This project uses [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/) — the recommended way to deploy static sites on Cloudflare. Key docs:
+This project uses [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/) — the recommended way to deploy static assets as part of a Cloudflare Worker. Key docs:
 
 - https://developers.cloudflare.com/workers/static-assets/
 - https://developers.cloudflare.com/workers/static-assets/binding/
+- https://developers.cloudflare.com/workers/static-assets/#routing-behavior
+- https://developers.cloudflare.com/workers/wrangler/configuration/#assets
+- https://developers.cloudflare.com/workers/vite-plugin/
 - https://developers.cloudflare.com/workers/best-practices/workers-best-practices/
 
-For a purely static site, only `assets.directory` is needed in `wrangler.jsonc`. No `main` entry point or Worker script is required.
+Current deployment uses `main: ./worker/index.js`, `assets.directory: ./src`, `assets.binding: ASSETS`, and selected `assets.run_worker_first` routes. Do not remove the Worker script unless Markdown alternate responses are intentionally removed. The Cloudflare Vite plugin is not currently needed because the frontend has no build step; consider it only if the project moves to Vite/framework tooling.
 
 ## Landing Page Structure
 
-The site has a two-category landing model with a featured reference architecture on top:
+The site has a decision-map-first landing model with a featured reference architecture and two category cards:
 
-- `src/index.html` — top-level page; features the **UC0 Reference Architecture** hero card above the two category cards ("AI Security" vs "AI Builder")
+- `src/index.html` — top-level page; features the **UC0 Reference Architecture** hero card and cards for `/decision-map`, `/ai-security`, and `/ai-builder`
+- `src/decision-map/index.html` — interactive visual decision map and full customer architecture route lanes
 - `src/ai-security.html` — lists the 7 AI security UCs (UC1–UC7)
 - `src/ai-builder.html` — lists the 9 AI builder UCs (UC8–UC16), grouped into two sections:
   - **Developing with AI** (UC8–UC9)

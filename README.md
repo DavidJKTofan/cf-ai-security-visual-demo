@@ -1,274 +1,251 @@
-# Cloudflare AI - Interactive Visual Demos
+# Cloudflare AI Security Visual Demo
 
-An interactive, modular frontend web application that visualizes Cloudflare's AI platform across two categories — **AI Security** (UC1–UC7) and **AI Builder** (UC8–UC16) — plus a featured **Reference Architecture (UC0)** that combines every layer into one end-to-end walkthrough of how Cloudflare runs AI Code Review and its full internal AI engineering stack on its own products.
+Unofficial educational demo for explaining where Cloudflare AI security, Zero Trust, and Developer Platform controls fit across common AI usage paths.
 
-Each use case features a step-through request-flow diagram showing how requests travel through Cloudflare's stack, with per-step explanations of which product acts and why.
+The site is a static-first Cloudflare Workers project with vanilla HTML, CSS, and JavaScript. It includes an interactive decision map plus 17 step-through use-case walkthroughs.
 
-The site has a three-tier landing model:
+## Pages
 
-- `/` — top-level page; features the **UC0 Reference Architecture** hero card above the two category cards
-- `/ai-security` — 7 AI security use cases (UC1–UC7)
-- `/ai-builder` — 9 AI builder use cases (UC8–UC16), grouped into **Developing with AI** (UC8–UC9) and **Building AI Applications** (UC10–UC16)
+- `/decision-map` — interactive guide for choosing the right Cloudflare control by AI traffic path, including a full customer architecture route map.
+- `/` — landing page with the decision map, featured reference architecture, and category links.
+- `/ai-security` — AI Security use cases UC1-UC7.
+- `/ai-builder` — AI Builder use cases UC8-UC16.
+- `/use-cases/uc0-internal-stack.html` — featured reference architecture for Cloudflare's internal AI engineering stack.
 
-## UC0 Reference Architecture (Featured)
+## Decision Map
 
-**Cloudflare's Internal AI Engineering Stack** — the comprehensive end-to-end walkthrough that combines elements from every other UC into a single coherent reference architecture. Mirrors the two Agents Week blog posts and integrates the Project Think Execution Ladder, Sandbox SDK GA, Outbound Workers, MCP Server Portals with Code Mode, and Agent Memory.
+The decision map answers when to use each major control:
 
-- Page: `/use-cases/uc0-internal-stack`
-- 16 steps · 17 nodes · 20 edges
-- Stats valid for: 30-day window, March 10 – April 9, 2026 (as of April 2026)
-- Sources: [AI Code Review](https://blog.cloudflare.com/ai-code-review/) · [Internal AI Engineering Stack](https://blog.cloudflare.com/internal-ai-engineering-stack/) · [Project Think](https://blog.cloudflare.com/project-think/) · [Sandbox GA](https://blog.cloudflare.com/sandbox-ga/) · [Dynamic Workers](https://blog.cloudflare.com/dynamic-workers/) · [Enterprise MCP](https://blog.cloudflare.com/enterprise-mcp/) · [Agent Memory](https://blog.cloudflare.com/introducing-agent-memory/) · [Project Glasswing](https://blog.cloudflare.com/cyber-frontier-models/)
+- **AI Gateway** — LLM/API traffic from CLIs, coding agents, apps, Workers, or gateways that can set a provider endpoint.
+- **Secure Web Gateway** — employee Internet-bound traffic to web AI tools such as ChatGPT, Claude, Gemini, and Perplexity.
+- **MCP Server Portal** — MCP-capable clients and agents that need approved tools, identity, audit, and optional Gateway routing.
+- **CASB** — out-of-band API checks of SaaS provider posture and stored AI content.
+- **AI Security for Apps** — public-facing AI application hostnames protected through Cloudflare's reverse proxy.
+- **Developer Platform** — custom AI apps, Workers, Agents SDK, Remote MCP Servers, Durable Objects, and related primitives.
+- **Workers VPC** — Worker and agent access to private networks, Cloudflare Mesh, and governed public egress.
 
-### Headline numbers (verified against the source blog posts)
+The bottom of `/decision-map` includes route lanes for request, response, and out-of-band flows:
 
-| Metric | Value |
-|--------|-------|
-| Internal users | **3,683** (60% company-wide, 93% of R&D) |
-| AI Code Review runs (30 days) | 131,246 across 48,095 MRs in 5,169 repos |
-| Avg cost per review | **$1.19** ($0.98 median · $4.45 P99) |
-| Cache hit rate | **85.7%** |
-| MR velocity | **+58%** weekly (~5,600 → 8,700+; peak 10,952) |
-| Tokens through AI Gateway | 241.37B (30 days) |
-| Tokens on Workers AI | 51.83B (30 days) |
-| Code Mode token reduction | 52 tools → 2 portal tools = **94% fewer tokens** |
-| Break-glass override rate | 0.6% (288 / 48,095 MRs) |
+- Web AI: employee device -> Secure Web Gateway -> DLP / AI Prompt Protection -> web AI SaaS.
+- LLM/API: CLI, app, or agent -> AI Gateway -> Workers AI or external LLM providers.
+- MCP tools: MCP client -> Access + MCP Server Portal -> optional Gateway routing + DLP -> Remote MCP Servers.
+- Public hostname: public user or attacker -> WAF + AI Security for Apps -> Workers + Agents SDK -> models and tools.
+- Private access: Worker agent -> Workers VPC -> Gateway policies -> private and public services.
+- CASB: security team / CASB -> provider API integration -> SaaS tenant findings.
 
-## AI Security Use Cases
+## Use Cases
 
-### Secure AI Usage & Applications
+| UC | Title | Category | Primary products |
+| --- | --- | --- | --- |
+| UC0 | Cloudflare's Internal AI Engineering Stack | Reference Architecture | Access, Workers, AI Gateway, Workers AI, MCP Server Portal, Code Mode, Agents SDK, Logpush |
+| UC1 | Secure Workforce Use of GenAI | AI Security | Gateway, Access, DLP, RBI, CASB, AI Gateway |
+| UC2 | Govern AI Agents & MCP | AI Security | MCP Server Portal, Access, Gateway routing, DLP, Dynamic Workers, Remote MCP Servers |
+| UC3 | Build Securely with AI | AI Security | AI Gateway, Guardrails, DLP, Dynamic Routing, Workers |
+| UC4 | Protect AI-Powered Apps | AI Security | DDoS, Bot Management, WAF, Rate Limiting, AI Security for Apps, API Shield |
+| UC5 | Secure Self-Hosted AI Agents | AI Security | Access, Sandbox SDK, AI Gateway, Secrets Store, Browser Run, R2, Workers |
+| UC6 | Secure AI Code Execution | AI Security | Dynamic Workers, Codemode, Workers RPC, Tail Workers, AI Gateway |
+| UC7 | Secure AI-to-AI Communication | AI Security | Agents SDK, Access, mTLS, MCP Server Portal, Workflows, Queues, AI Search |
+| UC8 | API Key Management & Unified Billing | AI Builder | AI Gateway, BYOK, Unified Billing, Spend Limits, ZDR, Logpush |
+| UC9 | Dynamic Routing | AI Builder | AI Gateway Dynamic Routing, BYOK, provider fallback, analytics |
+| UC10 | RAG Knowledge Base | AI Builder | AI Search, Vectorize, Workers AI, Workers, AI Gateway |
+| UC11 | Voice AI Agent | AI Builder | Agents SDK voice APIs, Workers AI STT/TTS, Durable Objects, Twilio |
+| UC12 | Persistent AI Chat Agent | AI Builder | AIChatAgent, Durable Objects SQLite, resumable streams, Workers AI |
+| UC13 | Scheduled AI Agent | AI Builder | Agents SDK scheduling, Durable Object alarms, Workers AI, Queues |
+| UC14 | Browser AI Agent | AI Builder | Browser Run, Codemode browser tools, Agents SDK, R2 |
+| UC15 | Private Networking for Agents | AI Builder | Cloudflare Mesh, Cloudflare One Client, Workers VPC, Gateway, Access, DLP |
+| UC16 | Durable Long-Running Agents | AI Builder | Project Think, Durable Objects, fibers, Sessions API, sub-agents, Sandbox SDK |
 
-| # | Use Case | Cloudflare Products |
-|---|----------|-------------------|
-| 1 | **Secure Workforce Use of GenAI** | Gateway, Access, DLP (AI Prompt Protection), RBI, CASB, AI Gateway (Secrets Store, Unified Billing) |
-| 2 | **Govern AI Agents** | Access (OAuth 2.1, MCP Server Portals), DLP for MCP, Agents SDK (McpAgent), Workers |
-| 3 | **Build Securely with AI** | AI Gateway (Caching, Rate Limiting, Guardrails, DLP, Dynamic Routing, Secrets Store, Unified Billing), Workers |
-| 4 | **Protect AI-Powered Apps** | DDoS Protection, Bot Management, WAF (Sensitive Data Detection), Rate Limiting, AI Security for Apps, API Shield |
-
-### Secure AI Infrastructure & Agents
-
-| # | Use Case | Cloudflare Products |
-|---|----------|-------------------|
-| 5 | **Secure Self-Hosted AI Agents** | Access, Sandbox SDK, AI Gateway, Secrets Store, Browser Run, R2, Workers |
-| 6 | **Secure AI Code Execution** | Dynamic Workers (Worker Loader), Codemode, Workers RPC, AI Gateway, Agents SDK |
-| 7 | **Secure AI-to-AI Communication** | Agents SDK (Durable Objects), Access + mTLS, MCP Server Portals, Workflows, AI Search, Queues |
-
-## AI Builder Use Cases
-
-### Developing with AI
-
-| # | Use Case | Cloudflare Products |
-|---|----------|-------------------|
-| 8 | **API Key Management & Unified Billing** | AI Gateway (BYOK, Unified Billing, Spend Limits, Zero Data Retention), Secrets Store, Logpush |
-| 9 | **Dynamic Routing** | AI Gateway (Dynamic Routing, Conditional / Percentage / Rate / Budget nodes, BYOK fallback chains, Analytics) |
-
-### Building AI Applications
-
-| # | Use Case | Cloudflare Products |
-|---|----------|-------------------|
-| 10 | **RAG Knowledge Base** | AI Search (AutoRAG), Vectorize, Workers AI, Workers, AI Gateway |
-| 11 | **Voice AI Agent** | Agents SDK (`@cloudflare/voice`, `withVoice`), Workers AI (Deepgram Flux STT, Aura-1 TTS), Durable Objects, Twilio adapter |
-| 12 | **Persistent AI Chat Agent** | Agents SDK (`AIChatAgent`, `useAgentChat`), Durable Objects (SQLite state, resumable streams), Workers AI |
-| 13 | **Scheduled AI Agent** | Agents SDK (`this.schedule()`, cron / datetime / interval), Durable Object alarms, Workers AI |
-| 14 | **Browser AI Agent** | Agents SDK (`createBrowserTools()`), Browser Run (Chrome DevTools Protocol), R2, Workers AI |
-| 15 | **Private Networking for Agents** | Cloudflare Mesh (formerly WARP Connector), Cloudflare One Client, Workers VPC binding, Gateway / Access / DLP / device posture |
-| 16 | **Durable Long-Running Agents** | Project Think (`@cloudflare/think`), Durable Objects + fibers, Sessions API, Sub-agents (Facets), Execution Ladder (Workspace · Isolate · npm · Browser Run · Sandbox SDK), Self-authored extensions |
-
-## How It Works
-
-Each use case presents an interactive diagram with three spatial columns:
-
-- **Left** — Origin actors (human users, AI agents, devices)
-- **Center** — Cloudflare control plane (product-specific nodes)
-- **Right** — Destination resources (AI services, APIs, internal apps)
-
-Users can:
-- **Play** through the flow automatically or step manually with arrow keys
-- **Click any node** to see a tooltip with product description and documentation link
-- **Read the side panel** for each step's title, acting product, description, "why it matters" context, and OWASP risk mappings
-
-Flow archetypes visualized across the 17 walkthroughs:
-
-1. **Human → AI** — User-initiated requests flowing through Cloudflare controls to AI services (UC1, UC4, UC10, UC11, UC12)
-2. **Agentic AI → Resources** — AI-agent-initiated calls flowing through Cloudflare to downstream APIs, data, or tools (UC2, UC5, UC13, UC14, UC15)
-3. **Agent → Agent** — AI-to-AI orchestration with identity, durable execution, and shared infrastructure (UC6, UC7, UC16)
-4. **App / Developer → AI Provider** — Application code and developer tooling calling AI providers through a managed gateway (UC3, UC8, UC9)
-5. **Reference architecture** — Engineer → CI → entire AI Engineering Stack → MR comment (UC0)
+Each use case is data-driven: nodes, edges, and step copy live in `src/data/ucN-steps.js`; the shared `FlowEngine` renders the walkthrough.
 
 ## Project Structure
 
-```
+```text
 src/
-  index.html                          Top-level page (UC0 hero + 2 category cards)
-  ai-security.html                    AI Security category landing (UC1–UC7)
-  ai-builder.html                     AI Builder category landing (UC8–UC16)
-  use-cases/
-    uc0-internal-stack.html           UC0: Cloudflare's Internal AI Engineering Stack
-    uc1-genai-workforce.html          UC1: Secure Workforce Use of GenAI
-    uc2-govern-agents.html            UC2: Govern AI Agents (MCP)
-    uc3-build-with-ai.html            UC3: Build Securely with AI
-    uc4-protect-ai-apps.html          UC4: Protect AI-Powered Apps
-    uc5-self-hosted-agents.html       UC5: Secure Self-Hosted AI Agents
-    uc6-code-execution.html           UC6: Secure AI Code Execution
-    uc7-multi-agent.html              UC7: Secure AI-to-AI Communication
-    uc8-unified-billing.html          UC8: API Key Management & Unified Billing
-    uc9-dynamic-routing.html          UC9: Dynamic Routing
-    uc10-rag.html                     UC10: RAG Knowledge Base
-    uc11-voice-agent.html             UC11: Voice AI Agent
-    uc12-ai-chat.html                 UC12: Persistent AI Chat Agent
-    uc13-scheduled-agent.html         UC13: Scheduled AI Agent
-    uc14-browser-agent.html           UC14: Browser AI Agent
-    uc15-private-networking.html      UC15: Private Networking for Agents
-    uc16-durable-agents.html          UC16: Durable Long-Running Agents
+  index.html                         Landing page
+  decision-map/index.html            Interactive product decision map
+  ai-security.html                   UC1-UC7 category landing
+  ai-builder.html                    UC8-UC16 category landing
+  use-cases/                         One HTML page per use case
   components/
-    flow-engine.js                    Shared step-through animation controller
-    tooltip.js                        Per-node contextual overlay
-    legend.js                         Product legend renderer
-  styles/
-    base.css                          Reset, typography, utilities
-    theme.css                         Design tokens (Cloudflare orange #F38020)
-    diagram.css                       Diagram layout, nodes, edges, panel
+    flow-engine.js                   Shared step-through animation engine
+    tooltip.js                       Node tooltip behavior
+    legend.js                        Product legend renderer
   data/
-    uc0-stack-steps.js  …  uc16-steps.js
-                                      Nodes, edges, and step definitions for each UC
-  sitemap.xml, robots.txt, site.webmanifest, favicon.*, og-image.png
-wrangler.jsonc                        Cloudflare Workers Static Assets config
+    uc0-stack-steps.js
+    uc1-steps.js ... uc16-steps.js   Nodes, edges, steps, OWASP labels
+  styles/
+    base.css                         Reset, typography, utilities
+    theme.css                        Design tokens
+    diagram.css                      Flow diagram layout and styling
+  sitemap.xml
+  robots.txt
+  site.webmanifest
+  favicon.*
+  og-image.png
+worker/
+  index.js                           Asset fallback + Markdown responses for selected pages
+wrangler.jsonc                       Workers Static Assets config
 package.json
 ```
 
 ## Architecture
 
-- **Vanilla JS** — No frameworks, no build step. ES modules loaded natively in the browser.
-- **Modular** — Adding a new use case requires only a new `ucN-steps.js` data file, a new HTML page, and a card on the appropriate category landing page. Zero changes to the shared engine.
-- **FlowEngine** is fully reusable: feed it `{ steps, nodes, edges }` and it renders the complete interactive diagram with SVG edge paths, animated packet dots, and step-through controls.
-- **Clean URLs** — Internal navigation links use extensionless paths (e.g. `/ai-security`, `/use-cases/uc0-internal-stack`). Cloudflare Workers Static Assets `html_handling: "auto-trailing-slash"` (default) serves `src/foo.html` directly at `/foo` — canonical URLs, sitemap entries, and back-links all point to the non-redirecting form.
+- **Frontend:** Vanilla HTML/CSS/JS with ES modules. No bundler and no framework runtime.
+- **Data model:** Each walkthrough exports `{ id, title, subtitle, nodes, edges, steps }` from `src/data/`.
+- **Renderer:** `src/components/flow-engine.js` renders all use cases from the shared data model.
+- **Deployment:** Cloudflare Workers Static Assets serves files from `src/`.
+- **Worker script:** `worker/index.js` uses the `ASSETS` binding and selectively runs first for landing/category/use-case routes so it can add Markdown alternates and respond to `.md`, `?format=markdown`, or Markdown-oriented `Accept` headers.
+
+## Workers Static Assets And Vite
+
+This project intentionally does **not** use Vite today. The current site is hand-authored static HTML/CSS/JS, so Workers Static Assets plus Wrangler is the simplest deployment path.
+
+Relevant Cloudflare docs notes:
+
+- Workers Static Assets deploy static files and Worker code together as one Worker deployment.
+- `assets.directory` is the source directory Wrangler uploads.
+- `assets.binding` lets Worker code fetch from the asset collection via `env.ASSETS.fetch(request)`.
+- `assets.run_worker_first` is useful when some routes need Worker logic before static asset serving.
+- The Cloudflare Vite plugin is the recommended path if this project later moves to Vite, React, Vue, a framework build, or wants Vite HMR/build integration. It is not necessary for the current no-build static site.
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+Local dev runs Wrangler and serves the Worker at `http://localhost:8787`.
+
+## Verification
+
+Useful checks before deploying:
+
+```bash
+npm audit --omit=optional
+npm exec wrangler -- --version
+node --check worker/index.js
+npm exec wrangler -- deploy --dry-run
+```
+
+There is no TypeScript build in this repository, so there is no `tsc --noEmit` typecheck. The Worker is JavaScript; `node --check worker/index.js` validates syntax, and `wrangler deploy --dry-run` validates the Worker + Static Assets deployment package.
 
 ## Deployment
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/DavidJKTofan/cf-ai-security-visual-demo)
-
-This project deploys as a purely static site via [Cloudflare Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/). No Worker script is needed — Wrangler serves the `src/` directory directly from Cloudflare's edge network.
-
-```jsonc
-// wrangler.jsonc
-{
-  "name": "cf-ai-security-visual-demo",
-  "compatibility_date": "2026-03-01",
-  "assets": {
-    "directory": "./src"
-  }
-}
-```
-
-### Commands
-
 ```bash
-npm install         # Install dependencies (wrangler)
-npm run dev         # Start local development server
-npm run deploy      # Deploy to Cloudflare Workers
+npm run deploy
 ```
 
-## Design System
+The current `wrangler.jsonc` deploys to Workers using:
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| Primary | `#F38020` | Cloudflare-like orange — active elements, CTAs, featured hero |
-| Background | `#0d1117` | Dark theme background |
-| User nodes | `#3B82F6` | Users, devices |
-| Cloudflare nodes | `#F38020` | Cloudflare products |
-| AI Service nodes | `#10B981` | External AI providers |
-| Resource nodes | `#8B5CF6` | APIs, databases, internal services |
-| Coming Soon | `#EAB308` | Features in development |
-| Font | Inter / system-sans | |
+- `main: ./worker/index.js`
+- `assets.directory: ./src`
+- `assets.binding: ASSETS`
+- selected `assets.run_worker_first` routes
+- `observability.enabled: true`
 
-## OWASP Framework Mappings
+## Product Accuracy
 
-Each use case step includes OWASP risk labels in the step info panel, mapping Cloudflare products to the specific threats they mitigate. Two frameworks are referenced:
-
-### OWASP Top 10 for LLMs 2025
-
-The industry-standard risk taxonomy for Large Language Model applications. Labels use the format `LLM01:2025 Prompt Injection`.
-
-- Official page: https://genai.owasp.org/llm-top-10/
-- Full document: https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/
-
-### OWASP Top 10 for Agentic Applications 2026
-
-Covers risks specific to autonomous AI agent systems — tool misuse, identity abuse, supply chain attacks, and cascading failures. Labels use the format `ASI01 Agent Goal Hijack`.
-
-- Official page: https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/
-
-UC2 and UC7 carry the most ASI labels as the primary agentic use cases. UC5, UC6, UC14, and UC16 map sandbox / browser / execution-ladder primitives to ASI05 (Unexpected Code Execution). UC13 and UC11 surface ASI10 (Rogue Agents) for autonomous and long-lived agent behavior. UC15 maps Mesh + Cloudflare One controls to ASI02 (Tool Misuse) and ASI03 (Identity & Privilege Abuse). UC0 inherits the most comprehensive set of mappings across both frameworks.
+Product names, statuses, and capabilities should be checked against official Cloudflare Developer Docs before changing diagram copy or data files.
 
 ## References
 
-> Use [Cloudflare MCP Servers](https://developers.cloudflare.com/agents/model-context-protocol/mcp-servers-for-cloudflare/) for better LLM research and accuracy.
+### Cloudflare Workers Deployment
 
-**Agents Week — UC0 sources**
+- [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/)
+- [Workers Static Assets routing behavior](https://developers.cloudflare.com/workers/static-assets/#routing-behavior)
+- [Wrangler configuration: assets](https://developers.cloudflare.com/workers/wrangler/configuration/#assets)
+- [Cloudflare Vite plugin](https://developers.cloudflare.com/workers/vite-plugin/)
+- [Workers best practices](https://developers.cloudflare.com/workers/best-practices/workers-best-practices/)
+- [Deploy to Workers](https://developers.cloudflare.com/workers/configuration/deployments/)
+
+### AI Security And Governance
+
+- [Cloudflare AI Security](https://www.cloudflare.com/ai-security/)
+- [Holistic AI Security Learning Path](https://developers.cloudflare.com/learning-paths/holistic-ai-security/concepts/)
+- [Cloudflare One AI Security Analytics](https://developers.cloudflare.com/cloudflare-one/insights/analytics/ai-security/)
+- [Cloudflare One DLP](https://developers.cloudflare.com/cloudflare-one/data-loss-prevention/)
+- [DLP profiles](https://developers.cloudflare.com/cloudflare-one/data-loss-prevention/dlp-profiles/)
+- [Gateway traffic policies](https://developers.cloudflare.com/cloudflare-one/traffic-policies/)
+- [Gateway HTTP policies](https://developers.cloudflare.com/cloudflare-one/traffic-policies/http-policies/)
+- [Gateway egress policies](https://developers.cloudflare.com/cloudflare-one/traffic-policies/egress-policies/)
+- [CASB cloud and SaaS integrations](https://developers.cloudflare.com/cloudflare-one/integrations/cloud-and-saas/)
+- [CASB ChatGPT integration](https://developers.cloudflare.com/cloudflare-one/integrations/cloud-and-saas/openai/)
+- [CASB Claude integration](https://developers.cloudflare.com/cloudflare-one/integrations/cloud-and-saas/anthropic/)
+- [CASB Gemini integration](https://developers.cloudflare.com/cloudflare-one/integrations/cloud-and-saas/google-workspace/gemini/)
+- [AI Security for Apps](https://developers.cloudflare.com/waf/detections/ai-security-for-apps/)
+- [MCP Server Portals](https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/mcp-portals/)
+- [Detect MCP traffic in Gateway logs](https://developers.cloudflare.com/cloudflare-one/tutorials/detect-mcp-traffic-gateway-logs/)
+- [Ruleset Engine Phases](https://developers.cloudflare.com/ruleset-engine/reference/phases-list/)
+- [mTLS on Cloudflare](https://developers.cloudflare.com/learning-paths/mtls/concepts/mtls-cloudflare/)
+- [Service Tokens](https://developers.cloudflare.com/cloudflare-one/access-controls/service-credentials/service-tokens/)
+
+### AI Gateway And Agents
+
+- [AI Gateway](https://developers.cloudflare.com/ai-gateway/)
+- [AI Gateway coding agents](https://developers.cloudflare.com/ai-gateway/integrations/coding-agents/)
+- [AI Gateway Worker Binding Methods](https://developers.cloudflare.com/ai-gateway/usage/worker-binding-methods/)
+- [AI Gateway DLP](https://developers.cloudflare.com/ai-gateway/features/dlp/)
+- [AI Gateway Dynamic Routing](https://developers.cloudflare.com/ai-gateway/features/dynamic-routing/)
+- [AI Gateway Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/)
+- [AI Gateway BYOK](https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/)
+- [Agents SDK](https://developers.cloudflare.com/agents/)
+- [Docs for agents](https://developers.cloudflare.com/docs-for-agents/)
+- [MCP servers for Cloudflare](https://developers.cloudflare.com/agents/model-context-protocol/cloudflare/servers-for-cloudflare/)
+- [Remote MCP Servers](https://developers.cloudflare.com/agents/model-context-protocol/guides/remote-mcp-server/)
+- [Voice Agents](https://developers.cloudflare.com/agents/api-reference/voice/)
+- [Chat Agents](https://developers.cloudflare.com/agents/api-reference/chat-agents/)
+- [Schedule Tasks](https://developers.cloudflare.com/agents/api-reference/schedule-tasks/)
+- [Browse the Web](https://developers.cloudflare.com/agents/api-reference/browse-the-web/)
+- [Durable Execution](https://developers.cloudflare.com/agents/api-reference/durable-execution/)
+- [Sub-agents](https://developers.cloudflare.com/agents/api-reference/sub-agents/)
+- [Sessions API](https://developers.cloudflare.com/agents/api-reference/sessions/)
+- [Human-in-the-Loop](https://developers.cloudflare.com/agents/concepts/human-in-the-loop/)
+
+### Developer Platform
+
+- [Dynamic Workers](https://developers.cloudflare.com/dynamic-workers/)
+- [Codemode](https://developers.cloudflare.com/agents/api-reference/codemode/)
+- [Sandbox SDK](https://developers.cloudflare.com/sandbox/)
+- [Sandbox SDK GitHub](https://github.com/cloudflare/sandbox-sdk)
+- [Try Sandbox](https://sandbox.cloudflare.com/)
+- [Workers AI](https://developers.cloudflare.com/workers-ai/)
+- [AI Search](https://developers.cloudflare.com/ai-search/)
+- [Vectorize](https://developers.cloudflare.com/vectorize/)
+- [Durable Objects](https://developers.cloudflare.com/durable-objects/)
+- [Workflows](https://developers.cloudflare.com/workflows/)
+- [Queues](https://developers.cloudflare.com/queues/)
+- [Browser Run](https://developers.cloudflare.com/browser-run/)
+- [Browser Run for AI agents blog](https://blog.cloudflare.com/browser-run-for-ai-agents/)
+- [R2 Object Storage](https://developers.cloudflare.com/r2/)
+- [Workers VPC](https://developers.cloudflare.com/workers-vpc/)
+- [Workers VPC: VPC Networks](https://developers.cloudflare.com/workers-vpc/configuration/vpc-networks/)
+- [Connect Workers to Cloudflare Mesh](https://developers.cloudflare.com/workers-vpc/examples/connect-to-cloudflare-mesh/)
+- [Cloudflare Mesh](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-mesh/)
+- [Cloudflare One Client](https://developers.cloudflare.com/cloudflare-one/connections/connect-devices/warp/)
+- [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/)
+- [Cloudflare WAN](https://developers.cloudflare.com/cloudflare-wan/)
+- [Moltworker Blog Post](https://blog.cloudflare.com/moltworker-self-hosted-ai-agent/)
+
+### UC0 Blog Sources
+
 - [Orchestrating AI Code Review at scale](https://blog.cloudflare.com/ai-code-review/)
 - [The AI engineering stack we built internally](https://blog.cloudflare.com/internal-ai-engineering-stack/)
-- [Project Think: building the next generation of AI agents](https://blog.cloudflare.com/project-think/)
-- [Agents have their own computers with Sandboxes GA](https://blog.cloudflare.com/sandbox-ga/)
-- [Sandboxing AI agents, 100x faster (Dynamic Workers)](https://blog.cloudflare.com/dynamic-workers/)
+- [Project Think](https://blog.cloudflare.com/project-think/)
+- [Dynamic Workers](https://blog.cloudflare.com/dynamic-workers/)
+- [Sandbox SDK GA](https://blog.cloudflare.com/sandbox-ga/)
 - [Dynamic, identity-aware, and secure Sandbox auth](https://blog.cloudflare.com/sandbox-auth/)
 - [Scaling MCP adoption — Enterprise MCP reference architecture](https://blog.cloudflare.com/enterprise-mcp/)
 - [Safe in the sandbox — V8 + MPK hardening](https://blog.cloudflare.com/safe-in-the-sandbox-security-hardening-for-cloudflare-workers/)
 - [Introducing Agent Memory](https://blog.cloudflare.com/introducing-agent-memory/)
-- [Securing non-human identities — scannable tokens, OAuth, scoped RBAC](https://blog.cloudflare.com/improved-developer-security/)
-- [Project Glasswing — what Mythos showed us (cyber frontier models)](https://blog.cloudflare.com/cyber-frontier-models/) — sibling harness pattern applied to deep vulnerability research
+- [Securing non-human identities](https://blog.cloudflare.com/improved-developer-security/)
+- [Project Glasswing — cyber frontier models](https://blog.cloudflare.com/cyber-frontier-models/)
 
-**AI Security**
-- [Cloudflare AI Security](https://www.cloudflare.com/ai-security/)
-- [Holistic AI Security Learning Path](https://developers.cloudflare.com/learning-paths/holistic-ai-security/concepts/)
-- [AI Security for Apps](https://developers.cloudflare.com/waf/detections/ai-security-for-apps/)
-- [Cloudflare One AI Security Analytics](https://developers.cloudflare.com/cloudflare-one/insights/analytics/ai-security/)
+### OWASP Frameworks
 
-**AI Gateway & Agents**
-- [AI Gateway Documentation](https://developers.cloudflare.com/ai-gateway/)
-- [AI Gateway Worker Binding Methods](https://developers.cloudflare.com/ai-gateway/integrations/worker-binding-methods/)
-- [AI Gateway Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/)
-- [AI Gateway BYOK (Secrets Store)](https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/)
-- [AI Gateway Dynamic Routing](https://developers.cloudflare.com/ai-gateway/features/dynamic-routing/)
-- [Agents SDK](https://developers.cloudflare.com/agents/)
-- [MCP Server Portals](https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/mcp-portals/)
-
-**Developer Platform**
-- [Dynamic Workers](https://developers.cloudflare.com/dynamic-workers/)
-- [Codemode](https://developers.cloudflare.com/agents/api-reference/codemode/)
-- [Sandbox SDK](https://developers.cloudflare.com/sandbox/) · [GitHub](https://github.com/cloudflare/sandbox-sdk) · [Try it](https://sandbox.cloudflare.com/)
-- [Workflows](https://developers.cloudflare.com/workflows/)
-- [AI Search](https://developers.cloudflare.com/ai-search/)
-- [Vectorize](https://developers.cloudflare.com/vectorize/)
-- [Workers AI](https://developers.cloudflare.com/workers-ai/)
-- [Durable Objects](https://developers.cloudflare.com/durable-objects/)
-- [Browser Run (CDP)](https://developers.cloudflare.com/browser-rendering/)
-- [R2 Object Storage](https://developers.cloudflare.com/r2/)
-- [Workers VPC + Cloudflare Mesh](https://developers.cloudflare.com/workers-vpc/)
-
-**Agents SDK — UC8–UC16 primitives**
-- [Voice Agents (`@cloudflare/voice`)](https://developers.cloudflare.com/agents/api-reference/voice/)
-- [Chat Agents (`AIChatAgent`, `useAgentChat`)](https://developers.cloudflare.com/agents/api-reference/chat-agents/)
-- [Schedule Tasks](https://developers.cloudflare.com/agents/api-reference/schedule-tasks/)
-- [Browse the Web](https://developers.cloudflare.com/agents/api-reference/browse-the-web/)
-- [Durable Execution (fibers)](https://developers.cloudflare.com/agents/api-reference/durable-execution/)
-- [Sub-agents (Facets)](https://developers.cloudflare.com/agents/api-reference/sub-agents/)
-- [Sessions API](https://developers.cloudflare.com/agents/api-reference/sessions/)
-- [Human-in-the-Loop](https://developers.cloudflare.com/agents/concepts/human-in-the-loop/)
-
-**Infrastructure**
-- [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/)
-- [Ruleset Engine Phases](https://developers.cloudflare.com/ruleset-engine/reference/phases-list/)
-- [mTLS on Cloudflare](https://developers.cloudflare.com/learning-paths/mtls/concepts/mtls-cloudflare/)
-- [Service Tokens](https://developers.cloudflare.com/cloudflare-one/access-controls/service-credentials/service-tokens/)
-- [Moltworker Blog Post](https://blog.cloudflare.com/moltworker-self-hosted-ai-agent/)
-
-**OWASP Frameworks**
-- [OWASP Top 10 for LLMs 2025](https://genai.owasp.org/llm-top-10/)
+- [OWASP Top 10 for LLM Applications 2025](https://genai.owasp.org/llm-top-10/)
 - [OWASP Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)
-
-* * *
 
 ## Disclaimer
 
-**This project is for educational and demonstration purposes only.**
-
-It is not affiliated with, endorsed by, or officially associated with Cloudflare, Inc. All product names, logos, and brands referenced are property of their respective owners. The information presented in the diagrams is based on publicly available documentation and may not reflect the most current product capabilities or configurations. Always refer to the [official Cloudflare documentation](https://developers.cloudflare.com/) for authoritative and up-to-date information.
+This project is for educational and demonstration purposes only. It is not affiliated with, endorsed by, or officially associated with Cloudflare, Inc. Product capabilities can change; refer to the official Cloudflare documentation for authoritative information.

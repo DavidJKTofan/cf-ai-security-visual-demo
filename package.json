@@ -2,16 +2,16 @@
   "name": "cf-ai-security-visual-demo",
   "version": "1.0.0",
   "private": true,
-  "description": "Interactive visual demo of Cloudflare AI Security use cases",
+	"description": "Interactive decision map and visual walkthroughs for Cloudflare AI security use cases",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "start": "wrangler dev"
   },
   "devDependencies": {
-    "wrangler": "^4.93.0"
+    "wrangler": "^4.103.0"
   },
-  "overrides": {
-    "ws": "8.20.1"
-  }
+	"overrides": {
+		"ws": "8.21.0"
+	}
 }

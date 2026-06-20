@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <title>AI Security Decision Map | Cloudflare AI Interactive Demo</title>
+  <meta name="title" content="AI Security Decision Map | Cloudflare AI Interactive Demo">
+  <meta name="description" content="Interactive Cloudflare AI security decision map: learn when to use AI Gateway, Secure Web Gateway, MCP Server Portal, CASB, AI Security for Apps, Agents SDK, Workers VPC, and DLP.">
+  <meta name="keywords" content="Cloudflare, AI security, decision map, AI Gateway, Secure Web Gateway, DLP, MCP Server Portal, CASB, AI Security for Apps, Workers VPC, Agents SDK">
+  <meta name="author" content="Community Demo (Not affiliated with Cloudflare.)">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="color-scheme" content="dark">
+
+  <link rel="canonical" href="https://ai-security.automatic-demo.com/decision-map">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ai-security.automatic-demo.com/decision-map">
+  <meta property="og:title" content="AI Security Decision Map | Cloudflare AI Interactive Demo">
+  <meta property="og:description" content="Choose the right Cloudflare control for AI usage paths: LLM gateways, workforce web AI, MCP tools, SaaS posture, public AI apps, custom agents, private networks, and DLP governance.">
+  <meta property="og:image" content="https://ai-security.automatic-demo.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="Cloudflare AI (Unofficial Demo)">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://ai-security.automatic-demo.com/decision-map">
+  <meta name="twitter:title" content="AI Security Decision Map | Cloudflare AI Interactive Demo">
+  <meta name="twitter:description" content="Interactive guide for choosing Cloudflare AI Gateway, SWG, MCP Server Portal, CASB, AI Security for Apps, Agents SDK, Workers VPC, and DLP.">
+  <meta name="twitter:image" content="https://ai-security.automatic-demo.com/og-image.png">
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="stylesheet" href="/styles/theme.css">
+  <link rel="stylesheet" href="/styles/base.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "AI Security Decision Map",
+    "description": "Interactive decision map for choosing Cloudflare AI security and developer platform controls by AI traffic path and use case.",
+    "url": "https://ai-security.automatic-demo.com/decision-map",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Cloudflare AI (Unofficial Demo)",
+      "url": "https://ai-security.automatic-demo.com/"
+    },
+    "dateModified": "2026-06-19",
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://ai-security.automatic-demo.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "AI Security Decision Map",
+          "item": "https://ai-security.automatic-demo.com/decision-map"
+        }
+      ]
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      --map-blue: #45a3ff;
+      --map-green: #34d399;
+      --map-purple: #a78bfa;
+      --map-amber: #f59e0b;
+      --map-rose: #fb7185;
+      --map-cyan: #22d3ee;
+      --map-slate: #94a3b8;
+      --map-panel: rgba(22, 27, 34, 0.82);
+      --map-panel-strong: rgba(28, 35, 51, 0.92);
+      --map-border: rgba(148, 163, 184, 0.18);
+      --map-ink: #f8fafc;
+      --map-muted: #9ca3af;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 8% 5%, rgba(243, 128, 32, 0.18), transparent 28rem),
+        radial-gradient(circle at 88% 12%, rgba(69, 163, 255, 0.14), transparent 30rem),
+        linear-gradient(180deg, #0d1117 0%, #0a0d13 100%);
+    }
+
+    .map-shell {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .map-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: clamp(0.8rem, 2vw, 1.35rem) clamp(1rem, 3vw, 2rem);
+      padding-left: max(clamp(1rem, 3vw, 2rem), env(safe-area-inset-left));
+      padding-right: max(clamp(1rem, 3vw, 2rem), env(safe-area-inset-right));
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(13, 17, 23, 0.72);
+      backdrop-filter: blur(18px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .map-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-width: 0;
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .map-brand-mark {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.65rem;
+      background: linear-gradient(135deg, var(--cf-orange), #ffb86b);
+      display: grid;
+      place-items: center;
+      color: #111827;
+      font-weight: 900;
+      box-shadow: 0 0 22px rgba(243, 128, 32, 0.24);
+      flex: 0 0 auto;
+    }
+
+    .map-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .map-nav a {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .map-nav a:hover { color: var(--cf-orange); opacity: 1; }
+
+    .map-main {
+      width: 100%;
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: clamp(1rem, 2.5vw, 1.75rem) clamp(1rem, 3vw, 2rem) clamp(2rem, 5vw, 4rem);
+      padding-left: max(clamp(1rem, 3vw, 2rem), env(safe-area-inset-left));
+      padding-right: max(clamp(1rem, 3vw, 2rem), env(safe-area-inset-right));
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+      gap: clamp(1rem, 3vw, 2rem);
+      align-items: stretch;
+      margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
+    }
+
+    .hero-copy,
+    .dlp-card,
+    .decision-card,
+    .detail-panel,
+    .quick-rule {
+      border: 1px solid var(--map-border);
+      background: var(--map-panel);
+      box-shadow: 0 18px 80px rgba(0, 0, 0, 0.26);
+      backdrop-filter: blur(18px);
+    }
+
+    .hero-copy {
+      border-radius: 1.4rem;
+      padding: clamp(1.15rem, 3vw, 1.7rem);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-copy::after {
+      content: "";
+      position: absolute;
+      inset: auto -4rem -8rem auto;
+      width: 18rem;
+      height: 18rem;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(243, 128, 32, 0.18), transparent 68%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--cf-orange);
+      border: 1px solid rgba(243, 128, 32, 0.32);
+      background: rgba(243, 128, 32, 0.1);
+      border-radius: 999px;
+      padding: 0.32rem 0.7rem;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-copy h1 {
+      color: var(--map-ink);
+      font-size: clamp(2rem, 4.5vw, 3.5rem);
+      line-height: 1;
+      letter-spacing: -0.065em;
+      max-width: none;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-copy h1 span {
+      color: var(--cf-orange);
+      display: inline;
+    }
+
+    .hero-copy p {
+      color: var(--text-secondary);
+      font-size: clamp(0.98rem, 2vw, 1.16rem);
+      line-height: 1.58;
+      max-width: 62ch;
+      position: relative;
+      z-index: 1;
+    }
+
+    .rule-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 0.9rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .rule-pill,
+    .mini-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-light);
+      background: rgba(13, 17, 23, 0.46);
+      border-radius: 999px;
+      padding: 0.38rem 0.65rem;
+      font-size: 0.76rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .dlp-card {
+      border-color: rgba(243, 128, 32, 0.34);
+      border-radius: 1.4rem;
+      padding: clamp(1rem, 2.4vw, 1.35rem);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dlp-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 0.42rem;
+      background: linear-gradient(90deg, var(--cf-orange), rgba(243, 128, 32, 0.2));
+    }
+
+    .dlp-card h2 {
+      color: var(--map-ink);
+      font-size: clamp(1.18rem, 3vw, 1.75rem);
+      margin: 0.25rem 0 0.5rem;
+    }
+
+    .dlp-card p {
+      color: var(--text-secondary);
+      line-height: 1.5;
+      font-size: 0.96rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .dlp-route-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    .dlp-route {
+      min-height: 4.4rem;
+      border: 1px solid rgba(243, 128, 32, 0.22);
+      background: rgba(13, 17, 23, 0.42);
+      border-radius: 0.9rem;
+      padding: 0.68rem;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .dlp-route strong {
+      display: block;
+      color: #ffd7ad;
+      font-size: 0.74rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.28rem;
+    }
+
+    .controls-panel {
+      display: grid;
+      grid-template-columns: minmax(16rem, 0.38fr) minmax(0, 1fr);
+      gap: clamp(1rem, 2.5vw, 1.45rem);
+      align-items: start;
+    }
+
+    .interaction-note {
+      border: 1px solid rgba(69, 163, 255, 0.22);
+      background: rgba(69, 163, 255, 0.08);
+      color: var(--text-secondary);
+      border-radius: 1rem;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+      line-height: 1.55;
+      font-size: 0.92rem;
+    }
+
+    .interaction-note strong {
+      color: var(--text-primary);
+    }
+
+    .quick-rule {
+      border-radius: 1.05rem;
+      padding: 1rem;
+      position: sticky;
+      top: 5.25rem;
+    }
+
+    .quick-rule h2 {
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .quick-rule ol {
+      list-style: none;
+      display: grid;
+      gap: 0.62rem;
+      counter-reset: rules;
+    }
+
+    .quick-rule li {
+      display: grid;
+      grid-template-columns: 1.6rem minmax(0, 1fr);
+      gap: 0.62rem;
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .quick-rule li::before {
+      counter-increment: rules;
+      content: counter(rules);
+      display: grid;
+      place-items: center;
+      width: 1.45rem;
+      height: 1.45rem;
+      border-radius: 999px;
+      color: #111827;
+      background: var(--cf-orange);
+      font-weight: 900;
+      font-size: 0.75rem;
+    }
+
+    .map-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
+      gap: 0.7rem;
+    }
+
+    .decision-card {
+      --accent: var(--cf-orange);
+      min-height: 7.1rem;
+      border-radius: 1rem;
+      padding: 0.85rem;
+      text-align: left;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+      transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .decision-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 0.34rem;
+      background: var(--accent);
+    }
+
+    .decision-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -4rem -5rem auto;
+      width: 10rem;
+      height: 10rem;
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--accent) 20%, transparent);
+      pointer-events: none;
+    }
+
+    .decision-card:hover,
+    .decision-card.is-active {
+      border-color: var(--accent);
+      background: var(--map-panel-strong);
+      box-shadow: 0 16px 52px color-mix(in srgb, var(--accent) 14%, transparent);
+      transform: translateY(-2px);
+    }
+
+    .decision-card.is-active {
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 46%, transparent), 0 16px 52px color-mix(in srgb, var(--accent) 17%, transparent);
+    }
+
+    .card-kicker {
+      color: var(--accent);
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin: 0.3rem 0 0.38rem;
+    }
+
+    .decision-card h3 {
+      color: var(--map-ink);
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .decision-card p {
+      color: var(--text-secondary);
+      line-height: 1.42;
+      font-size: 0.78rem;
+      margin-bottom: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .detail-panel {
+      --detail-accent: var(--cf-orange);
+      border-color: color-mix(in srgb, var(--detail-accent) 34%, transparent);
+      border-radius: 1.35rem;
+      padding: clamp(1.1rem, 3vw, 1.45rem);
+      grid-column: 2;
+      overflow: hidden;
+    }
+
+    .detail-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 0.42rem;
+      background: linear-gradient(90deg, var(--detail-accent), transparent);
+    }
+
+    .detail-kicker {
+      color: var(--detail-accent);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin: 0.35rem 0 0.6rem;
+    }
+
+    .detail-panel h2 {
+      color: var(--map-ink);
+      font-size: clamp(1.45rem, 3.5vw, 2.05rem);
+      letter-spacing: -0.04em;
+      margin-bottom: 0.55rem;
+    }
+
+    .detail-signal {
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 1.1rem;
+    }
+
+    .detail-section {
+      border-top: 1px solid var(--map-border);
+      padding-top: 0.85rem;
+      margin-top: 0.95rem;
+    }
+
+    .detail-section summary {
+      color: var(--text-primary);
+      font-size: 0.82rem;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 800;
+      list-style-position: inside;
+    }
+
+    .detail-section[open] summary {
+      margin-bottom: 0.55rem;
+    }
+
+    .detail-list {
+      display: grid;
+      gap: 0.42rem;
+      list-style: none;
+    }
+
+    .detail-list li {
+      color: var(--text-secondary);
+      line-height: 1.5;
+      font-size: 0.9rem;
+      padding-left: 1rem;
+      position: relative;
+    }
+
+    .detail-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.7em;
+      width: 0.36rem;
+      height: 0.36rem;
+      border-radius: 50%;
+      background: var(--detail-accent);
+    }
+
+    .dlp-note {
+      color: #ffd7ad;
+      background: rgba(243, 128, 32, 0.1);
+      border: 1px solid rgba(243, 128, 32, 0.24);
+      border-radius: 0.95rem;
+      padding: 0.85rem;
+      line-height: 1.5;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .source-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--detail-accent);
+      font-size: 0.85rem;
+      font-weight: 800;
+      margin-top: 1rem;
+    }
+
+    .diagram-footer {
+      margin-top: clamp(1.25rem, 3vw, 2rem);
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.8rem;
+    }
+
+    .footer-tile {
+      border: 1px solid var(--map-border);
+      background: rgba(13, 17, 23, 0.45);
+      border-radius: 1rem;
+      padding: 0.9rem;
+    }
+
+    .footer-tile strong {
+      display: block;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    .footer-tile span {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+
+    .architecture-section {
+      margin-top: clamp(1.5rem, 4vw, 2.75rem);
+      border: 1px solid rgba(243, 128, 32, 0.28);
+      border-radius: 1.35rem;
+      background:
+        radial-gradient(circle at 8% 10%, rgba(243, 128, 32, 0.12), transparent 22rem),
+        radial-gradient(circle at 92% 85%, rgba(69, 163, 255, 0.1), transparent 26rem),
+        rgba(22, 27, 34, 0.74);
+      box-shadow: 0 18px 80px rgba(0, 0, 0, 0.28);
+      overflow: hidden;
+    }
+
+    .architecture-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: clamp(1rem, 3vw, 1.4rem);
+      border-bottom: 1px solid var(--map-border);
+    }
+
+    .architecture-header h2 {
+      color: var(--map-ink);
+      font-size: clamp(1.35rem, 3vw, 2.15rem);
+      letter-spacing: -0.045em;
+      margin-bottom: 0.4rem;
+    }
+
+    .architecture-header p {
+      color: var(--text-secondary);
+      line-height: 1.58;
+      max-width: 62rem;
+    }
+
+    .architecture-legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 0.45rem;
+      min-width: 15rem;
+    }
+
+    .legend-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 0.45rem;
+    }
+
+    .legend-token {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border: 1px solid var(--map-border);
+      background: rgba(13, 17, 23, 0.48);
+      border-radius: 999px;
+      color: var(--text-secondary);
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 0.28rem 0.55rem;
+      white-space: nowrap;
+    }
+
+    .legend-line {
+      width: 1.6rem;
+      height: 0;
+      border-top: 2px solid var(--cf-orange);
+    }
+
+    .legend-line.response {
+      border-color: var(--map-blue);
+    }
+
+    .legend-line.dashed {
+      border-top-style: dashed;
+      border-color: var(--map-amber);
+    }
+
+    .color-chip {
+      --chip-color: var(--cf-orange);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--text-secondary);
+      border: 1px solid var(--map-border);
+      background: rgba(13, 17, 23, 0.48);
+      border-radius: 999px;
+      padding: 0.28rem 0.55rem;
+      font-size: 0.7rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .color-chip::before {
+      content: "";
+      width: 0.56rem;
+      height: 0.56rem;
+      border-radius: 50%;
+      background: var(--chip-color);
+      box-shadow: 0 0 12px color-mix(in srgb, var(--chip-color) 45%, transparent);
+    }
+
+    .architecture-frame {
+      padding: clamp(1rem, 3vw, 1.4rem);
+    }
+
+    .network-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      color: var(--cf-orange);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: 1px solid rgba(243, 128, 32, 0.34);
+      border-radius: 999px;
+      background: rgba(243, 128, 32, 0.1);
+      padding: 0.38rem 0.7rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .architecture-canvas-wrap {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 0.45rem;
+    }
+
+    .architecture-canvas {
+      position: relative;
+      width: 1160px;
+      height: 680px;
+      border-radius: 1.35rem;
+      background:
+        radial-gradient(circle at 58% 24%, rgba(69, 163, 255, 0.08), transparent 15rem),
+        radial-gradient(circle at 63% 78%, rgba(16, 185, 129, 0.1), transparent 17rem),
+        linear-gradient(135deg, rgba(243, 128, 32, 0.08), rgba(243, 128, 32, 0.025));
+      min-width: 1160px;
+    }
+
+    .cloudflare-boundary {
+      position: absolute;
+      left: 128px;
+      top: 42px;
+      width: 760px;
+      height: 540px;
+      border: 2px solid rgba(243, 128, 32, 0.48);
+      border-radius: 1.6rem;
+      background: rgba(243, 128, 32, 0.055);
+      box-shadow: inset 0 0 80px rgba(243, 128, 32, 0.06);
+    }
+
+    .boundary-title {
+      position: absolute;
+      left: 154px;
+      top: 62px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      color: var(--cf-orange);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .boundary-title span {
+      color: #ffd0a3;
+      border: 1px solid rgba(243, 128, 32, 0.35);
+      border-radius: 999px;
+      padding: 0.15rem 0.5rem;
+      background: rgba(243, 128, 32, 0.1);
+      letter-spacing: 0.04em;
+    }
+
+    .arch-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .arch-svg .request { stroke: var(--cf-orange); }
+    .arch-svg .response { stroke: var(--map-blue); }
+    .arch-svg .model { stroke: var(--map-blue); }
+    .arch-svg .mcp { stroke: var(--map-amber); }
+    .arch-svg .private { stroke: var(--map-green); }
+    .arch-svg .external { stroke: var(--map-slate); }
+    .arch-svg .blocked { stroke: #ef4444; }
+    .arch-svg .outofband { stroke: var(--map-amber); stroke-dasharray: 7 6; }
+    .arch-svg .dashed { stroke-dasharray: 7 7; }
+    .arch-svg path,
+    .arch-svg line {
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.95;
+    }
+
+    .arch-label {
+      position: absolute;
+      z-index: 3;
+      border: 1px solid var(--map-border);
+      background: rgba(13, 17, 23, 0.82);
+      border-radius: 999px;
+      padding: 0.22rem 0.55rem;
+      color: var(--text-secondary);
+      font-size: 0.66rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .arch-label.start { color: #d1d5db; left: 8px; top: 250px; }
+    .arch-label.response { color: #93c5fd; right: 18px; top: 214px; }
+    .arch-label.blocked { color: #fca5a5; right: 74px; top: 532px; border-color: rgba(239, 68, 68, 0.45); }
+
+    .arch-read-note {
+      position: absolute;
+      z-index: 3;
+      left: 154px;
+      top: 20px;
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid var(--map-border);
+      border-radius: 999px;
+      background: rgba(13, 17, 23, 0.68);
+      padding: 0.22rem 0.6rem;
+    }
+
+    .arch-node {
+      --node-color: var(--cf-orange);
+      position: absolute;
+      z-index: 2;
+      width: 150px;
+      min-height: 86px;
+      border: 2px solid color-mix(in srgb, var(--node-color) 56%, transparent);
+      border-left-width: 5px;
+      border-radius: 0.95rem;
+      background: rgba(13, 17, 23, 0.88);
+      box-shadow: 0 16px 38px color-mix(in srgb, var(--node-color) 18%, transparent);
+      padding: 0.68rem 0.72rem;
+    }
+
+    .arch-node.compact { width: 124px; min-height: 76px; }
+    .arch-node.wide { width: 176px; }
+
+    .arch-node small {
+      display: block;
+      color: color-mix(in srgb, var(--node-color) 78%, #ffffff);
+      font-size: 0.62rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.28rem;
+    }
+
+    .arch-node strong {
+      display: block;
+      color: var(--map-ink);
+      font-size: 0.94rem;
+      line-height: 1.18;
+      margin-bottom: 0.24rem;
+    }
+
+    .arch-node span {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.7rem;
+      line-height: 1.34;
+    }
+
+    .arch-node ul {
+      margin: 0.36rem 0 0;
+      padding-left: 0.85rem;
+      color: color-mix(in srgb, var(--node-color) 70%, #ffffff);
+      font-size: 0.68rem;
+      line-height: 1.45;
+    }
+
+    .arch-node.start-node {
+      left: 14px;
+      top: 292px;
+      width: 92px;
+      min-height: 80px;
+      --node-color: var(--map-slate);
+      text-align: center;
+    }
+
+    .arch-node.start-node strong { font-size: 0.86rem; }
+
+    .node-swg { left: 172px; top: 108px; --node-color: var(--map-green); }
+    .node-web-ai { left: 970px; top: 112px; --node-color: var(--map-amber); }
+    .node-waf { left: 174px; top: 292px; --node-color: var(--map-rose); }
+    .node-agent { left: 368px; top: 292px; --node-color: var(--cf-orange); }
+    .node-dlp { left: 394px; top: 180px; width: 210px; min-height: 74px; --node-color: var(--cf-orange); }
+    .node-aig { left: 540px; top: 88px; width: 176px; min-height: 142px; --node-color: var(--map-blue); }
+    .node-workers-ai { left: 742px; top: 88px; --node-color: var(--map-purple); }
+    .node-llm { left: 948px; top: 248px; width: 190px; --node-color: var(--map-slate); }
+    .node-mcp { left: 600px; top: 300px; --node-color: var(--map-amber); }
+    .node-mcp-server { left: 768px; top: 300px; --node-color: var(--map-amber); }
+    .node-api { left: 970px; top: 392px; --node-color: var(--map-slate); }
+    .node-vpc { left: 400px; top: 484px; --node-color: var(--map-cyan); }
+    .node-private { left: 628px; top: 484px; --node-color: var(--map-green); }
+    .node-internet { left: 984px; top: 530px; --node-color: #ef4444; border-style: dashed; }
+    .node-casb { left: 172px; top: 596px; width: 236px; min-height: 66px; --node-color: var(--map-amber); border-style: dashed; }
+
+    .architecture-help {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      line-height: 1.45;
+      margin-top: 0.65rem;
+      display: none;
+    }
+
+    .route-map {
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .route-lane {
+      --route-color: var(--cf-orange);
+      border: 1px solid color-mix(in srgb, var(--route-color) 34%, var(--map-border));
+      border-left: 5px solid var(--route-color);
+      border-radius: 1.1rem;
+      background: rgba(13, 17, 23, 0.5);
+      padding: 0.9rem;
+      display: grid;
+      grid-template-columns: 12rem 1.2rem minmax(0, 1fr) 1.2rem 13rem;
+      gap: 0.75rem;
+      align-items: center;
+      box-shadow: 0 12px 38px color-mix(in srgb, var(--route-color) 8%, transparent);
+    }
+
+    .route-lane.out-of-band {
+      border-style: dashed;
+    }
+
+    .route-source,
+    .route-destination,
+    .route-step {
+      border: 1px solid var(--map-border);
+      border-radius: 0.85rem;
+      background: rgba(22, 27, 34, 0.82);
+      padding: 0.72rem;
+      min-height: 5.4rem;
+    }
+
+    .route-source,
+    .route-destination {
+      border-color: color-mix(in srgb, var(--route-color) 34%, var(--map-border));
+    }
+
+    .route-step {
+      border-top: 3px solid var(--route-color);
+      min-width: 9rem;
+    }
+
+    .route-kicker {
+      display: block;
+      color: color-mix(in srgb, var(--route-color) 78%, #ffffff);
+      font-size: 0.62rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.28rem;
+    }
+
+    .route-source strong,
+    .route-destination strong,
+    .route-step strong {
+      display: block;
+      color: var(--text-primary);
+      font-size: 0.92rem;
+      line-height: 1.18;
+      margin-bottom: 0.24rem;
+    }
+
+    .route-source span,
+    .route-destination span,
+    .route-step span {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.72rem;
+      line-height: 1.38;
+    }
+
+    .route-path {
+      display: flex;
+      align-items: stretch;
+      gap: 0.42rem;
+      min-width: 0;
+    }
+
+    .route-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--route-color);
+      font-weight: 900;
+      font-size: 1.15rem;
+      min-width: 1rem;
+      justify-content: center;
+    }
+
+    .route-arrow::before {
+      content: "→";
+    }
+
+    .route-lane.out-of-band .route-arrow::before {
+      content: "⇢";
+    }
+
+    .route-response {
+      grid-column: 3 / 6;
+      border: 1px solid rgba(69, 163, 255, 0.22);
+      background: rgba(69, 163, 255, 0.07);
+      color: #bfdbfe;
+      border-radius: 999px;
+      padding: 0.36rem 0.7rem;
+      font-size: 0.72rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .route-response::before {
+      content: "Response: ";
+      color: var(--map-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.62rem;
+      font-weight: 900;
+    }
+
+    .route-lane.out-of-band .route-response {
+      border-color: rgba(245, 158, 11, 0.25);
+      background: rgba(245, 158, 11, 0.08);
+      color: #fed7aa;
+    }
+
+    .route-lane.out-of-band .route-response::before {
+      content: "Findings: ";
+      color: var(--map-amber);
+    }
+
+    .architecture-outcomes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin-top: 0.9rem;
+    }
+
+    .out-of-band-card,
+    .foundation-card {
+      border: 1px solid var(--map-border);
+      border-radius: 1rem;
+      background: rgba(13, 17, 23, 0.5);
+      padding: 0.95rem;
+    }
+
+    .out-of-band-card {
+      border-style: dashed;
+      border-color: rgba(245, 158, 11, 0.62);
+    }
+
+    .out-of-band-card strong,
+    .foundation-card strong {
+      display: block;
+      color: var(--text-primary);
+      margin-bottom: 0.35rem;
+      font-size: 0.9rem;
+    }
+
+    .out-of-band-card span,
+    .foundation-card span {
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .map-disclaimer {
+      color: var(--text-muted);
+      text-align: center;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      margin-top: 1.4rem;
+    }
+
+    @media (max-width: 78rem) {
+      .hero-grid,
+      .controls-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-rule,
+      .detail-panel {
+        position: static;
+      }
+
+      .detail-panel {
+        grid-column: auto;
+      }
+
+      .diagram-footer,
+      .architecture-outcomes {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .architecture-header {
+        flex-direction: column;
+      }
+
+      .architecture-legend {
+        justify-content: flex-start;
+      }
+
+      .architecture-canvas-wrap {
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+        scroll-snap-type: x proximity;
+      }
+
+      .architecture-canvas {
+        scroll-snap-align: start;
+      }
+
+      .architecture-help {
+        display: block;
+      }
+
+      .route-lane {
+        grid-template-columns: 1fr;
+      }
+
+      .route-lane > .route-arrow {
+        transform: rotate(90deg);
+        min-height: 1.2rem;
+      }
+
+      .route-path {
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+      }
+
+      .route-step {
+        min-width: 10.5rem;
+      }
+
+      .route-response {
+        grid-column: auto;
+        border-radius: 0.85rem;
+      }
+    }
+
+    @media (max-width: 42rem) {
+      .map-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.65rem;
+      }
+
+      .map-nav {
+        justify-content: flex-start;
+      }
+
+      .hero-copy .rule-strip,
+      .dlp-route-grid {
+        display: none;
+      }
+
+      .hero-copy,
+      .dlp-card {
+        padding: 1rem;
+      }
+
+      .hero-copy p,
+      .dlp-card p,
+      .interaction-note {
+        font-size: 0.92rem;
+        line-height: 1.5;
+      }
+
+      .map-board,
+      .diagram-footer,
+      .architecture-outcomes {
+        grid-template-columns: 1fr;
+      }
+
+      .architecture-header,
+      .architecture-frame {
+        padding: 1rem;
+      }
+
+      .hero-copy h1 {
+        letter-spacing: -0.055em;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <div class="map-shell">
+    <header class="map-header">
+      <a class="map-brand" href="/" aria-label="Back to Cloudflare AI home">
+        <span class="map-brand-mark">CF</span>
+        <span>Cloudflare AI</span>
+      </a>
+      <nav class="map-nav" aria-label="Decision map navigation">
+        <a href="/">Home</a>
+        <a href="/ai-security">AI Security</a>
+        <a href="/ai-builder">AI Builder</a>
+      </nav>
+    </header>
+
+    <main class="map-main">
+      <section class="hero-grid" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <span class="eyebrow">Customer Decision Map</span>
+          <h1 id="page-title">Secure AI <span>by path.</span></h1>
+          <p>
+            Start with the path you need to secure. The matching Cloudflare control changes by traffic type, while DLP governance can be reused across most AI usage patterns.
+          </p>
+          <div class="rule-strip" aria-label="Common governance goals">
+            <span class="rule-pill">One DLP profile strategy</span>
+            <span class="rule-pill">Log, allow, isolate, or block</span>
+            <span class="rule-pill">Govern employees, systems, and agents</span>
+          </div>
+        </div>
+
+        <aside class="dlp-card" aria-labelledby="dlp-title">
+          <span class="eyebrow">Reusable Layer</span>
+          <h2 id="dlp-title">Cloudflare DLP governance</h2>
+          <p>
+            Same policy vocabulary, applied at the right enforcement point for each AI path.
+          </p>
+          <div class="rule-strip" aria-label="DLP examples">
+            <span class="mini-pill">PII</span>
+            <span class="mini-pill">Source code</span>
+            <span class="mini-pill">Credentials</span>
+            <span class="mini-pill">Customer data</span>
+            <span class="mini-pill">Custom AI topics</span>
+          </div>
+          <div class="dlp-route-grid" aria-label="DLP reuse paths">
+            <div class="dlp-route"><strong>Profile library</strong>PII, credentials, source code, customer data, custom topics.</div>
+            <div class="dlp-route"><strong>Inline enforcement</strong>AI Gateway, SWG, MCP via Gateway, Worker egress.</div>
+            <div class="dlp-route"><strong>Stored data checks</strong>CASB findings for SaaS content after storage.</div>
+          </div>
+        </aside>
+      </section>
+
+      <p class="interaction-note">
+        <strong>How to use this map:</strong> select any product box to highlight when it makes sense, then use the expandable sections in the detail panel to read common use cases, primary controls, and the relevant DLP or standalone security note.
+      </p>
+
+      <section class="controls-panel" aria-label="Interactive AI security decision map">
+        <aside class="quick-rule" aria-labelledby="quick-rules-title">
+          <h2 id="quick-rules-title">Fast Rule</h2>
+          <ol>
+            <li>If the client can change its LLM endpoint, use AI Gateway.</li>
+            <li>If the user is browsing the Internet, use Secure Web Gateway.</li>
+            <li>If an agent needs tools through MCP, use MCP Server Portal.</li>
+            <li>If the data is already inside SaaS, use CASB.</li>
+            <li>If the app is public-facing, add AI Security for Apps.</li>
+            <li>If you are building the agent or private path, use Developer Platform and Workers VPC.</li>
+          </ol>
+        </aside>
+
+        <div class="map-board" id="map-board" aria-label="Cloudflare product decision cards"></div>
+
+        <aside class="detail-panel" id="detail-panel" aria-live="polite"></aside>
+      </section>
+
+      <section class="diagram-footer" aria-label="Decision map principles">
+        <div class="footer-tile">
+          <strong>Inline controls</strong>
+          <span>AI Gateway, SWG, MCP Portal through Gateway, and reverse proxy protections can inspect traffic while it flows.</span>
+        </div>
+        <div class="footer-tile">
+          <strong>Out-of-band checks</strong>
+          <span>CASB uses provider APIs to find risky SaaS posture and sensitive content after storage.</span>
+        </div>
+        <div class="footer-tile">
+          <strong>Owned execution</strong>
+          <span>Workers, Agents SDK, and remote MCP servers fit when you own the app, agent, or integration layer.</span>
+        </div>
+        <div class="footer-tile">
+          <strong>Private reachability</strong>
+          <span>Workers VPC connects Workers to private APIs and can apply Gateway policies to Worker public egress.</span>
+        </div>
+      </section>
+
+      <section class="architecture-section" aria-labelledby="architecture-title">
+        <div class="architecture-header">
+          <div>
+            <span class="eyebrow">Full Customer Architecture</span>
+            <h2 id="architecture-title">How the pieces fit together</h2>
+            <p>
+              A comprehensive customer architecture usually has several AI paths at once: employees using web AI, coding agents calling LLM APIs, MCP-enabled tools reaching approved servers, public AI apps behind Cloudflare, and Workers-based agents reaching private networks. Requests flow left to right through the relevant Cloudflare control; responses return through the same policy checkpoints.
+            </p>
+          </div>
+          <div class="architecture-legend" aria-label="Architecture legend">
+            <div class="legend-group" aria-label="Line styles">
+              <span class="legend-token"><span class="legend-line"></span>Lane arrows = request path</span>
+              <span class="legend-token"><span class="legend-line response"></span>Blue note = response path</span>
+              <span class="legend-token"><span class="legend-line dashed"></span>Dashed lane = out-of-band/API</span>
+            </div>
+            <div class="legend-group" aria-label="Color coding">
+              <span class="color-chip" style="--chip-color: var(--map-rose)">Ingress security</span>
+              <span class="color-chip" style="--chip-color: var(--map-green)">Zero Trust / private</span>
+              <span class="color-chip" style="--chip-color: var(--map-blue)">LLM gateway</span>
+              <span class="color-chip" style="--chip-color: var(--map-amber)">MCP / CASB / SaaS</span>
+              <span class="color-chip" style="--chip-color: var(--map-cyan)">Developer Platform</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="architecture-frame">
+          <div class="network-label">Cloudflare Global Network + Zero Trust + Developer Platform</div>
+          <div class="route-map" aria-label="Comprehensive Cloudflare AI architecture routes">
+            <div class="route-lane" style="--route-color: var(--map-green)">
+              <div class="route-source"><span class="route-kicker">Start: web-based AI</span><strong>Employee device</strong><span>Browser or app accessing ChatGPT, Claude, Gemini, Perplexity, and other web AI tools.</span></div>
+              <div class="route-arrow"></div>
+              <div class="route-path">
+                <div class="route-step"><span class="route-kicker">Zero Trust</span><strong>Secure Web Gateway</strong><span>DNS, Network, HTTP, egress, app controls, RBI.</span></div>
+                <div class="route-arrow"></div>
+                <div class="route-step"><span class="route-kicker">Governance</span><strong>DLP + AI Prompt Protection</strong><span>Policy checks for prompts and sensitive data.</span></div>
+              </div>
+              <div class="route-arrow"></div>
+              <div class="route-destination"><span class="route-kicker">Destination</span><strong>Web AI SaaS</strong><span>Inline request reaches approved web AI destination.</span></div>
+              <div class="route-response">SaaS response returns through SWG/Gateway policies where traffic is inline and inspectable.</div>
+            </div>
+
+            <div class="route-lane" style="--route-color: var(--map-blue)">
+              <div class="route-source"><span class="route-kicker">Start: LLM/API calls</span><strong>CLI, app, or agent</strong><span>Claude Code, OpenCode, LiteLLM, Cursor, Workers, or custom agents with configurable endpoints.</span></div>
+              <div class="route-arrow"></div>
+              <div class="route-path">
+                <div class="route-step"><span class="route-kicker">LLM gateway</span><strong>AI Gateway</strong><span>Auth, logs, caching, rate limits, routing, DLP.</span></div>
+                <div class="route-arrow"></div>
+                <div class="route-step"><span class="route-kicker">Model choice</span><strong>Workers AI</strong><span>On-network inference option.</span></div>
+              </div>
+              <div class="route-arrow"></div>
+              <div class="route-destination"><span class="route-kicker">Destination</span><strong>LLM providers</strong><span>Workers AI, OpenAI, Anthropic, Google, Mistral, and others.</span></div>
+              <div class="route-response">Model response returns through AI Gateway for logging and optional response DLP before reaching the client.</div>
+            </div>
+
+            <div class="route-lane" style="--route-color: var(--map-amber)">
+              <div class="route-source"><span class="route-kicker">Start: MCP tools</span><strong>MCP-capable client</strong><span>Claude Desktop, Claude Code, Cursor, OpenCode, or a custom agent harness.</span></div>
+              <div class="route-arrow"></div>
+              <div class="route-path">
+                <div class="route-step"><span class="route-kicker">Identity + tools</span><strong>Access + MCP Server Portal</strong><span>OAuth, tool curation, audit, Code Mode.</span></div>
+                <div class="route-arrow"></div>
+                <div class="route-step"><span class="route-kicker">Optional route</span><strong>Gateway routing + DLP</strong><span>HTTP logs, egress, standard DLP profiles.</span></div>
+              </div>
+              <div class="route-arrow"></div>
+              <div class="route-destination"><span class="route-kicker">Destination</span><strong>Remote MCP Servers</strong><span>Workers-hosted MCPs, SaaS MCPs, internal tools, and APIs.</span></div>
+              <div class="route-response">Tool result returns through the portal; blocked DLP matches surface back to the client as tool errors.</div>
+            </div>
+
+            <div class="route-lane" style="--route-color: var(--map-rose)">
+              <div class="route-source"><span class="route-kicker">Start: public hostname</span><strong>User or attacker</strong><span>Customer traffic, bots, abuse attempts, prompt injection, scraping, or normal app usage.</span></div>
+              <div class="route-arrow"></div>
+              <div class="route-path">
+                <div class="route-step"><span class="route-kicker">Reverse proxy</span><strong>WAF + AI Security for Apps</strong><span>DDoS, Bot, WAF, rate limits, API Shield, cf.llm signals.</span></div>
+                <div class="route-arrow"></div>
+                <div class="route-step"><span class="route-kicker">App runtime</span><strong>Workers + Agents SDK</strong><span>AI app, Durable Objects, Workflows, Queues, R2, Vectorize.</span></div>
+              </div>
+              <div class="route-arrow"></div>
+              <div class="route-destination"><span class="route-kicker">Destination</span><strong>Models + tools</strong><span>AI Gateway, Workers AI, MCP Portal, providers, and downstream APIs.</span></div>
+              <div class="route-response">Application response returns through edge controls; AI detection fields and threat signals remain visible for policy and analytics.</div>
+            </div>
+
+            <div class="route-lane" style="--route-color: var(--map-cyan)">
+              <div class="route-source"><span class="route-kicker">Start: private access</span><strong>Worker agent</strong><span>Custom agent, automation Worker, Remote MCP server, or background workflow.</span></div>
+              <div class="route-arrow"></div>
+              <div class="route-path">
+                <div class="route-step"><span class="route-kicker">Private reach</span><strong>Workers VPC</strong><span>VPC Services or VPC Networks, including cf1:network.</span></div>
+                <div class="route-arrow"></div>
+                <div class="route-step"><span class="route-kicker">Policy layer</span><strong>Gateway policies</strong><span>Public egress logs and policy enforcement for Worker traffic.</span></div>
+              </div>
+              <div class="route-arrow"></div>
+              <div class="route-destination"><span class="route-kicker">Destination</span><strong>Private + public services</strong><span>Internal APIs, databases, Mesh nodes, Tunnel routes, WAN, external APIs, Internet.</span></div>
+              <div class="route-response">Private service or public endpoint response returns to the Worker, agent, or MCP server that made the call.</div>
+            </div>
+
+            <div class="route-lane out-of-band" style="--route-color: var(--map-amber)">
+              <div class="route-source"><span class="route-kicker">Start: out-of-band</span><strong>Security team / CASB</strong><span>API integration scans SaaS state after content lands in provider tenants.</span></div>
+              <div class="route-arrow"></div>
+              <div class="route-path">
+                <div class="route-step"><span class="route-kicker">API integration</span><strong>CASB</strong><span>Posture, findings, stored content, DLP detections.</span></div>
+              </div>
+              <div class="route-arrow"></div>
+              <div class="route-destination"><span class="route-kicker">Destination</span><strong>SaaS tenants</strong><span>ChatGPT, Claude, Gemini, projects, files, chats, artifacts where supported.</span></div>
+              <div class="route-response">Findings, DLP matches, and compliance evidence flow back to dashboards, Logpush, SIEM, and workflows.</div>
+            </div>
+          </div>
+
+          <div class="architecture-outcomes">
+            <div class="out-of-band-card">
+              <strong>CASB out-of-band lane</strong>
+              <span>CASB connects to SaaS providers such as ChatGPT, Claude, and Gemini by API. It scans posture, uploaded files, chat messages, projects, and artifacts where supported, then sends DLP findings and compliance evidence to security teams.</span>
+            </div>
+            <div class="foundation-card">
+              <strong>Shared foundation across paths</strong>
+              <span>Use Cloudflare Access identity, device posture, reusable DLP profiles, Gateway logs, AI Gateway analytics, CASB findings, Logpush, SIEM workflows, and policy evidence as the common governance layer.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <p class="map-disclaimer">
+        For educational and demonstration purposes only. Not an official Cloudflare demo. Product behavior summarized from Cloudflare Developer Docs and public Cloudflare blog posts.
+      </p>
+    </main>
+  </div>
+
+  <script type="module">
+    const controls = [
+      {
+        id: "ai-gateway",
+        color: "#45a3ff",
+        kicker: "LLM/API traffic",
+        title: "AI Gateway",
+        question: "The tool can set a base URL or provider endpoint.",
+        signal: "Use AI Gateway when Claude Code CLI, LiteLLM, OpenCode, Cursor, custom apps, or agents make direct LLM API calls and can point those calls at a gateway endpoint.",
+        examples: ["Claude Code via ANTHROPIC_BASE_URL", "LiteLLM or in-house LLM gateway", "Custom Workers, apps, and agent SDK calls", "Provider fan-out to Anthropic, OpenAI, Workers AI, and others"],
+        controls: ["DLP scans request and response bodies for secrets, credentials, PII, and sensitive code", "Request logging, token usage, cost visibility, caching, and rate limiting", "Dynamic Routing, fallback, budget limits, and provider selection", "Gateway authentication and BYOK patterns for provider keys"],
+        dlp: "AI Gateway DLP inspects prompts and responses sent to AI providers without requiring Gateway HTTP filtering or TLS decryption. Response scanning may buffer streamed responses.",
+        goodFit: "Best when the LLM client is configurable.",
+        source: "https://developers.cloudflare.com/ai-gateway/integrations/coding-agents/"
+      },
+      {
+        id: "swg",
+        color: "#34d399",
+        kicker: "Employee Internet traffic",
+        title: "Secure Web Gateway",
+        question: "The user is browsing web AI tools on the Internet.",
+        signal: "Use Secure Web Gateway when employees access web-based AI tools such as chatgpt.com, claude.com, Gemini, Perplexity, or other Internet destinations through Cloudflare One connectivity.",
+        examples: ["Browser sessions from managed devices", "WARP or Cloudflare One Client traffic", "DNS, Network, HTTP, and egress policies", "Sanctioned and shadow AI app usage"],
+        controls: ["Gateway HTTP policies and application granular controls for AI chat operations", "DLP profile selector in HTTP policies", "AI Prompt Protection with content and intent topic detection", "Remote Browser Isolation, allow/block, and logging patterns"],
+        dlp: "Use Gateway HTTP policies with DLP profiles to scan web AI operations. AI prompt topics cover content such as PII, source code, credentials, financial information, and intent such as jailbreak attempts.",
+        goodFit: "Best when the actor is a workforce user going to the Internet.",
+        source: "https://developers.cloudflare.com/cloudflare-one/data-loss-prevention/"
+      },
+      {
+        id: "mcp",
+        color: "#a78bfa",
+        kicker: "Agent tool calls",
+        title: "MCP Server Portal",
+        question: "The AI tool or agent harness needs approved MCP servers.",
+        signal: "Use MCP Server Portal when any MCP-capable agent harness or AI tool needs centralized discovery, authentication, tool curation, auditability, and controlled access to upstream MCP servers.",
+        examples: ["Claude Desktop, Claude Code, Cursor, OpenCode, or custom MCP clients", "Internal or third-party MCP servers", "Per-server Access policies and OAuth", "Code Mode for large tool catalogs"],
+        controls: ["Portal proxies real-time tool calls to upstream MCP servers", "Access logs individual requests made through tools", "Gateway routing adds HTTP logs, DLP scanning, and egress policies", "Blocked DLP matches surface back to the MCP client as errors"],
+        dlp: "Turn on Gateway routing for portal traffic, then apply standard DLP profiles to upstream MCP server hostnames. AI prompt DLP profiles do not apply to MCP portal traffic.",
+        goodFit: "Best when the primary thing to govern is tools, not model calls.",
+        source: "https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/mcp-portals/"
+      },
+      {
+        id: "casb",
+        color: "#f59e0b",
+        kicker: "SaaS state after storage",
+        title: "CASB",
+        question: "The risk is already inside a SaaS AI provider.",
+        signal: "Use CASB for out-of-band, API-based checks of SaaS providers where prompts, projects, attachments, files, artifacts, or settings already exist in the provider tenant.",
+        examples: ["ChatGPT, Claude, and Gemini integrations", "Claude Compliance API findings", "Project visibility, uploaded files, chat messages, and artifacts", "Posture, data, and compliance risks"],
+        controls: ["Agentless API integrations with SaaS providers", "Security findings for misconfigurations and exposed data", "DLP findings on uploaded or generated content where supported", "Useful even when traffic did not traverse SWG or AI Gateway"],
+        dlp: "CASB reuses DLP policies for stored SaaS content, including uploaded chat attachments or files and, for Claude, project attachments, chat files, chat messages, and artifacts.",
+        goodFit: "Best for after-the-fact SaaS governance and posture scanning.",
+        source: "https://developers.cloudflare.com/cloudflare-one/integrations/cloud-and-saas/"
+      },
+      {
+        id: "ai-apps",
+        color: "#fb7185",
+        kicker: "Public AI app ingress",
+        title: "AI Security for Apps",
+        question: "The public hostname is your AI-powered application.",
+        signal: "Use AI Security for Apps when external users, bots, or attackers hit your public-facing AI application through Cloudflare's reverse proxy.",
+        examples: ["Public chatbots and AI assistants", "LLM-powered API endpoints", "Prompt injection attempts against your app", "WAF custom rules using cf.llm fields"],
+        controls: ["Detects LLM prompts in incoming JSON requests", "Exposes fields such as prompt detection, PII detection, unsafe topic detection, and prompt injection score", "Pairs with WAF custom rules, Bot Management, rate limiting, and API Shield", "Runs as a standalone WAF/reverse-proxy LLM-specific ingress protection"],
+        noteLabel: "Standalone note",
+        dlp: "AI Security for Apps is not a DLP integration. It is a separate WAF/reverse-proxy capability for LLM-specific ingress threats such as prompt injection, PII in incoming prompts, and unsafe topics.",
+        goodFit: "Best when Cloudflare is reverse proxying the public app hostname.",
+        source: "https://developers.cloudflare.com/waf/detections/ai-security-for-apps/"
+      },
+      {
+        id: "developer-platform",
+        color: "#22d3ee",
+        kicker: "Build custom agents",
+        title: "Developer Platform",
+        question: "You own the agent, app, or MCP server implementation.",
+        signal: "Use Cloudflare's Developer Platform when you are building the AI system itself: Workers, Agents SDK, remote MCP servers, Durable Objects, Workflows, Queues, R2, Vectorize, Workers AI, and AI Gateway integrations.",
+        examples: ["Remote MCP servers with McpAgent", "Agents SDK applications on Durable Objects", "Custom AI apps and tool execution", "Secure internal AI engineering workflows"],
+        controls: ["Expose MCP tools and resources directly from an Agent", "Use AI Gateway for outbound model calls", "Use Access, service bindings, Secrets Store, and logs around the app", "Compose with DLP at ingress, egress, and provider gateway points"],
+        dlp: "DLP is usually applied at the traffic control points around the app: AI Gateway for model calls, Gateway for HTTP egress, or CASB for SaaS state. Use AI Security for Apps separately for public LLM ingress threat detection.",
+        goodFit: "Best when you need to build, not only govern, the AI workflow.",
+        source: "https://developers.cloudflare.com/agents/"
+      },
+      {
+        id: "workers-vpc",
+        color: "#94a3b8",
+        kicker: "Private network access",
+        title: "Workers VPC",
+        question: "A Worker or agent needs private services or governed public egress.",
+        signal: "Use Workers VPC when Workers or agents running on Workers need private APIs, databases, internal MCP servers, or account-wide Cloudflare Mesh reachability.",
+        examples: ["Bind to cf1:network for Cloudflare Mesh", "Reach private APIs and services over HTTP or TCP", "Connect to subnet routes behind Tunnel, Mesh, or Cloudflare WAN", "Route Worker public Internet egress through Gateway policies"],
+        controls: ["VPC Networks give broad access without pre-registering each host", "fetch() and connect() choose the destination at runtime", "Public Internet egress through cf1:network uses Gateway DNS, HTTP, Network, and egress policies", "Gateway logs provide visibility for Worker-originated public traffic"],
+        dlp: "For Worker public Internet egress through Gateway, apply Gateway HTTP policies and DLP where HTTP inspection is configured. Private service calls should be governed with least privilege and app-level controls.",
+        goodFit: "Best when the AI system needs private reachability from Workers.",
+        source: "https://developers.cloudflare.com/workers-vpc/"
+      }
+    ];
+
+    const board = document.querySelector("#map-board");
+    const detailPanel = document.querySelector("#detail-panel");
+
+    let activeId = controls[0].id;
+
+    const escapeHtml = (value) => value
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+
+    function setActive(id) {
+      activeId = id;
+      render();
+    }
+
+    function renderCards() {
+      board.innerHTML = controls.map((item) => `
+        <button class="decision-card ${item.id === activeId ? "is-active" : ""}" style="--accent: ${item.color}" data-id="${item.id}" type="button" aria-pressed="${item.id === activeId}">
+          <div class="card-kicker">${escapeHtml(item.kicker)}</div>
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(item.question)}</p>
+        </button>
+      `).join("");
+    }
+
+    function renderDetail() {
+      const item = controls.find((control) => control.id === activeId) || controls[0];
+      detailPanel.style.setProperty("--detail-accent", item.color);
+      detailPanel.innerHTML = `
+        <div class="detail-kicker">${escapeHtml(item.kicker)}</div>
+        <h2>${escapeHtml(item.title)}</h2>
+        <p class="detail-signal">${escapeHtml(item.goodFit)} ${escapeHtml(item.signal)}</p>
+
+        <details class="detail-section">
+          <summary>Common use cases</summary>
+          <ul class="detail-list">
+            ${item.examples.map((example) => `<li>${escapeHtml(example)}</li>`).join("")}
+          </ul>
+        </details>
+
+        <details class="detail-section">
+          <summary>Primary controls</summary>
+          <ul class="detail-list">
+            ${item.controls.map((control) => `<li>${escapeHtml(control)}</li>`).join("")}
+          </ul>
+        </details>
+
+        <p class="dlp-note"><strong>${escapeHtml(item.noteLabel || "DLP fit")}:</strong> ${escapeHtml(item.dlp)}</p>
+        <a class="source-link" href="${item.source}" target="_blank" rel="noopener">Open product docs -&gt;</a>
+      `;
+    }
+
+    function bindEvents() {
+      document.querySelectorAll("[data-id]").forEach((button) => {
+        button.addEventListener("click", () => setActive(button.dataset.id));
+      });
+    }
+
+    function render() {
+      renderCards();
+      renderDetail();
+      bindEvents();
+    }
+
+    render();
+  </script>
+</body>
+</html>
