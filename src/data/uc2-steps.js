@@ -9,9 +9,10 @@
  * Remote MCP servers = centralized visibility, identity-based access, and audit logging.
  *
  * MCP authorization uses OAuth 2.1. Cloudflare Access acts as the OAuth provider,
- * issuing OAuth ID tokens with user identity attributes for per-tool authorization.
+ * issuing OAuth ID tokens with user identity attributes. Access policies apply per
+ * upstream server; portal administrators separately curate and toggle exposed tools.
  *
- * DLP for MCP portal traffic is GA — MCP portal traffic can be routed through
+ * MCP portal traffic can be routed through
  * Cloudflare Gateway for HTTP logging and DLP scanning via Gateway HTTP policies.
  *
  * References:
@@ -23,11 +24,13 @@
  *   https://developers.cloudflare.com/agents/api-reference/codemode/
  *   https://developers.cloudflare.com/cloudflare-one/traffic-policies/
  *   https://developers.cloudflare.com/cloudflare-one/data-loss-prevention/dlp-policies/
+ *   https://blog.cloudflare.com/mcp-v2/
+ *   https://blog.cloudflare.com/mcp-security-updates/
  */
 
 export const uc2 = {
   id: 'uc2',
-  title: 'Govern AI Agents',
+  title: 'Govern AI Agents & MCP',
   subtitle: 'Secure interactions between human users and AI agents via MCP',
 
   nodes: [
@@ -80,7 +83,7 @@ export const uc2 = {
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare Gateway',
-      description: 'Secure Web Gateway inspects MCP portal traffic when Gateway routing is enabled. Gateway HTTP policies with DLP profiles detect and block sensitive data in tool inputs/outputs sent to upstream MCP servers. Portal traffic appears in Gateway HTTP logs for unified visibility.',
+      description: 'Gateway identifies TLS-inspected remote MCP traffic using protocol signals, exposes the experimental.is_mcp selector, and distinguishes direct client traffic from the mcp_portal Traffic Source. Gateway policies can monitor or block direct MCP connections, while portal routing adds HTTP logging and DLP for compatible upstream calls.',
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/traffic-policies/',
     },
     {
@@ -97,24 +100,24 @@ export const uc2 = {
     {
       id: 'mcp-portal',
       label: 'MCP Server Portal',
-      sublabel: 'Discovery, DLP',
+      sublabel: 'Discovery, OAuth, DLP',
       icon: '\u{1F6AA}',
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare MCP Server Portal',
-      description: 'Centralizes multiple MCP servers onto a single HTTP endpoint. Admins curate tools, turn individual tools on/off, and configure prompt templates per portal. Supports both unauthenticated and OAuth-secured MCP servers. Portal logs provide per-portal and per-server audit views. Gateway routing enables DLP scanning of all portal traffic.',
+      description: 'Centralizes multiple MCP servers onto one endpoint. Admins curate tools, turn tools on/off, and configure prompt templates. Portals support unauthenticated and OAuth-secured upstreams, including pre-registered OAuth clients with manual credentials. Portal logs provide audit views; Gateway routing adds compatible HTTP policy and DLP controls.',
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/mcp-portals/',
     },
     {
       id: 'remote-mcp',
       label: 'Remote MCP Servers',
-      sublabel: 'Deployed globally',
+      sublabel: 'Stateless Workers handler',
       icon: '\u{2699}',
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare Workers',
-      description: 'Remote MCP servers deployed on Cloudflare Workers using the Agents SDK (McpAgent class). Built on Durable Objects for stateful execution with built-in SQL database. Supports Streamable HTTP transport and OAuth 2.1 authorization. Remote servers are recommended over local installations — local MCP servers introduce shadow IT risks with no audit trail.',
-      docsUrl: 'https://developers.cloudflare.com/agents/guides/remote-mcp-server/',
+      description: 'MCP 2026-07-28 is stateless: createMcpHandler can serve tools, prompts, resources, and elicitation from a Worker without a protocol session or Durable Object. Use Durable Objects only when the application itself needs coordinated state. McpAgent is deprecated and feature-frozen; migration can preserve legacy stateless clients on the same endpoint.',
+      docsUrl: 'https://developers.cloudflare.com/agents/model-context-protocol/guides/migrate-to-mcp-sdk-v2/',
     },
     {
       id: 'cf-access',
@@ -124,7 +127,7 @@ export const uc2 = {
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare Access',
-      description: 'Zero Trust Network Access with SSO and MFA enforcement. Users authenticate via OIDC/SAML from configured identity providers. For MCP servers, Access acts as the OAuth 2.1 provider — issuing OAuth ID tokens with user identity attributes. Access policies control which users/groups can reach each portal and each individual MCP server. Service tokens (Client ID + Client Secret) enable machine-to-machine authentication.',
+      description: 'Zero Trust Network Access with SSO and MFA enforcement. Access policies control which users and groups can reach each portal and server. Managed OAuth provides the MCP client transport while enforcing the same Access policies. Upstream pre-registered OAuth applications remain tied to each user\'s authorization.',
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/access-controls/policies/',
     },
 
@@ -173,8 +176,8 @@ export const uc2 = {
     {
       title: 'User connects via MCP client',
       product: 'MCP Protocol',
-      description: 'The user opens an MCP client application (OpenCode, Claude Code, Cursor IDE, or Claude Desktop) and connects to the organization\'s MCP Server Portal URL. The MCP client translates user intent into MCP protocol requests.',
-      why: 'MCP clients provide the user interface for interacting with remote tools. Using a centralized portal URL instead of configuring individual MCP servers eliminates shadow IT risks from unmanaged local MCP server installations.',
+      description: 'The user opens OpenCode, Claude Code, Cursor, Claude Desktop, or another MCP client and connects to the organization\'s portal. MCP 2026-07-28 removes the required initialize handshake, Mcp-Session-Id, and protocol session: each request carries its protocol version, identity, and capabilities. Optional server/discover supports capability discovery.',
+      why: 'The stateless protocol maps cleanly to ordinary HTTP infrastructure. A centralized portal URL then adds an approved path for identity, catalog curation, and audit without requiring each upstream server to maintain protocol sessions.',
       activeNodes: ['human-user', 'mcp-clients'],
       activeEdges: ['e-user-clients'],
     },
@@ -191,11 +194,11 @@ export const uc2 = {
     {
       title: 'Gateway inspects MCP traffic',
       product: 'Cloudflare Gateway',
-      description: 'When Gateway routing is enabled on the MCP Server Portal, all MCP protocol traffic passes through Cloudflare Gateway. Gateway HTTP policies with DLP profiles detect and block sensitive data (credentials, financial data, PII) in tool inputs sent to upstream MCP servers. Portal traffic appears in Gateway HTTP logs alongside the rest of the organization\'s HTTP traffic.',
-      why: 'Routing MCP portal traffic through Gateway provides inline DLP scanning and HTTP logging without requiring a separate device agent. Gateway HTTP policies explicitly target the upstream MCP server URL to match MCP-specific traffic.',
+      description: 'On managed paths with TLS inspection, Gateway identifies remote MCP traffic from protocol-level signals and exposes the experimental.is_mcp selector. The MCP dashboard shows users, servers, request volume, and whether traffic used a portal. Combine Is MCP with Traffic Source to monitor or block direct connections while allowing mcp_portal traffic. Local stdio, off-network, Do Not Inspect, and nonconforming traffic remain outside this view.',
+      why: 'Hostname and /mcp path matching misses ordinary URLs and can create false positives. Protocol detection provides a stronger signal, while Traffic Source separates unknown shadow MCP from bypass of an approved portal.',
       activeNodes: ['mcp-clients', 'cf-gateway'],
       activeEdges: ['e-clients-gateway'],
-      docsUrl: 'https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/mcp-portals/#route-portal-traffic-through-gateway',
+      docsUrl: 'https://blog.cloudflare.com/mcp-security-updates/',
       owasp: ['LLM02:2025 Sensitive Information Disclosure', 'ASI01 Agent Goal Hijack', 'ASI02 Tool Misuse & Exploitation'],
     },
     {
@@ -211,7 +214,7 @@ export const uc2 = {
     {
       title: 'MCP Portal routes tool calls',
       product: 'Cloudflare MCP Server Portal',
-      description: 'The MCP Server Portal aggregates multiple MCP servers onto a single HTTP endpoint. Admins curate which tools are exposed per portal, turn individual tools on/off, and configure prompt templates. The portal supports both unauthenticated MCP servers and servers secured with any OAuth provider. Per-portal and per-server audit logs capture all tool invocations. Logpush integration exports logs to SIEM tools.',
+      description: 'The MCP Server Portal aggregates multiple servers onto a single endpoint. Admins curate tools, turn individual tools on/off, and configure prompt templates. For upstream providers that require a registered OAuth application, admins can configure the callback URL and manual client credentials; each user still authorizes access to their own upstream data. Logpush exports portal activity.',
       why: 'Centralized portal management replaces per-server configuration. Admins control exactly which tools are available — the less external context exposed to the AI model, the better the responses. Audit logging provides compliance-ready visibility into all MCP usage.',
       activeNodes: ['cf-gateway', 'mcp-portal'],
       activeEdges: ['e-gateway-portal'],
@@ -219,10 +222,10 @@ export const uc2 = {
       owasp: ['LLM06:2025 Excessive Agency', 'ASI02 Tool Misuse & Exploitation', 'ASI04 Agentic Supply Chain Vulnerabilities'],
     },
     {
-      title: 'Access enforces identity per tool',
+      title: 'Access enforces identity per upstream server',
       product: 'Cloudflare Access',
-      description: 'Cloudflare Access (ZTNA) enforces SSO + MFA authentication for the portal and per-server Access policies control which users/groups can see and invoke each MCP server\'s tools. Access acts as the OAuth 2.1 provider per the MCP specification, issuing tokens with user identity attributes. Service tokens enable machine-to-machine authentication for automated agent systems.',
-      why: 'Zero Trust identity verification ensures only authorized users interact with MCP servers. Per-server Access policies enforce least privilege — even if a user can access the portal, they may not be authorized for every server. OAuth 2.1 integration follows the MCP specification natively.',
+      description: 'Access enforces SSO and MFA for the portal, while per-server policies control which users and groups can reach each upstream. Managed OAuth is enabled by default on new MCP portals and carries the same Access policy into MCP clients. MCP 2026-07-28 prefers pre-registered clients, then Client ID Metadata Documents; Dynamic Client Registration is deprecated for new implementations.',
+      why: 'Identity and client registration are separate concerns. Access governs the user at the portal, while audience-bound OAuth tokens and explicit client registration reduce authorization confusion at upstream servers.',
       activeNodes: ['cf-access', 'mcp-portal'],
       activeEdges: ['e-access-portal'],
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/access-controls/policies/',
@@ -231,18 +234,18 @@ export const uc2 = {
     {
       title: 'Remote MCP server executes tool',
       product: 'Cloudflare Workers',
-      description: 'The remote MCP server (built with the Agents SDK McpAgent class on Durable Objects) executes the tool call. Each agent instance has its own SQL database for stateful execution. Supports Streamable HTTP transport and OAuth 2.1 authorization. Remote servers connect to SaaS MCP servers (Slack, Jira, GitHub) and internal services (databases, APIs).',
-      why: 'Running MCP servers on Cloudflare Workers provides stateful, globally distributed execution with built-in SQL storage. Remote servers are recommended over local installations — local MCP servers introduce shadow IT risks with no audit trail or governance.',
+      description: 'A Worker using createMcpHandler executes the tool call with the stateless MCP 2026-07-28 protocol. Streamable HTTP requests expose Mcp-Method and Mcp-Name headers, allowing HTTP infrastructure to apply operation-aware policy and metrics. Durable Objects remain available when the tool application needs durable state, but MCP itself no longer requires one.',
+      why: 'Stateless servers remove sticky routing and session-draining complexity. Applications pay for coordinated state only when their own behavior needs it, not because the protocol imposes it.',
       activeNodes: ['mcp-portal', 'remote-mcp', 'saas-mcp', 'internal-services'],
       activeEdges: ['e-portal-remote', 'e-remote-saas', 'e-remote-internal'],
-      docsUrl: 'https://developers.cloudflare.com/agents/guides/remote-mcp-server/',
+      docsUrl: 'https://developers.cloudflare.com/agents/model-context-protocol/apis/handler-api/',
       owasp: ['LLM06:2025 Excessive Agency', 'ASI05 Unexpected Code Execution (RCE)'],
     },
     {
       title: 'All interactions logged and audited',
       product: 'Cloudflare Access',
-      description: 'All MCP tool invocations are logged by Cloudflare Access with full context: who called which tool, when, with what parameters, and from what device. Portal logs provide per-portal and per-server audit views. Logpush exports logs to third-party SIEM tools for long-term retention. Gateway HTTP logs capture DLP events. AI Gateway logs track LLM usage and costs.',
-      why: 'Comprehensive audit logging across Access, Gateway, and AI Gateway is essential for compliance, incident investigation, and understanding how AI agents interact with organizational resources.',
+      description: 'Portal logs provide per-portal and per-server activity, Gateway HTTP logs show protocol detection, Traffic Source, and DLP events, and the MCP dashboard summarizes users and servers. Logpush exports supported logs to external destinations. AI Gateway separately tracks the model calls and costs that led the agent to invoke tools.',
+      why: 'No single control point sees local stdio, all network paths, authorization decisions, and model behavior. Correlating portal, Gateway, Access, server, and AI Gateway telemetry gives the most complete investigation trail.',
       activeNodes: ['mcp-portal', 'cf-gateway', 'ai-gateway'],
       activeEdges: [],
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/mcp-portals/#view-portal-logs',

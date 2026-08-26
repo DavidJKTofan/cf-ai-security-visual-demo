@@ -39,16 +39,27 @@ export class FlowEngine {
     const container = this._container.querySelector('.flow-columns');
     if (!container) return;
 
-    // Pre-compute which same-column node pairs have a labeled edge between them.
-    // These pairs need extra vertical spacing so the label text is readable.
+    // Add spacing only between adjacent same-column nodes. Longer connections
+    // are routed through side lanes by _drawEdges().
     const labeledSameColPairs = new Set();
+    const nodesByColumn = Object.fromEntries(
+      ['left', 'center', 'right'].map(column => [
+        column,
+        this.nodes.filter(node => node.column === column),
+      ])
+    );
     this.edges.forEach(edge => {
       if (!edge.label) return;
       const fromNode = this.nodes.find(n => n.id === edge.from);
       const toNode = this.nodes.find(n => n.id === edge.to);
       if (fromNode && toNode && fromNode.column === toNode.column) {
-        // Mark the "from" node so we can add bottom margin after it
-        labeledSameColPairs.add(edge.from + '|' + fromNode.column);
+        const columnNodes = nodesByColumn[fromNode.column];
+        const fromIndex = columnNodes.indexOf(fromNode);
+        const toIndex = columnNodes.indexOf(toNode);
+        if (Math.abs(fromIndex - toIndex) === 1) {
+          const earlierNode = columnNodes[Math.min(fromIndex, toIndex)];
+          labeledSameColPairs.add(earlierNode.id + '|' + fromNode.column);
+        }
       }
     });
 
@@ -68,7 +79,6 @@ export class FlowEngine {
         el.dataset.type = node.type;
         el.setAttribute('role', 'button');
         el.setAttribute('tabindex', '0');
-        el.setAttribute('aria-label', node.label);
 
         // Add extra spacing class if this node has a labeled edge to next same-column node
         if (labeledSameColPairs.has(node.id + '|' + col)) {
@@ -76,7 +86,7 @@ export class FlowEngine {
         }
 
         el.innerHTML = `
-          <span class="node-icon">${node.icon}</span>
+          <span class="node-icon" aria-hidden="true">${node.icon}</span>
           <span class="node-label">
             ${node.label}
             ${node.sublabel ? `<span class="node-sublabel">${node.sublabel}</span>` : ''}
@@ -103,6 +113,9 @@ export class FlowEngine {
       this._drawEdges();
     });
     this._resizeObserver.observe(this._container);
+    const flowContainer = this._container.querySelector('.flow-container');
+    if (flowContainer) this._resizeObserver.observe(flowContainer);
+    document.fonts?.ready.then(() => this._drawEdges());
   }
 
   _drawEdges() {
@@ -110,11 +123,17 @@ export class FlowEngine {
     const flowContainer = this._container.querySelector('.flow-container');
     const containerRect = flowContainer.getBoundingClientRect();
 
-    // Set SVG size to match container
-    this._svgEl.setAttribute('width', flowContainer.scrollWidth);
-    this._svgEl.setAttribute('height', flowContainer.scrollHeight);
-    this._svgEl.style.width = flowContainer.scrollWidth + 'px';
-    this._svgEl.style.height = flowContainer.scrollHeight + 'px';
+    // Measure layout children rather than the SVG's previous dimensions, which
+    // would otherwise preserve stale overflow after an orientation change.
+    this._svgEl.style.width = '0';
+    this._svgEl.style.height = '0';
+    const flowColumns = flowContainer.querySelector('.flow-columns');
+    const svgWidth = Math.max(flowContainer.clientWidth, flowColumns.scrollWidth);
+    const svgHeight = Math.max(flowContainer.clientHeight, flowColumns.scrollHeight);
+    this._svgEl.setAttribute('width', svgWidth);
+    this._svgEl.setAttribute('height', svgHeight);
+    this._svgEl.style.width = svgWidth + 'px';
+    this._svgEl.style.height = svgHeight + 'px';
 
     // Clear existing
     this._svgEl.innerHTML = '';
@@ -151,6 +170,38 @@ export class FlowEngine {
     // Inset in px — keep arrows from touching node borders
     const ARROW_INSET = 6;
 
+    const nodesByColumn = Object.fromEntries(
+      ['left', 'center', 'right'].map(column => [
+        column,
+        this.nodes.filter(node => node.column === column).map(node => node.id),
+      ])
+    );
+    const sameColumnPairCounts = new Map();
+    this.edges.forEach(edge => {
+      const fromCol = getNodeColumn(edge.from);
+      if (fromCol !== getNodeColumn(edge.to)) return;
+      const key = [edge.from, edge.to].sort().join('|');
+      sameColumnPairCounts.set(key, (sameColumnPairCounts.get(key) || 0) + 1);
+    });
+
+    const nodeBoxes = [...this._container.querySelectorAll('.flow-node')].map(node => {
+      const rect = node.getBoundingClientRect();
+      return {
+        x: rect.left - containerRect.left,
+        y: rect.top - containerRect.top,
+        width: rect.width,
+        height: rect.height,
+      };
+    });
+    const placedLabelBoxes = [];
+    const laneCounts = new Map();
+    const overlaps = (a, b, padding = 4) => (
+      a.x < b.x + b.width + padding &&
+      a.x + a.width + padding > b.x &&
+      a.y < b.y + b.height + padding &&
+      a.y + a.height + padding > b.y
+    );
+
     this.edges.forEach(edge => {
       const fromEl = this._container.querySelector(`[data-id="${edge.from}"]`);
       const toEl = this._container.querySelector(`[data-id="${edge.to}"]`);
@@ -160,8 +211,10 @@ export class FlowEngine {
       const toRect = toEl.getBoundingClientRect();
       const fromCol = getNodeColumn(edge.from);
       const toCol = getNodeColumn(edge.to);
+      const columnDistance = Math.abs(['left', 'center', 'right'].indexOf(fromCol) - ['left', 'center', 'right'].indexOf(toCol));
 
       let startX, startY, endX, endY, d;
+      let laneSide = 0;
 
       // Determine connection points based on node positions
       const sameColumn = (fromCol === toCol);
@@ -171,22 +224,71 @@ export class FlowEngine {
       const toCenterY = toRect.top + toRect.height / 2 - containerRect.top;
 
       if (sameColumn) {
-        // Vertical connection within same column
-        startX = fromCenterX;
-        startY = fromRect.bottom - containerRect.top + ARROW_INSET;
-        endX = toCenterX;
-        endY = toRect.top - containerRect.top - ARROW_INSET;
+        const columnNodes = nodesByColumn[fromCol];
+        const fromIndex = columnNodes.indexOf(edge.from);
+        const toIndex = columnNodes.indexOf(edge.to);
+        const pairKey = [edge.from, edge.to].sort().join('|');
+        const needsLane = Math.abs(fromIndex - toIndex) > 1 || sameColumnPairCounts.get(pairKey) > 1;
 
-        // If target is above source, flip
-        if (endY < startY) {
-          startY = fromRect.top - containerRect.top - ARROW_INSET;
-          endY = toRect.bottom - containerRect.top + ARROW_INSET;
+        if (needsLane) {
+          laneSide = edge.direction === 'rtl' ? -1 : 1;
+          const laneKey = fromCol + '|' + laneSide;
+          const laneIndex = laneCounts.get(laneKey) || 0;
+          laneCounts.set(laneKey, laneIndex + 1);
+          const columnRects = columnNodes
+            .map(id => this._container.querySelector(`[data-id="${id}"]`)?.getBoundingClientRect())
+            .filter(Boolean);
+          const columnEdge = laneSide > 0
+            ? Math.max(...columnRects.map(rect => rect.right - containerRect.left))
+            : Math.min(...columnRects.map(rect => rect.left - containerRect.left));
+          const laneX = columnEdge + laneSide * (18 + laneIndex * 11);
+
+          startX = laneSide > 0
+            ? fromRect.right - containerRect.left + ARROW_INSET
+            : fromRect.left - containerRect.left - ARROW_INSET;
+          endX = laneSide > 0
+            ? toRect.right - containerRect.left + ARROW_INSET
+            : toRect.left - containerRect.left - ARROW_INSET;
+          startY = fromCenterY;
+          endY = toCenterY;
+          const midY = (startY + endY) / 2;
+          d = `M ${startX} ${startY} C ${laneX} ${startY}, ${laneX} ${startY}, ${laneX} ${midY} C ${laneX} ${endY}, ${laneX} ${endY}, ${endX} ${endY}`;
+        } else {
+          // Adjacent nodes use a compact vertical connection.
+          startX = fromCenterX;
+          startY = fromRect.bottom - containerRect.top + ARROW_INSET;
+          endX = toCenterX;
+          endY = toRect.top - containerRect.top - ARROW_INSET;
+
+          if (endY < startY) {
+            startY = fromRect.top - containerRect.top - ARROW_INSET;
+            endY = toRect.bottom - containerRect.top + ARROW_INSET;
+          }
+
+          const dist = Math.abs(endY - startY);
+          const cpOffset = Math.max(dist * 0.35, 20);
+          d = `M ${startX} ${startY} C ${startX} ${startY + cpOffset}, ${endX} ${endY - cpOffset}, ${endX} ${endY}`;
         }
-
-        // Smooth vertical bezier
-        const dist = Math.abs(endY - startY);
-        const cpOffset = Math.max(dist * 0.35, 20);
-        d = `M ${startX} ${startY} C ${startX} ${startY + cpOffset}, ${endX} ${endY - cpOffset}, ${endX} ${endY}`;
+      } else if (columnDistance === 2) {
+        // Route outer-column connections around the diagram instead of through
+        // the center stack. Response paths use the lower perimeter.
+        const sourceIsRight = fromCenterX > toCenterX;
+        startX = sourceIsRight
+          ? fromRect.left - containerRect.left - ARROW_INSET
+          : fromRect.right - containerRect.left + ARROW_INSET;
+        endX = sourceIsRight
+          ? toRect.right - containerRect.left + ARROW_INSET
+          : toRect.left - containerRect.left - ARROW_INSET;
+        startY = fromCenterY;
+        endY = toCenterY;
+        const perimeterKey = 'perimeter|' + (edge.direction === 'rtl' ? 'bottom' : 'top');
+        const perimeterIndex = laneCounts.get(perimeterKey) || 0;
+        laneCounts.set(perimeterKey, perimeterIndex + 1);
+        const routeY = edge.direction === 'rtl'
+          ? Math.min(svgHeight - 18, Math.max(...nodeBoxes.map(box => box.y + box.height)) + 18 + perimeterIndex * 11)
+          : Math.max(10, Math.min(...nodeBoxes.map(box => box.y)) - 18 - perimeterIndex * 11);
+        const midX = (startX + endX) / 2;
+        d = `M ${startX} ${startY} C ${startX} ${routeY}, ${startX} ${routeY}, ${midX} ${routeY} C ${endX} ${routeY}, ${endX} ${routeY}, ${endX} ${endY}`;
       } else if (edge.direction === 'rtl') {
         // Right-to-left (response path)
         startX = fromRect.left - containerRect.left - ARROW_INSET;
@@ -236,22 +338,64 @@ export class FlowEngine {
         const midPt = path.getPointAtLength(pathLen * 0.5);
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 
-        if (sameColumn) {
-          // Same-column: label sits to the right of the curve midpoint
-          text.setAttribute('x', midPt.x + 10);
-          text.setAttribute('y', midPt.y + 4);
-          text.setAttribute('text-anchor', 'start');
-        } else {
-          // Cross-column: label sits above the curve midpoint
-          text.setAttribute('x', midPt.x);
-          text.setAttribute('y', midPt.y - 10);
-          text.setAttribute('text-anchor', 'middle');
-        }
-
         text.classList.add('flow-edge-label');
         text.dataset.edgeId = edge.id;
         text.textContent = edge.label;
         this._svgEl.appendChild(text);
+
+        const crossPathPoints = [0.5, 0.35, 0.65, 0.2, 0.8, 0.1, 0.9]
+          .map(position => path.getPointAtLength(pathLen * position));
+        const candidates = sameColumn
+          ? (laneSide
+              ? [
+                  [midPt.x + laneSide * 9, midPt.y + 4, laneSide > 0 ? 'start' : 'end'],
+                  [midPt.x - laneSide * 9, midPt.y + 4, laneSide > 0 ? 'end' : 'start'],
+                  [midPt.x + laneSide * 9, midPt.y - 12, laneSide > 0 ? 'start' : 'end'],
+                ]
+              : [
+                  [midPt.x + 10, midPt.y + 4, 'start'],
+                  [midPt.x - 10, midPt.y + 4, 'end'],
+                  [midPt.x + 10, midPt.y - 12, 'start'],
+                  [midPt.x - 10, midPt.y - 12, 'end'],
+                ])
+          : crossPathPoints.flatMap(point => [
+              [point.x, point.y - 10, 'middle'],
+              [point.x, point.y + 20, 'middle'],
+              [point.x, point.y - 26, 'middle'],
+              [point.x, point.y + 36, 'middle'],
+              [point.x, point.y - 42, 'middle'],
+              [point.x, point.y + 52, 'middle'],
+            ]);
+
+        let bestCandidate;
+        for (const [x, y, anchor] of candidates) {
+          text.setAttribute('x', x);
+          text.setAttribute('y', y);
+          text.style.textAnchor = anchor;
+          const measuredBox = text.getBBox();
+          const labelBox = {
+            x: measuredBox.x,
+            y: measuredBox.y,
+            width: measuredBox.width,
+            height: measuredBox.height,
+          };
+          const nodeCollisions = nodeBoxes.filter(box => overlaps(labelBox, box)).length;
+          const labelCollisions = placedLabelBoxes.filter(box => overlaps(labelBox, box, 2)).length;
+          const overflow = Math.max(0, 4 - labelBox.x) +
+            Math.max(0, labelBox.x + labelBox.width + 4 - svgWidth) +
+            Math.max(0, 4 - labelBox.y) +
+            Math.max(0, labelBox.y + labelBox.height + 4 - svgHeight);
+          const score = nodeCollisions * 1000 + labelCollisions * 500 + overflow * 100;
+          if (!bestCandidate || score < bestCandidate.score) {
+            bestCandidate = { x, y, anchor, box: labelBox, score };
+          }
+          if (score === 0) break;
+        }
+        text.setAttribute('x', bestCandidate.x);
+        text.setAttribute('y', bestCandidate.y);
+        text.style.textAnchor = bestCandidate.anchor;
+        text.classList.toggle('crowded', bestCandidate.score > 0);
+        placedLabelBoxes.push(bestCandidate.box);
       }
     });
   }
@@ -318,7 +462,7 @@ export class FlowEngine {
       // Don't intercept if user is typing in an input
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-      if (e.key === 'ArrowRight' || e.key === ' ') {
+      if (e.key === 'ArrowRight') {
         e.preventDefault();
         this.next();
       } else if (e.key === 'ArrowLeft') {
@@ -473,10 +617,11 @@ export class FlowEngine {
     this._container.querySelectorAll('.flow-edge-label').forEach(el => {
       const edgeId = el.dataset.edgeId;
       if (this.currentStep === -1) {
-        el.classList.remove('active');
+        el.classList.remove('active', 'dimmed');
       } else {
         const isActive = step.activeEdges && step.activeEdges.includes(edgeId);
         el.classList.toggle('active', isActive);
+        el.classList.toggle('dimmed', !isActive);
       }
     });
 

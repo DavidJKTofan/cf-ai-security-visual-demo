@@ -6,12 +6,13 @@
 
   <title>AI Security Decision Map | Cloudflare AI Interactive Demo</title>
   <meta name="title" content="AI Security Decision Map | Cloudflare AI Interactive Demo">
-  <meta name="description" content="Interactive Cloudflare AI security decision map: learn when to use AI Gateway, Secure Web Gateway, MCP Server Portal, CASB, AI Security for Apps, Agents SDK, Workers VPC, and DLP.">
-  <meta name="keywords" content="Cloudflare, AI security, decision map, AI Gateway, Secure Web Gateway, DLP, MCP Server Portal, CASB, AI Security for Apps, Workers VPC, Agents SDK">
+  <meta name="description" content="Interactive Cloudflare AI decision map: choose AI Gateway, Secure Web Gateway, MCP Server Portal, Cloudflare OS, AI Security for Apps, Developer Platform, Workers VPC, CASB, and DLP.">
+  <meta name="keywords" content="Cloudflare, Cloudflare OS, AI security, decision map, AI Gateway, Secure Web Gateway, DLP, MCP Server Portal, CASB, AI Security for Apps, Workers VPC, Agents SDK">
   <meta name="author" content="Community Demo (Not affiliated with Cloudflare.)">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="theme-color" content="#0d1117">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="light dark">
+  <script src="/components/theme-controller.js"></script>
 
   <link rel="canonical" href="https://ai-security.automatic-demo.com/decision-map">
 
@@ -19,7 +20,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ai-security.automatic-demo.com/decision-map">
   <meta property="og:title" content="AI Security Decision Map | Cloudflare AI Interactive Demo">
-  <meta property="og:description" content="Choose the right Cloudflare control for AI usage paths: LLM gateways, workforce web AI, MCP tools, SaaS posture, public AI apps, custom agents, private networks, and DLP governance.">
+  <meta property="og:description" content="Choose the right Cloudflare control or platform for LLM APIs, workforce web AI, MCP tools, governed employee agents, public AI apps, SaaS posture, and private networks.">
   <meta property="og:image" content="https://ai-security.automatic-demo.com/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -54,7 +55,7 @@
       "name": "Cloudflare AI (Unofficial Demo)",
       "url": "https://ai-security.automatic-demo.com/"
     },
-    "dateModified": "2026-06-19",
+    "dateModified": "2026-08-25",
     "breadcrumb": {
       "@type": "BreadcrumbList",
       "itemListElement": [
@@ -89,13 +90,31 @@
       --map-border: rgba(148, 163, 184, 0.18);
       --map-ink: #f8fafc;
       --map-muted: #9ca3af;
+      --map-mix: #ffffff;
+      --map-response-text: #bfdbfe;
+      --map-findings-text: #fed7aa;
+    }
+
+    [data-theme="light"] {
+      --map-blue: #1d4ed8;
+      --map-green: #047857;
+      --map-purple: #6d28d9;
+      --map-amber: #b45309;
+      --map-rose: #be123c;
+      --map-cyan: #0e7490;
+      --map-slate: #475569;
+      --map-panel: rgba(255, 253, 249, 0.88);
+      --map-panel-strong: rgba(255, 255, 255, 0.96);
+      --map-border: rgba(71, 85, 105, 0.24);
+      --map-ink: #172033;
+      --map-muted: #64748b;
+      --map-mix: #172033;
+      --map-response-text: #1e40af;
+      --map-findings-text: #92400e;
     }
 
     body {
-      background:
-        radial-gradient(circle at 8% 5%, rgba(243, 128, 32, 0.18), transparent 28rem),
-        radial-gradient(circle at 88% 12%, rgba(69, 163, 255, 0.14), transparent 30rem),
-        linear-gradient(180deg, #0d1117 0%, #0a0d13 100%);
+      background: var(--page-gradient);
     }
 
     .map-shell {
@@ -114,7 +133,7 @@
       padding-left: max(clamp(1rem, 3vw, 2rem), env(safe-area-inset-left));
       padding-right: max(clamp(1rem, 3vw, 2rem), env(safe-area-inset-right));
       border-bottom: 1px solid var(--border-color);
-      background: rgba(13, 17, 23, 0.72);
+      background: var(--surface-glass);
       backdrop-filter: blur(18px);
       position: sticky;
       top: 0;
@@ -260,7 +279,7 @@
       gap: 0.35rem;
       color: var(--text-secondary);
       border: 1px solid var(--border-light);
-      background: rgba(13, 17, 23, 0.46);
+      background: var(--surface-soft);
       border-radius: 999px;
       padding: 0.38rem 0.65rem;
       font-size: 0.76rem;
@@ -307,7 +326,7 @@
     .dlp-route {
       min-height: 4.4rem;
       border: 1px solid rgba(243, 128, 32, 0.22);
-      background: rgba(13, 17, 23, 0.42);
+      background: var(--surface-soft);
       border-radius: 0.9rem;
       padding: 0.68rem;
       color: var(--text-secondary);
@@ -317,7 +336,7 @@
 
     .dlp-route strong {
       display: block;
-      color: #ffd7ad;
+      color: var(--cf-orange);
       font-size: 0.74rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -579,7 +598,7 @@
 
     .footer-tile {
       border: 1px solid var(--map-border);
-      background: rgba(13, 17, 23, 0.45);
+      background: var(--surface-soft);
       border-radius: 1rem;
       padding: 0.9rem;
     }
@@ -604,7 +623,7 @@
       background:
         radial-gradient(circle at 8% 10%, rgba(243, 128, 32, 0.12), transparent 22rem),
         radial-gradient(circle at 92% 85%, rgba(69, 163, 255, 0.1), transparent 26rem),
-        rgba(22, 27, 34, 0.74);
+        var(--surface-glass);
       box-shadow: 0 18px 80px rgba(0, 0, 0, 0.28);
       overflow: hidden;
     }
@@ -651,7 +670,7 @@
       align-items: center;
       gap: 0.35rem;
       border: 1px solid var(--map-border);
-      background: rgba(13, 17, 23, 0.48);
+      background: var(--surface-soft);
       border-radius: 999px;
       color: var(--text-secondary);
       font-size: 0.72rem;
@@ -682,7 +701,7 @@
       gap: 0.35rem;
       color: var(--text-secondary);
       border: 1px solid var(--map-border);
-      background: rgba(13, 17, 23, 0.48);
+      background: var(--surface-soft);
       border-radius: 999px;
       padding: 0.28rem 0.55rem;
       font-size: 0.7rem;
@@ -803,7 +822,7 @@
       position: absolute;
       z-index: 3;
       border: 1px solid var(--map-border);
-      background: rgba(13, 17, 23, 0.82);
+      background: var(--surface-glass);
       border-radius: 999px;
       padding: 0.22rem 0.55rem;
       color: var(--text-secondary);
@@ -814,9 +833,9 @@
       white-space: nowrap;
     }
 
-    .arch-label.start { color: #d1d5db; left: 8px; top: 250px; }
-    .arch-label.response { color: #93c5fd; right: 18px; top: 214px; }
-    .arch-label.blocked { color: #fca5a5; right: 74px; top: 532px; border-color: rgba(239, 68, 68, 0.45); }
+    .arch-label.start { color: var(--text-secondary); left: 8px; top: 250px; }
+    .arch-label.response { color: var(--map-blue); right: 18px; top: 214px; }
+    .arch-label.blocked { color: #dc2626; right: 74px; top: 532px; border-color: rgba(239, 68, 68, 0.45); }
 
     .arch-read-note {
       position: absolute;
@@ -830,7 +849,7 @@
       text-transform: uppercase;
       border: 1px solid var(--map-border);
       border-radius: 999px;
-      background: rgba(13, 17, 23, 0.68);
+      background: var(--surface-glass);
       padding: 0.22rem 0.6rem;
     }
 
@@ -843,7 +862,7 @@
       border: 2px solid color-mix(in srgb, var(--node-color) 56%, transparent);
       border-left-width: 5px;
       border-radius: 0.95rem;
-      background: rgba(13, 17, 23, 0.88);
+      background: var(--surface-strong);
       box-shadow: 0 16px 38px color-mix(in srgb, var(--node-color) 18%, transparent);
       padding: 0.68rem 0.72rem;
     }
@@ -853,7 +872,7 @@
 
     .arch-node small {
       display: block;
-      color: color-mix(in srgb, var(--node-color) 78%, #ffffff);
+      color: color-mix(in srgb, var(--node-color) 78%, var(--map-mix));
       font-size: 0.62rem;
       font-weight: 900;
       letter-spacing: 0.1em;
@@ -879,7 +898,7 @@
     .arch-node ul {
       margin: 0.36rem 0 0;
       padding-left: 0.85rem;
-      color: color-mix(in srgb, var(--node-color) 70%, #ffffff);
+      color: color-mix(in srgb, var(--node-color) 70%, var(--map-mix));
       font-size: 0.68rem;
       line-height: 1.45;
     }
@@ -929,7 +948,7 @@
       border: 1px solid color-mix(in srgb, var(--route-color) 34%, var(--map-border));
       border-left: 5px solid var(--route-color);
       border-radius: 1.1rem;
-      background: rgba(13, 17, 23, 0.5);
+      background: var(--surface-soft);
       padding: 0.9rem;
       display: grid;
       grid-template-columns: 12rem 1.2rem minmax(0, 1fr) 1.2rem 13rem;
@@ -947,7 +966,7 @@
     .route-step {
       border: 1px solid var(--map-border);
       border-radius: 0.85rem;
-      background: rgba(22, 27, 34, 0.82);
+      background: var(--surface-strong);
       padding: 0.72rem;
       min-height: 5.4rem;
     }
@@ -964,7 +983,7 @@
 
     .route-kicker {
       display: block;
-      color: color-mix(in srgb, var(--route-color) 78%, #ffffff);
+      color: color-mix(in srgb, var(--route-color) 78%, var(--map-mix));
       font-size: 0.62rem;
       font-weight: 900;
       letter-spacing: 0.1em;
@@ -1020,7 +1039,7 @@
       grid-column: 3 / 6;
       border: 1px solid rgba(69, 163, 255, 0.22);
       background: rgba(69, 163, 255, 0.07);
-      color: #bfdbfe;
+      color: var(--map-response-text);
       border-radius: 999px;
       padding: 0.36rem 0.7rem;
       font-size: 0.72rem;
@@ -1040,7 +1059,7 @@
     .route-lane.out-of-band .route-response {
       border-color: rgba(245, 158, 11, 0.25);
       background: rgba(245, 158, 11, 0.08);
-      color: #fed7aa;
+      color: var(--map-findings-text);
     }
 
     .route-lane.out-of-band .route-response::before {
@@ -1050,16 +1069,17 @@
 
     .architecture-outcomes {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
       gap: 0.8rem;
       margin-top: 0.9rem;
     }
 
     .out-of-band-card,
+    .os-foundation-card,
     .foundation-card {
       border: 1px solid var(--map-border);
       border-radius: 1rem;
-      background: rgba(13, 17, 23, 0.5);
+      background: var(--surface-soft);
       padding: 0.95rem;
     }
 
@@ -1069,6 +1089,7 @@
     }
 
     .out-of-band-card strong,
+    .os-foundation-card strong,
     .foundation-card strong {
       display: block;
       color: var(--text-primary);
@@ -1077,6 +1098,7 @@
     }
 
     .out-of-band-card span,
+    .os-foundation-card span,
     .foundation-card span {
       color: var(--text-secondary);
       font-size: 0.82rem;
@@ -1223,7 +1245,7 @@
           <span class="eyebrow">Customer Decision Map</span>
           <h1 id="page-title">Secure AI <span>by path.</span></h1>
           <p>
-            Start with the path you need to secure. The matching Cloudflare control changes by traffic type, while DLP governance can be reused across most AI usage patterns.
+            Start with the path you need to secure or the platform you need to provide. The matching Cloudflare control changes by traffic type, while Cloudflare OS combines governed workspaces, apps, resources, and model policy for employee-built automation.
           </p>
           <div class="rule-strip" aria-label="Common governance goals">
             <span class="rule-pill">One DLP profile strategy</span>
@@ -1266,6 +1288,7 @@
             <li>If an agent needs tools through MCP, use MCP Server Portal.</li>
             <li>If the data is already inside SaaS, use CASB.</li>
             <li>If the app is public-facing, add AI Security for Apps.</li>
+            <li>If employees need governed agents and app creation, use Cloudflare OS.</li>
             <li>If you are building the agent or private path, use Developer Platform and Workers VPC.</li>
           </ol>
         </aside>
@@ -1286,7 +1309,7 @@
         </div>
         <div class="footer-tile">
           <strong>Owned execution</strong>
-          <span>Workers, Agents SDK, and remote MCP servers fit when you own the app, agent, or integration layer.</span>
+          <span>Cloudflare OS fits governed employee work; Workers, Agents SDK, and remote MCP servers fit custom engineering.</span>
         </div>
         <div class="footer-tile">
           <strong>Private reachability</strong>
@@ -1300,7 +1323,7 @@
             <span class="eyebrow">Full Customer Architecture</span>
             <h2 id="architecture-title">How the pieces fit together</h2>
             <p>
-              A comprehensive customer architecture usually has several AI paths at once: employees using web AI, coding agents calling LLM APIs, MCP-enabled tools reaching approved servers, public AI apps behind Cloudflare, and Workers-based agents reaching private networks. Requests flow left to right through the relevant Cloudflare control; responses return through the same policy checkpoints.
+              A comprehensive customer architecture usually has several AI paths at once: employees using web AI, coding agents calling LLM APIs, MCP-enabled tools reaching approved servers, employees building governed work in Cloudflare OS, public AI apps behind Cloudflare, and Workers-based agents reaching private networks.
             </p>
           </div>
           <div class="architecture-legend" aria-label="Architecture legend">
@@ -1339,7 +1362,7 @@
               <div class="route-source"><span class="route-kicker">Start: LLM/API calls</span><strong>CLI, app, or agent</strong><span>Claude Code, OpenCode, LiteLLM, Cursor, Workers, or custom agents with configurable endpoints.</span></div>
               <div class="route-arrow"></div>
               <div class="route-path">
-                <div class="route-step"><span class="route-kicker">LLM gateway</span><strong>AI Gateway</strong><span>Auth, logs, caching, rate limits, routing, DLP.</span></div>
+                 <div class="route-step"><span class="route-kicker">LLM gateway</span><strong>Access for people + AI Gateway</strong><span>Access adds verified user identity. Services use gateway authentication and custom metadata. Both gain logs, DLP, routing, and spend controls.</span></div>
                 <div class="route-arrow"></div>
                 <div class="route-step"><span class="route-kicker">Model choice</span><strong>Workers AI</strong><span>On-network inference option.</span></div>
               </div>
@@ -1352,13 +1375,26 @@
               <div class="route-source"><span class="route-kicker">Start: MCP tools</span><strong>MCP-capable client</strong><span>Claude Desktop, Claude Code, Cursor, OpenCode, or a custom agent harness.</span></div>
               <div class="route-arrow"></div>
               <div class="route-path">
-                <div class="route-step"><span class="route-kicker">Identity + tools</span><strong>Access + MCP Server Portal</strong><span>OAuth, tool curation, audit, Code Mode.</span></div>
+                <div class="route-step"><span class="route-kicker">Identity + tools</span><strong>Access + MCP Server Portal</strong><span>Managed OAuth, manual clients, tool curation, audit, Code Mode.</span></div>
                 <div class="route-arrow"></div>
-                <div class="route-step"><span class="route-kicker">Optional route</span><strong>Gateway routing + DLP</strong><span>HTTP logs, egress, standard DLP profiles.</span></div>
+                <div class="route-step"><span class="route-kicker">Network control</span><strong>MCP detection + Gateway</strong><span>Is MCP, Traffic Source, portal-only policy, DLP.</span></div>
               </div>
               <div class="route-arrow"></div>
               <div class="route-destination"><span class="route-kicker">Destination</span><strong>Remote MCP Servers</strong><span>Workers-hosted MCPs, SaaS MCPs, internal tools, and APIs.</span></div>
               <div class="route-response">Tool result returns through the portal; blocked DLP matches surface back to the client as tool errors.</div>
+            </div>
+
+            <div class="route-lane" style="--route-color: var(--cf-orange)">
+              <div class="route-source"><span class="route-kicker">Start: governed work</span><strong>Employee</strong><span>Any function needs an agent, document, application, or reusable workflow grounded in company context.</span></div>
+              <div class="route-arrow"></div>
+              <div class="route-path">
+                <div class="route-step"><span class="route-kicker">Workspace</span><strong>Cloudflare OS + Access</strong><span>Persistent sessions, files, skills, isolated execution.</span></div>
+                <div class="route-arrow"></div>
+                <div class="route-step"><span class="route-kicker">Capabilities</span><strong>Gatekeepers + MCP Portals</strong><span>Typed bindings, scoped actions, observed-resource policy.</span></div>
+              </div>
+              <div class="route-arrow"></div>
+              <div class="route-destination"><span class="route-kicker">Output</span><strong>Apps, workflows, systems</strong><span>Dynamic Workers, DO Facets, AI Gateway models, and governed systems of record.</span></div>
+              <div class="route-response">Sharing rechecks the viewer against resources the agent observed; model calls and cost policy remain centralized in AI Gateway.</div>
             </div>
 
             <div class="route-lane" style="--route-color: var(--map-rose)">
@@ -1408,12 +1444,16 @@
               <strong>Shared foundation across paths</strong>
               <span>Use Cloudflare Access identity, device posture, reusable DLP profiles, Gateway logs, AI Gateway analytics, CASB findings, Logpush, SIEM workflows, and policy evidence as the common governance layer.</span>
             </div>
+            <div class="os-foundation-card">
+              <strong>Cloudflare OS platform layer</strong>
+              <span>Use Cloudflare OS when the goal is to give employees governed workspaces and app creation, not only secure one traffic path. Agents start with no resource access; Gatekeepers grant typed capabilities and carry observed-resource policy into sharing.</span>
+            </div>
           </div>
         </div>
       </section>
 
       <p class="map-disclaimer">
-        For educational and demonstration purposes only. Not an official Cloudflare demo. Product behavior summarized from Cloudflare Developer Docs and public Cloudflare blog posts.
+        For educational and demonstration purposes only. Not an official Cloudflare demo. Product behavior summarized from Cloudflare Developer Docs and public Cloudflare blog posts.<span class="footer-update">Last Updated: <time datetime="2026-08-25">August 25, 2026</time></span>
       </p>
     </main>
   </div>
@@ -1428,10 +1468,10 @@
         question: "The tool can set a base URL or provider endpoint.",
         signal: "Use AI Gateway when Claude Code CLI, LiteLLM, OpenCode, Cursor, custom apps, or agents make direct LLM API calls and can point those calls at a gateway endpoint.",
         examples: ["Claude Code via ANTHROPIC_BASE_URL", "LiteLLM or in-house LLM gateway", "Custom Workers, apps, and agent SDK calls", "Provider fan-out to Anthropic, OpenAI, Workers AI, and others"],
-        controls: ["DLP scans request and response bodies for secrets, credentials, PII, and sensitive code", "Request logging, token usage, cost visibility, caching, and rate limiting", "Dynamic Routing, fallback, budget limits, and provider selection", "Gateway authentication and BYOK patterns for provider keys"],
+        controls: ["DLP scans request and response bodies for secrets, credentials, PII, and sensitive code", "Protect a custom domain with Access and attach verified cf.user_id metadata", "Cost-based spend limits by model, provider, user, team, or application", "User Insights for behavioral anomalies; Dynamic Routing for provider selection and fallback"],
         dlp: "AI Gateway DLP inspects prompts and responses sent to AI providers without requiring Gateway HTTP filtering or TLS decryption. Response scanning may buffer streamed responses.",
-        goodFit: "Best when the LLM client is configurable.",
-        source: "https://developers.cloudflare.com/ai-gateway/integrations/coding-agents/"
+        goodFit: "Best when the LLM client is configurable and model usage needs one identity, security, and FinOps control plane.",
+        source: "https://developers.cloudflare.com/ai-gateway/configuration/cloudflare-access/"
       },
       {
         id: "swg",
@@ -1452,12 +1492,12 @@
         kicker: "Agent tool calls",
         title: "MCP Server Portal",
         question: "The AI tool or agent harness needs approved MCP servers.",
-        signal: "Use MCP Server Portal when any MCP-capable agent harness or AI tool needs centralized discovery, authentication, tool curation, auditability, and controlled access to upstream MCP servers.",
-        examples: ["Claude Desktop, Claude Code, Cursor, OpenCode, or custom MCP clients", "Internal or third-party MCP servers", "Per-server Access policies and OAuth", "Code Mode for large tool catalogs"],
-        controls: ["Portal proxies real-time tool calls to upstream MCP servers", "Access logs individual requests made through tools", "Gateway routing adds HTTP logs, DLP scanning, and egress policies", "Blocked DLP matches surface back to the MCP client as errors"],
+        signal: "Use MCP Server Portal when an agent needs an approved MCP path with centralized identity, tool curation, OAuth, auditability, and optional Gateway policy for compatible upstream traffic.",
+        examples: ["Stateless MCP 2026-07-28 clients and servers", "Pre-registered/manual OAuth clients for upstream providers", "Shadow MCP discovery and portal-only policy on managed network paths", "Code Mode for large tool catalogs"],
+        controls: ["Portal proxies calls to curated upstream MCP servers", "Gateway Is MCP detection and Traffic Source separate direct from portal traffic", "Gateway routing adds compatible HTTP logging, DLP, and egress policy", "createMcpHandler runs stateless MCP servers on Workers without protocol-session state"],
         dlp: "Turn on Gateway routing for portal traffic, then apply standard DLP profiles to upstream MCP server hostnames. AI prompt DLP profiles do not apply to MCP portal traffic.",
         goodFit: "Best when the primary thing to govern is tools, not model calls.",
-        source: "https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/mcp-portals/"
+        source: "https://blog.cloudflare.com/mcp-security-updates/"
       },
       {
         id: "casb",
@@ -1487,14 +1527,28 @@
         source: "https://developers.cloudflare.com/waf/detections/ai-security-for-apps/"
       },
       {
+        id: "cloudflare-os",
+        color: "#f38020",
+        kicker: "Governed employee agents",
+        title: "Cloudflare OS",
+        question: "Employees need workspaces that can become apps and workflows.",
+        signal: "Use Cloudflare OS when the goal is to give people across the organization a browser-based agent workspace grounded in company context, with governed resource access and secure generation of shareable apps and workflows.",
+        examples: ["Research, documents, slides, and spreadsheets grounded in company context", "Personal or team applications generated from a conversation", "Mostly deterministic workflows that run on demand, on a schedule, or from events", "Shared work that must preserve source-system authorization"],
+        controls: ["Access controls entry; every agent and app starts with no resource access", "Gatekeeper Workers hold credentials and expose scoped typed capabilities", "Observed-resource records make policy follow data into outputs and sharing", "Dynamic Workers and Durable Object Facets isolate generated server code and state; every model call uses AI Gateway"],
+        noteLabel: "Platform fit",
+        dlp: "Cloudflare OS is a platform pattern rather than a replacement for DLP. It composes Access, Gatekeepers, MCP Server Portals, isolated compute, and AI Gateway; DLP can still apply at model, web, and network enforcement points.",
+        goodFit: "Best when employees need a governed place to create work, not only a secured route to an existing AI service.",
+        source: "https://blog.cloudflare.com/cloudflare-os/"
+      },
+      {
         id: "developer-platform",
         color: "#22d3ee",
         kicker: "Build custom agents",
         title: "Developer Platform",
         question: "You own the agent, app, or MCP server implementation.",
         signal: "Use Cloudflare's Developer Platform when you are building the AI system itself: Workers, Agents SDK, remote MCP servers, Durable Objects, Workflows, Queues, R2, Vectorize, Workers AI, and AI Gateway integrations.",
-        examples: ["Remote MCP servers with McpAgent", "Agents SDK applications on Durable Objects", "Custom AI apps and tool execution", "Secure internal AI engineering workflows"],
-        controls: ["Expose MCP tools and resources directly from an Agent", "Use AI Gateway for outbound model calls", "Use Access, service bindings, Secrets Store, and logs around the app", "Compose with DLP at ingress, egress, and provider gateway points"],
+        examples: ["Stateless remote MCP servers with createMcpHandler", "Agents SDK applications on Durable Objects", "Custom AI apps and adaptive isolate/container execution", "Secure internal AI engineering workflows"],
+        controls: ["Expose stateless MCP tools and resources from Workers; add Durable Objects only for application state", "Use AI Gateway for outbound model calls", "Use Agent Tracing for model, tool, approval, sub-agent, token, and runtime spans", "Compose Access, service bindings, Secrets Store, and DLP around the app"],
         dlp: "DLP is usually applied at the traffic control points around the app: AI Gateway for model calls, Gateway for HTTP egress, or CASB for SaaS state. Use AI Security for Apps separately for public LLM ingress threat detection.",
         goodFit: "Best when you need to build, not only govern, the AI workflow.",
         source: "https://developers.cloudflare.com/agents/"

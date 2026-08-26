@@ -7,12 +7,13 @@
   <!-- Primary Meta Tags -->
   <title>Secure AI-to-AI Communication - Cloudflare AI Security (Unofficial)</title>
   <meta name="title" content="Secure AI-to-AI Communication - Cloudflare AI Security (Unofficial)">
-  <meta name="description" content="Unofficial educational demo: interactive flow diagram of multi-agent orchestration with Cloudflare Agents SDK, Workflows, and mTLS. Not affiliated with or endorsed by Cloudflare.">
-  <meta name="keywords" content="Cloudflare, multi-agent, Agents SDK, Durable Objects, Workflows, mTLS, service tokens, Vectorize, Queues, MCP, educational demo">
+  <meta name="description" content="Unofficial educational demo: multi-agent orchestration with identity, MCP governance, durable execution, Agent Tracing, and Coming Soon gRPC transport. Not affiliated with or endorsed by Cloudflare.">
+  <meta name="keywords" content="Cloudflare, multi-agent, Agents SDK, Agent Tracing, gRPC, Durable Objects, Workflows, mTLS, service tokens, AI Search, Queues, MCP, educational demo">
   <meta name="author" content="Community Demo (Not affiliated with Cloudflare.)">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0d1117">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="light dark">
+  <script src="/components/theme-controller.js"></script>
   
   <!-- Canonical URL -->
   <link rel="canonical" href="https://ai-security.automatic-demo.com/use-cases/uc7-multi-agent.html">
@@ -21,7 +22,7 @@
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://ai-security.automatic-demo.com/use-cases/uc7-multi-agent.html">
   <meta property="og:title" content="Secure AI-to-AI Communication - Cloudflare AI Security (Unofficial)">
-  <meta property="og:description" content="Unofficial educational demo: interactive flow diagram of multi-agent orchestration. Not affiliated with or endorsed by Cloudflare.">
+  <meta property="og:description" content="Unofficial educational demo: multi-agent orchestration with identity, MCP governance, durable execution, Agent Tracing, and Coming Soon gRPC transport.">
   <meta property="og:image" content="https://ai-security.automatic-demo.com/og-image.png">
   <meta property="og:site_name" content="Cloudflare AI Security (Unofficial Demo)">
   
@@ -29,7 +30,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://ai-security.automatic-demo.com/use-cases/uc7-multi-agent.html">
   <meta name="twitter:title" content="Secure AI-to-AI Communication - Cloudflare AI Security (Unofficial)">
-  <meta name="twitter:description" content="Unofficial educational demo: interactive flow diagram of multi-agent orchestration. Not affiliated with or endorsed by Cloudflare.">
+  <meta name="twitter:description" content="Unofficial educational demo: multi-agent orchestration with identity, MCP governance, durable execution, Agent Tracing, and Coming Soon gRPC transport.">
   <meta name="twitter:image" content="https://ai-security.automatic-demo.com/og-image.png">
   
   <!-- Favicon -->
@@ -51,12 +52,14 @@
     "@context": "https://schema.org",
     "@type": "HowTo",
     "name": "Secure AI-to-AI Communication",
-    "description": "How to orchestrate multiple AI agents with Cloudflare's Agents SDK, Workflows, and Access.",
+    "description": "How to orchestrate multiple AI agents with Cloudflare's Agents SDK, Access, MCP Server Portals, Workflows, and Agent Tracing.",
     "step": [
       {"@type": "HowToStep", "name": "Agent Identity", "text": "Agents authenticate via mTLS or service tokens"},
       {"@type": "HowToStep", "name": "Tool Discovery", "text": "MCP Portal routes agent-to-agent tool calls"},
       {"@type": "HowToStep", "name": "Durable Execution", "text": "Workflows guarantee multi-step task completion"},
-      {"@type": "HowToStep", "name": "Shared Knowledge", "text": "Vectorize provides shared RAG knowledge base"}
+      {"@type": "HowToStep", "name": "Shared Knowledge", "text": "AI Search provides a shared managed knowledge base"},
+      {"@type": "HowToStep", "name": "Agent Tracing", "text": "Trace waterfalls and session replay correlate agent activity"},
+      {"@type": "HowToStep", "name": "Future Transport", "text": "Coming Soon gRPC and inbound TCP connect existing agent services"}
     ],
     "isPartOf": {
       "@type": "WebSite",
@@ -89,7 +92,7 @@
     </div>
 
     <!-- Main content -->
-    <div class="diagram-content">
+    <div class="diagram-content" role="main">
       <!-- Canvas -->
       <div class="diagram-canvas">
         <div class="flow-container">
@@ -115,7 +118,7 @@
           <button class="btn btn-secondary" data-action="prev" disabled>&larr;</button>
           <button class="btn btn-secondary" data-action="next">&rarr;</button>
           <button class="btn btn-secondary" data-action="reset">Reset</button>
-          <span class="step-counter">0 / 8</span>
+          <span class="step-counter">0 / 10</span>
         </div>
         <div class="panel-step-info">
           <div class="step-info-placeholder">

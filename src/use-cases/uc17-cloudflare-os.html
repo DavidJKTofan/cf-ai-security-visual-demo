@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Autonomous Scheduled Agent - Cloudflare AI (Unofficial)</title>
-  <meta name="description" content="Unofficial educational demo: interactive flow diagram of building autonomous scheduled AI agents with Cloudflare Agents SDK, Durable Object alarms, and SQLite task persistence. Not affiliated with or endorsed by Cloudflare.">
+  <title>Cloudflare OS: Governed AI Workspaces &amp; Apps - Cloudflare AI (Unofficial)</title>
+  <meta name="description" content="Unofficial educational demo: explore how Cloudflare OS combines agent workspaces, Gatekeepers, Dynamic Workers, Durable Object Facets, MCP Server Portals, Access, and AI Gateway.">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0d1117">
   <meta name="color-scheme" content="light dark">
   <script src="/components/theme-controller.js"></script>
-  <link rel="canonical" href="https://ai-security.automatic-demo.com/use-cases/uc13-scheduled-agent.html">
+  <link rel="canonical" href="https://ai-security.automatic-demo.com/use-cases/uc17-cloudflare-os.html">
   <meta property="og:type" content="article">
-  <meta property="og:url" content="https://ai-security.automatic-demo.com/use-cases/uc13-scheduled-agent.html">
-  <meta property="og:title" content="Autonomous Scheduled Agent - Cloudflare AI (Unofficial)">
-  <meta property="og:description" content="Unofficial educational demo: interactive flow diagram of building autonomous scheduled AI agents with Cloudflare Agents SDK, Durable Object alarms, and SQLite task persistence.">
+  <meta property="og:url" content="https://ai-security.automatic-demo.com/use-cases/uc17-cloudflare-os.html">
+  <meta property="og:title" content="Cloudflare OS: Governed AI Workspaces &amp; Apps - Cloudflare AI (Unofficial)">
+  <meta property="og:description" content="Interactive walkthrough of Cloudflare OS: workspaces, governed capabilities, generated apps, information-flow policy, and centralized model controls.">
   <meta property="og:image" content="https://ai-security.automatic-demo.com/og-image.png">
-  <meta property="og:site_name" content="Cloudflare AI Security (Unofficial Demo)">
+  <meta property="og:site_name" content="Cloudflare AI (Unofficial Demo)">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
@@ -29,14 +29,14 @@
   <div class="diagram-page">
     <header class="diagram-header">
       <a class="back-link" href="/ai-builder">&larr; AI Builder</a>
-      <span class="uc-badge">UC 13</span>
-      <h1>Autonomous Scheduled Agent</h1>
+      <span class="uc-badge">UC 17</span>
+      <h1>Cloudflare OS: Governed AI Workspaces &amp; Apps</h1>
     </header>
 
     <div class="flow-archetype-labels">
       <div class="archetype-label">
-        <span class="archetype-arrow agent-resource"></span>
-        Trigger &rarr; Agent &rarr; Scheduler &rarr; Task Runner &rarr; Services
+        <span class="archetype-arrow both-flows"></span>
+        Employee &rarr; Workspace &rarr; Governed Capabilities &rarr; Apps, Workflows &amp; Systems
       </div>
     </div>
 
@@ -45,15 +45,9 @@
         <div class="flow-container">
           <svg class="flow-edges"></svg>
           <div class="flow-columns">
-            <div class="flow-column col-left">
-              <div class="column-label">Triggers</div>
-            </div>
-            <div class="flow-column col-center">
-              <div class="column-label">Agent Scheduling Pipeline</div>
-            </div>
-            <div class="flow-column col-right">
-              <div class="column-label">Downstream Services</div>
-            </div>
+            <div class="flow-column col-left"><div class="column-label">People</div></div>
+            <div class="flow-column col-center"><div class="column-label">Cloudflare OS Platform</div></div>
+            <div class="flow-column col-right"><div class="column-label">Context, Models &amp; Systems</div></div>
           </div>
         </div>
       </div>
@@ -64,12 +58,12 @@
           <button class="btn btn-secondary" data-action="prev" disabled>&larr;</button>
           <button class="btn btn-secondary" data-action="next">&rarr;</button>
           <button class="btn btn-secondary" data-action="reset">Reset</button>
-          <span class="step-counter">0 / 7</span>
+          <span class="step-counter">0 / 10</span>
         </div>
         <div class="panel-step-info">
           <div class="step-info-placeholder">
             <span class="placeholder-icon">&#9654;</span>
-            <p>Press <strong>Play</strong> or use the <strong>arrow keys</strong> to step through the request flow.</p>
+            <p>Press <strong>Play</strong> or use the <strong>arrow keys</strong> to step through the platform flow.</p>
             <p style="font-size: 0.8125rem; margin-top: 0.5rem; color: var(--text-muted);">Tap any node for details.</p>
           </div>
         </div>
@@ -83,21 +77,13 @@
     import { FlowEngine } from '/components/flow-engine.js';
     import { Tooltip } from '/components/tooltip.js';
     import { Legend } from '/components/legend.js';
-    import { uc13 } from '/data/uc13-steps.js';
+    import { uc17 } from '/data/uc17-cloudflare-os-steps.js';
 
-    const tooltip = new Tooltip();
-    const legend = new Legend(document.getElementById('legend'));
+    new Tooltip();
+    new Legend(document.getElementById('legend'));
 
-    const engine = new FlowEngine({
-      steps: uc13.steps,
-      nodes: uc13.nodes,
-      edges: uc13.edges,
-    });
-
-    engine.mount(
-      document.querySelector('.diagram-canvas'),
-      document.querySelector('.diagram-panel')
-    );
+    const engine = new FlowEngine({ steps: uc17.steps, nodes: uc17.nodes, edges: uc17.edges });
+    engine.mount(document.querySelector('.diagram-canvas'), document.querySelector('.diagram-panel'));
   </script>
 </body>
 </html>

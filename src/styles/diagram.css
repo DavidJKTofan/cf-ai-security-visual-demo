@@ -4,6 +4,8 @@
   flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh; /* Dynamic viewport height — accounts for mobile browser chrome */
+  height: 100dvh;
+  overflow: hidden;
 }
 
 .diagram-header {
@@ -57,6 +59,9 @@
 .diagram-content {
   display: flex;
   flex: 1;
+  width: 100%;
+  max-width: 120rem;
+  margin-inline: auto;
   overflow: hidden;
   min-height: 0;
 }
@@ -77,6 +82,7 @@
   min-width: min(100%, 900px);
   min-height: 400px;
   height: 100%;
+  max-width: 90rem;
   margin: 0 auto;
 }
 
@@ -284,12 +290,21 @@
   font-weight: 500;
   fill: var(--text-secondary);
   text-anchor: middle;
-  transition: fill var(--transition-base);
+  transition: fill var(--transition-base), opacity var(--transition-base);
   paint-order: stroke;
   stroke: var(--bg-primary);
   stroke-width: 4px;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.flow-edge-label.dimmed {
+  opacity: 0.08;
+}
+
+.flow-edge-label.crowded,
+.flow-edge-label.crowded.active {
+  opacity: 0;
 }
 
 .flow-edge-label.active {
@@ -382,6 +397,7 @@
 /* === Step Info === */
 .panel-step-info {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: clamp(0.75rem, 1.5vw, 1.25rem);
 }
@@ -614,6 +630,16 @@
   line-height: 1.4;
 }
 
+[data-theme="light"] .step-owasp-header {
+  color: #1d4ed8;
+}
+
+[data-theme="light"] .owasp-badge {
+  color: #1e40af;
+  background: rgba(29, 78, 216, 0.08);
+  border-color: rgba(29, 78, 216, 0.24);
+}
+
 /* === Flow Direction Indicators === */
 .flow-archetype-labels {
   display: flex;
@@ -687,6 +713,19 @@
   color: var(--text-muted);
 }
 
+.legend-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: clamp(0.5625rem, 1vw, 0.6875rem);
+}
+
+.legend-meta time {
+  color: var(--text-secondary);
+}
+
 .legend-dot {
   width: clamp(6px, 1vw, 8px);
   height: clamp(6px, 1vw, 8px);
@@ -752,8 +791,8 @@
    RESPONSIVE BREAKPOINTS
    =================================================================== */
 
-/* MacBook Pro / laptop screens (<=1440px) — optimize for Retina laptop viewing */
-@media (max-width: 90rem) {
+/* MacBook Pro / laptop screens (<=1536px) — optimize for Retina laptop viewing */
+@media (max-width: 96rem) {
   .flow-column {
     gap: clamp(0.5rem, 1.2vw, 0.875rem);
   }
@@ -766,6 +805,50 @@
 
   .diagram-panel {
     width: clamp(16.25rem, 26vw, 21.25rem);
+  }
+}
+
+/* Desktop walkthroughs use normal page scrolling. The diagram and controls
+   remain visible while long explanations move through the viewport. */
+@media (min-width: 64.01rem) {
+  .diagram-page {
+    height: auto;
+    overflow: visible;
+  }
+
+  .diagram-content {
+    flex: none;
+    min-height: calc(100dvh - 8.6rem);
+    overflow: visible;
+    align-items: stretch;
+  }
+
+  .diagram-canvas {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: calc(100dvh - 8.6rem);
+    min-height: min(42rem, calc(100dvh - 8.6rem));
+  }
+
+  .diagram-panel {
+    align-self: stretch;
+    min-height: calc(100dvh - 8.6rem);
+    overflow: visible;
+  }
+
+  .panel-controls {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg-secondary);
+    box-shadow: 0 1px 0 var(--border-color);
+  }
+
+  .panel-step-info {
+    flex: 1 0 auto;
+    overflow: visible;
+    padding-bottom: 2rem;
   }
 }
 
@@ -783,6 +866,11 @@
 
 /* Tablets (<=1024px): Stack layout vertically */
 @media (max-width: 64rem) {
+  .diagram-page {
+    height: auto;
+    overflow: visible;
+  }
+
   .diagram-content {
     flex-direction: column;
   }
@@ -886,6 +974,13 @@
     gap: 0.5rem;
     padding: 0.375rem 0.75rem;
     padding-bottom: max(0.375rem, env(safe-area-inset-bottom));
+  }
+
+  .legend-meta {
+    width: 100%;
+    margin-left: 0;
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--border-light);
   }
 
   /* Tooltip: show as bottom sheet on small viewports */

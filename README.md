@@ -2,14 +2,14 @@
 
 Unofficial educational demo for explaining where Cloudflare AI security, Zero Trust, and Developer Platform controls fit across common AI usage paths.
 
-The site is a static-first Cloudflare Workers project with vanilla HTML, CSS, and JavaScript. It includes an interactive decision map plus 17 step-through use-case walkthroughs.
+The site is a static-first Cloudflare Workers project with vanilla HTML, CSS, and JavaScript. It includes an interactive decision map plus 18 step-through walkthroughs.
 
 ## Pages
 
 - `/decision-map` — interactive guide for choosing the right Cloudflare control by AI traffic path, including a full customer architecture route map.
-- `/` — landing page with the decision map, featured reference architecture, and category links.
+- `/` — landing page with featured Cloudflare OS and internal engineering architecture walkthroughs, the decision map, and category links.
 - `/ai-security` — AI Security use cases UC1-UC7.
-- `/ai-builder` — AI Builder use cases UC8-UC16.
+- `/ai-builder` — AI Builder use cases UC8-UC17.
 - `/use-cases/uc0-internal-stack.html` — featured reference architecture for Cloudflare's internal AI engineering stack.
 
 ## Decision Map
@@ -21,6 +21,7 @@ The decision map answers when to use each major control:
 - **MCP Server Portal** — MCP-capable clients and agents that need approved tools, identity, audit, and optional Gateway routing.
 - **CASB** — out-of-band API checks of SaaS provider posture and stored AI content.
 - **AI Security for Apps** — public-facing AI application hostnames protected through Cloudflare's reverse proxy.
+- **Cloudflare OS** — governed browser workspaces that can become apps and workflows, with Gatekeepers and observed-resource policy.
 - **Developer Platform** — custom AI apps, Workers, Agents SDK, Remote MCP Servers, Durable Objects, and related primitives.
 - **Workers VPC** — Worker and agent access to private networks, Cloudflare Mesh, and governed public egress.
 
@@ -29,6 +30,7 @@ The bottom of `/decision-map` includes route lanes for request, response, and ou
 - Web AI: employee device -> Secure Web Gateway -> DLP / AI Prompt Protection -> web AI SaaS.
 - LLM/API: CLI, app, or agent -> AI Gateway -> Workers AI or external LLM providers.
 - MCP tools: MCP client -> Access + MCP Server Portal -> optional Gateway routing + DLP -> Remote MCP Servers.
+- Cloudflare OS: employee -> Access + workspace -> Gatekeepers / MCP Portals -> apps, workflows, models, and systems of record.
 - Public hostname: public user or attacker -> WAF + AI Security for Apps -> Workers + Agents SDK -> models and tools.
 - Private access: Worker agent -> Workers VPC -> Gateway policies -> private and public services.
 - CASB: security team / CASB -> provider API integration -> SaaS tenant findings.
@@ -44,8 +46,8 @@ The bottom of `/decision-map` includes route lanes for request, response, and ou
 | UC4 | Protect AI-Powered Apps | AI Security | DDoS, Bot Management, WAF, Rate Limiting, AI Security for Apps, API Shield |
 | UC5 | Secure Self-Hosted AI Agents | AI Security | Access, Sandbox SDK, AI Gateway, Secrets Store, Browser Run, R2, Workers |
 | UC6 | Secure AI Code Execution | AI Security | Dynamic Workers, Codemode, Workers RPC, Tail Workers, AI Gateway |
-| UC7 | Secure AI-to-AI Communication | AI Security | Agents SDK, Access, mTLS, MCP Server Portal, Workflows, Queues, AI Search |
-| UC8 | API Key Management & Unified Billing | AI Builder | AI Gateway, BYOK, Unified Billing, Spend Limits, ZDR, Logpush |
+| UC7 | Secure AI-to-AI Communication | AI Security | Agents SDK, Access, MCP Server Portal, Workflows, Queues, Agent Tracing, gRPC (Coming Soon) |
+| UC8 | Identity, Keys & AI Spend Control | AI Builder | AI Gateway, Access, BYOK, Unified Billing, Spend Limits, User Insights |
 | UC9 | Dynamic Routing | AI Builder | AI Gateway Dynamic Routing, BYOK, provider fallback, analytics |
 | UC10 | RAG Knowledge Base | AI Builder | AI Search, Vectorize, Workers AI, Workers, AI Gateway |
 | UC11 | Voice AI Agent | AI Builder | Agents SDK voice APIs, Workers AI STT/TTS, Durable Objects, Twilio |
@@ -53,7 +55,8 @@ The bottom of `/decision-map` includes route lanes for request, response, and ou
 | UC13 | Scheduled AI Agent | AI Builder | Agents SDK scheduling, Durable Object alarms, Workers AI, Queues |
 | UC14 | Browser AI Agent | AI Builder | Browser Run, Codemode browser tools, Agents SDK, R2 |
 | UC15 | Private Networking for Agents | AI Builder | Cloudflare Mesh, Cloudflare One Client, Workers VPC, Gateway, Access, DLP |
-| UC16 | Durable Long-Running Agents | AI Builder | Project Think, Durable Objects, fibers, Sessions API, sub-agents, Sandbox SDK |
+| UC16 | Durable Long-Running Agents | AI Builder | Project Think, Durable Objects, fibers, sub-agents, @cloudflare/computer, Agent Tracing |
+| UC17 | Cloudflare OS: Governed AI Workspaces & Apps | AI Builder | Cloudflare OS, Gatekeepers, Access, AI Gateway, Dynamic Workers, Durable Object Facets |
 
 Each use case is data-driven: nodes, edges, and step copy live in `src/data/ucN-steps.js`; the shared `FlowEngine` renders the walkthrough.
 
@@ -64,15 +67,17 @@ src/
   index.html                         Landing page
   decision-map/index.html            Interactive product decision map
   ai-security.html                   UC1-UC7 category landing
-  ai-builder.html                    UC8-UC16 category landing
+  ai-builder.html                    UC8-UC17 category landing
   use-cases/                         One HTML page per use case
   components/
     flow-engine.js                   Shared step-through animation engine
     tooltip.js                       Node tooltip behavior
     legend.js                        Product legend renderer
+    theme-controller.js              Persistent light/dark theme + accessible toggle
   data/
     uc0-stack-steps.js
     uc1-steps.js ... uc16-steps.js   Nodes, edges, steps, OWASP labels
+    uc17-cloudflare-os-steps.js      Cloudflare OS nodes, edges, and steps
   styles/
     base.css                         Reset, typography, utilities
     theme.css                        Design tokens
@@ -95,6 +100,28 @@ package.json
 - **Renderer:** `src/components/flow-engine.js` renders all use cases from the shared data model.
 - **Deployment:** Cloudflare Workers Static Assets serves files from `src/`.
 - **Worker script:** `worker/index.js` uses the `ASSETS` binding and selectively runs first for landing/category/use-case routes so it can add Markdown alternates and respond to `.md`, `?format=markdown`, or Markdown-oriented `Accept` headers.
+- **Theme system:** `theme-controller.js` follows the OS preference until the user chooses light or dark mode, stores that choice in `localStorage`, updates browser theme metadata, and uses shared semantic tokens from `theme.css`.
+
+## UI, Themes, And Responsive Layout
+
+- All pages support dark and light mode with an accessible 44px header toggle.
+- The selected theme persists under the `cf-ai-theme` local-storage key; without a saved preference, the site follows `prefers-color-scheme`.
+- Desktop walkthroughs use normal page scrolling, with a sticky diagram canvas and sticky playback controls so long explanations and the footer remain fully reachable. Dense diagrams can still scroll inside the canvas.
+- Shared edge routing separates reciprocal paths, sends long vertical connections through side lanes, routes full-width responses around the perimeter, and moves labels away from nodes and other labels.
+- Tablet layouts stack the canvas and explanation panel. Phone layouts retain readable full-width step text and provide horizontal scrolling for the three-column architecture.
+- Content width is constrained on 4K displays to preserve readable line lengths and avoid excessively stretched diagrams.
+
+Required responsive review matrix:
+
+| Class | Viewport |
+| --- | --- |
+| MacBook Pro | 1512 x 982 |
+| Tablet | 1024 x 768 |
+| Smartphone | 430 x 932 |
+| Compact smartphone | 360 x 800 |
+| 4K monitor | 3840 x 2160 |
+
+Test both themes at each representative size, including keyboard focus, theme persistence, long step content, and unintended page-level horizontal overflow.
 
 ## Workers Static Assets And Vite
 
@@ -143,6 +170,8 @@ The current `wrangler.jsonc` deploys to Workers using:
 - `assets.binding: ASSETS`
 - selected `assets.run_worker_first` routes
 - `observability.enabled: true`
+- full Worker logs and 1% sampled traces
+- current reviewed compatibility date
 
 ## Product Accuracy
 
@@ -189,6 +218,8 @@ Product names, statuses, and capabilities should be checked against official Clo
 - [AI Gateway Dynamic Routing](https://developers.cloudflare.com/ai-gateway/features/dynamic-routing/)
 - [AI Gateway Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/)
 - [AI Gateway BYOK](https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/)
+- [AI Gateway Cloudflare Access identity](https://developers.cloudflare.com/ai-gateway/configuration/cloudflare-access/)
+- [AI Gateway User Insights](https://developers.cloudflare.com/ai-gateway/observability/user-insights/)
 - [Agents SDK](https://developers.cloudflare.com/agents/)
 - [Docs for agents](https://developers.cloudflare.com/docs-for-agents/)
 - [MCP servers for Cloudflare](https://developers.cloudflare.com/agents/model-context-protocol/cloudflare/servers-for-cloudflare/)
@@ -200,6 +231,7 @@ Product names, statuses, and capabilities should be checked against official Clo
 - [Durable Execution](https://developers.cloudflare.com/agents/api-reference/durable-execution/)
 - [Sub-agents](https://developers.cloudflare.com/agents/api-reference/sub-agents/)
 - [Sessions API](https://developers.cloudflare.com/agents/api-reference/sessions/)
+- [Agent Tracing](https://developers.cloudflare.com/agents/runtime/operations/observability/tracing/)
 - [Human-in-the-Loop](https://developers.cloudflare.com/agents/concepts/human-in-the-loop/)
 
 ### Developer Platform

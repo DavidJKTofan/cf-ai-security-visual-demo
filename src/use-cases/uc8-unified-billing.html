@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   
   <!-- Primary Meta Tags -->
-  <title>API Key Management &amp; Unified Billing - Cloudflare AI Security (Unofficial)</title>
-  <meta name="title" content="API Key Management &amp; Unified Billing - Cloudflare AI Security (Unofficial)">
-  <meta name="description" content="Unofficial educational demo: interactive flow diagram of Cloudflare AI Gateway BYOK and Unified Billing for centralized AI provider credential and cost management. Not affiliated with or endorsed by Cloudflare.">
-  <meta name="keywords" content="Cloudflare, AI Gateway, BYOK, Secrets Store, Unified Billing, AI provider keys, spend limits, ZDR, Zero Data Retention, educational demo">
+  <title>Identity, Keys &amp; AI Spend Control - Cloudflare AI Security (Unofficial)</title>
+  <meta name="title" content="Identity, Keys &amp; AI Spend Control - Cloudflare AI Security (Unofficial)">
+  <meta name="description" content="Unofficial educational demo: use Access identity, BYOK, Unified Billing, spend limits, analytics, and User Insights with Cloudflare AI Gateway.">
+  <meta name="keywords" content="Cloudflare, AI Gateway, Cloudflare Access, identity, BYOK, Unified Billing, spend limits, User Insights, educational demo">
   <meta name="author" content="Community Demo (Not affiliated with Cloudflare.)">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0d1117">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="light dark">
+  <script src="/components/theme-controller.js"></script>
   
   <!-- Canonical URL -->
   <link rel="canonical" href="https://ai-security.automatic-demo.com/use-cases/uc8-unified-billing.html">
@@ -20,16 +21,16 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://ai-security.automatic-demo.com/use-cases/uc8-unified-billing.html">
-  <meta property="og:title" content="API Key Management &amp; Unified Billing - Cloudflare AI Security (Unofficial)">
-  <meta property="og:description" content="Unofficial educational demo: interactive flow diagram of Cloudflare AI Gateway BYOK and Unified Billing for centralized AI provider credential and cost management. Not affiliated with or endorsed by Cloudflare.">
+  <meta property="og:title" content="Identity, Keys &amp; AI Spend Control - Cloudflare AI Security (Unofficial)">
+  <meta property="og:description" content="Use verified Access identity, centralized credentials, cost-based budgets, and User Insights with AI Gateway.">
   <meta property="og:image" content="https://ai-security.automatic-demo.com/og-image.png">
   <meta property="og:site_name" content="Cloudflare AI Security (Unofficial Demo)">
   
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://ai-security.automatic-demo.com/use-cases/uc8-unified-billing.html">
-  <meta name="twitter:title" content="API Key Management &amp; Unified Billing - Cloudflare AI Security (Unofficial)">
-  <meta name="twitter:description" content="Unofficial educational demo: interactive flow diagram of Cloudflare AI Gateway BYOK and Unified Billing for centralized AI provider credential and cost management. Not affiliated with or endorsed by Cloudflare.">
+  <meta name="twitter:title" content="Identity, Keys &amp; AI Spend Control - Cloudflare AI Security (Unofficial)">
+  <meta name="twitter:description" content="Use verified Access identity, centralized credentials, cost-based budgets, and User Insights with AI Gateway.">
   <meta name="twitter:image" content="https://ai-security.automatic-demo.com/og-image.png">
   
   <!-- Favicon -->
@@ -50,15 +51,16 @@
   {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    "name": "API Key Management & Unified Billing with Cloudflare AI Gateway",
-    "description": "How to centralize AI provider credentials and billing using BYOK (Secrets Store) and Unified Billing via Cloudflare AI Gateway.",
+    "name": "Identity, Keys & AI Spend Control with Cloudflare AI Gateway",
+    "description": "How to combine Access identity, provider credentials, spend limits, analytics, and behavioral insights in Cloudflare AI Gateway.",
     "step": [
-      {"@type": "HowToStep", "name": "Authenticate to AI Gateway", "text": "App sends request with cf-aig-authorization — no provider keys in code"},
+      {"@type": "HowToStep", "name": "Verify identity", "text": "Protect an AI Gateway custom domain with Cloudflare Access and attach cf.user_id"},
       {"@type": "HowToStep", "name": "BYOK via Secrets Store", "text": "Provider API keys stored and referenced by name, never in plaintext"},
       {"@type": "HowToStep", "name": "Unified Billing", "text": "Cloudflare-managed credentials eliminate per-provider API key management"},
-      {"@type": "HowToStep", "name": "Spend Limits", "text": "Daily, weekly, or monthly caps prevent unexpected charges"},
+      {"@type": "HowToStep", "name": "Spend Limits", "text": "Cost-based budgets by model, provider, user, team, or application"},
       {"@type": "HowToStep", "name": "Zero Data Retention", "text": "ZDR routes Unified Billing traffic through provider-side non-retaining endpoints"},
-      {"@type": "HowToStep", "name": "Centralized Analytics", "text": "Usage, cost, and token counts logged across all providers in one place"}
+      {"@type": "HowToStep", "name": "Centralized Analytics", "text": "Usage, cost, and token counts logged across all providers in one place"},
+      {"@type": "HowToStep", "name": "User Insights", "text": "Surface identities whose session cost breaks their behavioral baseline"}
     ],
     "isPartOf": {
       "@type": "WebSite",
@@ -75,30 +77,30 @@
     <header class="diagram-header">
       <a class="back-link" href="/ai-builder">&larr; AI Builder</a>
       <span class="uc-badge">UC 8</span>
-      <h1>API Key Management &amp; Unified Billing</h1>
+      <h1>Identity, Keys &amp; AI Spend Control</h1>
     </header>
 
     <!-- Flow archetypes -->
     <div class="flow-archetype-labels">
       <div class="archetype-label">
         <span class="archetype-arrow human-ai"></span>
-        App / Developer &rarr; AI Gateway &rarr; AI Provider
+        Person &rarr; Access identity / Service &rarr; Gateway auth &rarr; AI Gateway
       </div>
       <div class="archetype-label">
         <span class="archetype-arrow agent-resource"></span>
-        Provider &rarr; Analytics &rarr; App (response path)
+        AI provider &rarr; Analytics &rarr; Person or service (response path)
       </div>
     </div>
 
     <!-- Main content -->
-    <div class="diagram-content">
+    <div class="diagram-content" role="main">
       <!-- Canvas -->
       <div class="diagram-canvas">
         <div class="flow-container">
           <svg class="flow-edges"></svg>
           <div class="flow-columns">
             <div class="flow-column col-left">
-              <div class="column-label">App / Developer</div>
+              <div class="column-label">Identity / Client</div>
             </div>
             <div class="flow-column col-center">
               <div class="column-label">Cloudflare AI Gateway</div>
@@ -117,7 +119,7 @@
           <button class="btn btn-secondary" data-action="prev" disabled>&larr;</button>
           <button class="btn btn-secondary" data-action="next">&rarr;</button>
           <button class="btn btn-secondary" data-action="reset">Reset</button>
-          <span class="step-counter">0 / 7</span>
+          <span class="step-counter">0 / 8</span>
         </div>
         <div class="panel-step-info">
           <div class="step-info-placeholder">

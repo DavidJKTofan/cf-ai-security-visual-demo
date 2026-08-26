@@ -12,7 +12,8 @@
   <meta name="author" content="Community Demo (Not affiliated with Cloudflare.)">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0d1117">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="light dark">
+  <script src="/components/theme-controller.js"></script>
 
   <!-- Canonical URL -->
   <link rel="canonical" href="https://ai-security.automatic-demo.com/ai-security">
@@ -284,7 +285,7 @@
       font-weight: 500;
       margin-bottom: 0.5rem;
       width: fit-content;
-      background: rgba(255, 255, 255, 0.04);
+      background: var(--surface-soft);
       color: var(--text-muted);
       border: 1px solid var(--border-light);
       letter-spacing: 0.02em;
@@ -295,6 +296,10 @@
       font-size: 0.85em;
       opacity: 0.75;
     }
+
+    [data-theme="light"] .uc-card-flow-type.human-ai { color: #1d4ed8; }
+    [data-theme="light"] .uc-card-flow-type.agent-resource { color: #047857; }
+    [data-theme="light"] .uc-card-flow-type.both-flows { color: #6d28d9; }
 
     .landing-footer {
       padding: clamp(0.625rem, 1.5vw, 1rem) clamp(1rem, 3vw, 2rem);
@@ -371,12 +376,14 @@
           <span class="uc-card-number">Use Case 2</span>
           <span class="uc-card-audience">Security / Platform</span>
           <span class="uc-card-flow-type agent-resource">&#129302; Agentic AI &rarr; Cloudflare &rarr; &#128450; Resources</span>
-          <h3>Govern AI Agents</h3>
-          <p>Secure interactions between human users and AI agents via MCP (Model Context Protocol) with Cloudflare Access controls.</p>
+          <h3>Govern AI Agents &amp; MCP</h3>
+          <p>Adopt stateless MCP 2026-07-28, discover shadow MCP on managed paths, enforce portal-only access, and run governed remote servers on Workers.</p>
           <div class="uc-card-products">
             <span class="product-tag">Access</span>
             <span class="product-tag">MCP Portals</span>
             <span class="product-tag">DLP for MCP</span>
+            <span class="product-tag">MCP Detection</span>
+            <span class="product-tag">Traffic Source</span>
             <span class="product-tag">Workers</span>
           </div>
           <span class="uc-card-cta">Explore flow <span class="arrow">&rarr;</span></span>
@@ -467,7 +474,7 @@
           <span class="uc-card-audience">AI Engineers / Platform</span>
           <span class="uc-card-flow-type agent-resource">&#129302; Agent &rarr; Cloudflare &rarr; &#129302; Agent</span>
           <h3>Secure AI-to-AI Communication</h3>
-          <p>Orchestrate multiple AI agents with mTLS identity, per-tool authorization, durable execution via Workflows, and shared knowledge.</p>
+          <p>Orchestrate multiple AI agents with machine identity, governed MCP tools, durable Workflows, shared knowledge, and end-to-end agent tracing.</p>
           <div class="uc-card-products">
             <span class="product-tag">Agents SDK</span>
             <span class="product-tag">Access + mTLS</span>
@@ -475,6 +482,7 @@
             <span class="product-tag">Workflows</span>
             <span class="product-tag">AI Search</span>
             <span class="product-tag">Queues</span>
+            <span class="product-tag">Agent Tracing</span>
           </div>
           <span class="uc-card-cta">Explore flow <span class="arrow">&rarr;</span></span>
         </a>
@@ -483,7 +491,7 @@
     </main>
 
     <footer class="landing-footer">
-      <p>For educational and demonstration purposes only. Not an official Cloudflare demo.</p>
+      <p>For educational and demonstration purposes only. Not an official Cloudflare demo.<span class="footer-update">Last Updated: <time datetime="2026-08-25">August 25, 2026</time></span></p>
       <p style="margin-top: 0.375rem;">Deployed on <a href="https://developers.cloudflare.com/workers/static-assets/" target="_blank" rel="noopener">Workers Static Assets</a> &middot; <a href="https://github.com/DavidJKTofan/cf-ai-security-visual-demo" target="_blank" rel="noopener">GitHub</a></p>
     </footer>
   </div>

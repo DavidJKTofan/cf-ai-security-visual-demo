@@ -24,6 +24,8 @@
  *   https://github.com/cloudflare/agents/tree/main/docs/think
  *   https://blog.cloudflare.com/dynamic-workers/
  *   https://developers.cloudflare.com/sandbox/
+ *   https://developers.cloudflare.com/changelog/post/2026-08-03-cloudflare-computer/
+ *   https://developers.cloudflare.com/agents/runtime/operations/observability/tracing/
  */
 
 export const uc16 = {
@@ -98,18 +100,29 @@ export const uc16 = {
       description: 'this.subAgent(ResearchAgent, "research") spawns a child Durable Object colocated with the parent via Facets. Each sub-agent has its own isolated SQLite and execution context; RPC latency is a function call because they\'re on the same machine. TypeScript catches misuse at compile time. Orchestrator delegates to specialized children (research, review, synthesis) that run in parallel — same scaling model, same hibernation economics.',
       docsUrl: 'https://developers.cloudflare.com/agents/api-reference/sub-agents/',
     },
+    {
+      id: 'tracing',
+      label: 'Agent Tracing',
+      sublabel: 'Sessions, turns, tools, tokens',
+      icon: '\u{1F50D}',
+      type: 'cloudflare',
+      column: 'center',
+      product: 'Cloudflare Agents',
+      description: 'Agent tracing shows sessions, runs, token usage, model calls, tool execution, approvals, sub-agents, and Workers runtime spans. Session replay uses recorded activity rather than re-executing the agent. Payload recording is off by default; traces use OpenTelemetry conventions and can be exported over OTLP.',
+      docsUrl: 'https://developers.cloudflare.com/agents/runtime/operations/observability/tracing/',
+    },
 
     // Right column — The Execution Ladder
     {
       id: 'workspace',
       label: 'Tier 0: Workspace',
-      sublabel: 'Durable filesystem (SQLite + R2)',
+      sublabel: 'SQLite VFS + adaptive execution',
       icon: '\u{1F4C1}',
       type: 'cloudflare',
       column: 'right',
-      product: '@cloudflare/shell',
-      description: 'A durable virtual filesystem backed by SQLite and R2. Read, write, edit, search, grep, diff. The agent is useful at Tier 0 alone — it has a persistent workspace that survives restarts and hibernation.',
-      docsUrl: 'https://www.npmjs.com/package/@cloudflare/shell',
+      product: '@cloudflare/computer',
+      description: 'The preview @cloudflare/computer package gives an agent a SQLite-backed virtual filesystem and AI SDK-compatible read, write, edit, ls, and exec tools. It chooses between an isolate backend using just-bash and Dynamic Workers or a full Linux Container backend mounted through FUSE. Operations are gated, audited, and observed.',
+      docsUrl: 'https://developers.cloudflare.com/changelog/post/2026-08-03-cloudflare-computer/',
     },
     {
       id: 'isolate-npm',
@@ -141,7 +154,7 @@ export const uc16 = {
       type: 'cloudflare',
       column: 'right',
       product: 'Cloudflare Sandbox SDK',
-      description: 'Tier 4: Cloudflare Sandbox SDK (GA as of Agents Week) — a full container environment with your toolchains, repos, and dependencies. git clone, npm test, cargo build — synced bidirectionally with the Workspace. Use when the job requires a real development environment. The ladder is additive: agents escalate tier-by-tier only as needed.',
+      description: 'Tier 4: Cloudflare Sandbox SDK — a full container environment with your toolchains, repos, and dependencies. git clone, npm test, cargo build — synced bidirectionally with the Workspace. Use when the job requires a real development environment. The ladder is additive: agents escalate tier-by-tier only as needed.',
       docsUrl: 'https://developers.cloudflare.com/sandbox/',
     },
     {
@@ -162,6 +175,7 @@ export const uc16 = {
     { id: 'e-agent-fiber',   from: 'think-agent',  to: 'fibers',      label: 'runFiber()',       direction: 'ltr' },
     { id: 'e-agent-session', from: 'think-agent',  to: 'sessions',    label: 'Load tree',        direction: 'ltr' },
     { id: 'e-agent-sub',     from: 'think-agent',  to: 'sub-agents',  label: 'Delegate',         direction: 'ltr' },
+    { id: 'e-agent-tracing', from: 'think-agent',  to: 'tracing',     label: 'Trace',            direction: 'ltr' },
     { id: 'e-agent-ws',      from: 'think-agent',  to: 'workspace',   label: 'Tier 0: files',    direction: 'ltr' },
     { id: 'e-fiber-isolate', from: 'fibers',       to: 'isolate-npm', label: 'Tier 1–2: code',   direction: 'ltr' },
     { id: 'e-fiber-browser', from: 'fibers',       to: 'browser',     label: 'Tier 3: web',      direction: 'ltr' },
@@ -201,13 +215,13 @@ export const uc16 = {
       owasp: ['ASI08 Cascading Failures', 'ASI10 Rogue Agents'],
     },
     {
-      title: 'Tier 0: Workspace — the agent\'s durable filesystem',
-      product: '@cloudflare/shell',
-      description: 'Even before running any code, the agent has a persistent workspace backed by SQLite + R2. Read, write, edit, search, grep, diff. Files survive hibernation and restarts. The Think base class wires createWorkspaceTools(this.workspace) into the tool set; the agent operates on files like it would in a shell.',
-      why: 'The execution ladder\'s design principle: the agent should be useful at Tier 0 alone. Every other tier is additive — users add capabilities as they go, instead of needing the full stack on day one.',
+      title: 'Workspace gives the agent files and the right computer',
+      product: '@cloudflare/computer',
+      description: 'The preview @cloudflare/computer package provides a persistent SQLite-backed virtual filesystem plus AI SDK-compatible read, write, edit, ls, and exec tools. Its isolate runtime uses just-bash and Dynamic Workers for fast file and data work; its Container runtime supplies full Linux, native binaries, and package managers through a FUSE-mounted workspace. The agent can choose the least expensive backend that satisfies the task.',
+      why: 'An agent needs a durable working environment, but not every command needs a container. Selecting between isolate and Linux execution keeps startup, cost, and authority proportional to the work while preserving one filesystem and tool surface.',
       activeNodes: ['think-agent', 'workspace'],
       activeEdges: ['e-agent-ws'],
-      docsUrl: 'https://www.npmjs.com/package/@cloudflare/shell',
+      docsUrl: 'https://developers.cloudflare.com/changelog/post/2026-08-03-cloudflare-computer/',
     },
     {
       title: 'Tier 1–2: Sandboxed code + npm via Dynamic Workers',
@@ -222,7 +236,7 @@ export const uc16 = {
     {
       title: 'Tier 3–4: Browser Run and Sandbox for the rest of the world',
       product: 'Browser Run + Sandbox SDK',
-      description: 'Tier 3 is Browser Run — headless Chrome via CDP for sites that don\'t support agents via MCP or APIs (see UC14). Tier 4 is the Sandbox SDK (GA): a full container with git, compilers, test runners — synced bidirectionally with the Workspace. Agents escalate only when the task requires it; most work stays at Tier 0–2.',
+      description: 'Tier 3 is Browser Run — headless Chrome via CDP for sites that don\'t support agents via MCP or APIs (see UC14). Tier 4 is the Sandbox SDK: a full container with git, compilers, test runners — synced bidirectionally with the Workspace. Agents escalate only when the task requires it; most work stays at Tier 0–2.',
       why: 'The execution ladder is additive. Don\'t run a full container when a 5ms isolate suffices. Don\'t open a browser when an API call works. Capability-by-capability escalation keeps costs and blast radius proportional to the task.',
       activeNodes: ['fibers', 'browser', 'sandbox'],
       activeEdges: ['e-fiber-browser', 'e-fiber-sandbox'],
@@ -247,6 +261,16 @@ export const uc16 = {
       activeNodes: ['sub-agents', 'extensions'],
       activeEdges: ['e-sub-ext'],
       owasp: ['ASI05 Unexpected Code Execution (RCE)', 'LLM06:2025 Excessive Agency'],
+    },
+    {
+      title: 'Agent tracing makes long-running work inspectable',
+      product: 'Cloudflare Agent Tracing',
+      description: 'The Agents dashboard groups activity by agent, session, run, and turn. Trace waterfalls include model calls, tool runs, approval requests, sub-agent activity, token usage, and underlying Workers operations. Session replay displays recorded activity rather than rerunning side effects. Message and tool payload recording is off by default, and OpenTelemetry-compatible spans can be exported through OTLP.',
+      why: 'Durability without observability can hide where an agent spent time, tokens, or authority. Correlated traces let operators investigate slow turns and unexpected behavior while choosing explicitly whether sensitive payloads should be stored.',
+      activeNodes: ['think-agent', 'fibers', 'sub-agents', 'tracing'],
+      activeEdges: ['e-agent-tracing'],
+      docsUrl: 'https://developers.cloudflare.com/agents/runtime/operations/observability/tracing/',
+      owasp: ['ASI10 Rogue Agents', 'ASI08 Cascading Failures'],
     },
     {
       title: 'Agent responds via resumable stream, then hibernates',

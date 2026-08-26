@@ -1,13 +1,13 @@
 /**
- * UC8 — API Key Management & Unified Billing
- * Centralize AI provider credential management and billing through AI Gateway.
+ * UC8 - Identity, Keys & AI Spend Control
+ * Centralize identity, provider credentials, budgets, and behavioral visibility.
  *
  * Two credential models:
  *   1. BYOK (Bring Your Own Key) — store keys in Cloudflare Secrets Store, reference by name
  *   2. Unified Billing — Cloudflare manages provider credentials; single Cloudflare invoice
  *
- * Unified Billing supports spend limits (daily/weekly/monthly) and Zero Data Retention (ZDR)
- * for eligible providers; BYOK centralizes customer-owned provider keys in Secrets Store.
+ * Cost-based spend limits support fixed or rolling windows for Unified Billing and BYOK
+ * requests with known pricing. ZDR is available for eligible Unified Billing providers.
  *
  * References:
  *   https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/
@@ -17,19 +17,39 @@
 
 export const uc8 = {
   id: 'uc8',
-  title: 'API Key Management & Unified Billing',
-  subtitle: 'Centralize AI provider credentials and billing through a single Cloudflare control plane',
+  title: 'Identity, Keys & AI Spend Control',
+  subtitle: 'Put verified identity, provider credentials, cost-based budgets, and behavioral insights behind one AI Gateway',
 
   nodes: [
-    // Left column — Developer / Application
+    // Left column — interactive and service callers
     {
       id: 'app-dev',
-      label: 'App / Developer',
-      sublabel: 'No provider keys in code',
+      label: 'Developer / User',
+      sublabel: 'Access-authenticated person',
       icon: '\u{1F4BB}',
       type: 'user',
       column: 'left',
-      description: 'Your application or developer sends LLM requests to AI Gateway using only a Cloudflare API token (cf-aig-authorization). No per-provider API keys are required in application code, environment variables, or CI/CD pipelines.',
+      description: 'An interactive developer or employee calls an AI Gateway custom domain protected by Cloudflare Access. A valid user subject becomes the reserved cf.user_id metadata used by logs, routing, spend controls, and User Insights.',
+    },
+    {
+      id: 'service-workload',
+      label: 'App / Service Agent',
+      sublabel: 'Gateway auth + custom metadata',
+      icon: '\u{1F916}',
+      type: 'device',
+      column: 'left',
+      description: 'A non-human workload authenticates with AI Gateway credentials or an Access service token. Service-token requests do not receive cf.user_id because they do not represent a person; use customer-defined metadata to attribute the application, agent, or team.',
+    },
+    {
+      id: 'access',
+      label: 'Cloudflare Access',
+      sublabel: 'Verified user identity',
+      icon: '\u{1F512}',
+      type: 'cloudflare',
+      column: 'left',
+      product: 'Cloudflare Access',
+      description: 'Protect an AI Gateway custom domain with Access and existing SAML identity providers such as Okta or Entra. Access policies decide who can call the gateway; AI Gateway receives the verified subject as reserved metadata key cf.user_id.',
+      docsUrl: 'https://developers.cloudflare.com/ai-gateway/configuration/cloudflare-access/',
     },
     // Center column — AI Gateway credential & billing layer
     {
@@ -40,8 +60,8 @@ export const uc8 = {
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare AI Gateway',
-      description: 'AI Gateway receives all LLM requests through a single authenticated endpoint. Authentication requires only a Cloudflare API token (cf-aig-authorization header). AI Gateway then resolves the provider credential — either from Secrets Store (BYOK) or Cloudflare-managed (Unified Billing) — and forwards the request transparently.',
-      docsUrl: 'https://developers.cloudflare.com/ai-gateway/configuration/authentication/',
+      description: 'AI Gateway receives LLM requests through a single endpoint. On an Access-protected custom domain, the verified user ID is available as cf.user_id in logs, analytics, routing, and spend controls. AI Gateway then resolves provider credentials through BYOK or Unified Billing.',
+      docsUrl: 'https://developers.cloudflare.com/ai-gateway/configuration/cloudflare-access/',
     },
     {
       id: 'byok',
@@ -51,7 +71,7 @@ export const uc8 = {
       type: 'cloudflare',
       column: 'center',
       product: 'AI Gateway BYOK',
-      description: 'Bring Your Own Key (BYOK): store provider API keys in Cloudflare Secrets Store and reference them by name in AI Gateway Provider Keys (e.g., ANTHROPIC_KEY_1). The gateway injects the key at request time — the application never sees the key value. Supports easy key rotation without code changes, and enables per-key rate/budget controls via Dynamic Routing.',
+      description: 'Bring Your Own Key (BYOK): store provider API keys in Cloudflare Secrets Store and reference them by name in AI Gateway Provider Keys. The gateway injects the key at request time, so applications never see its value. Cost-based spend limits also apply to BYOK requests when model pricing is known.',
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/',
     },
     {
@@ -62,19 +82,19 @@ export const uc8 = {
       type: 'cloudflare',
       column: 'center',
       product: 'AI Gateway Unified Billing',
-      description: 'Unified Billing eliminates provider API keys entirely. Load credits into your Cloudflare account; AI Gateway uses Cloudflare-managed provider credentials automatically. A single Cloudflare invoice covers all AI spend across OpenAI, Anthropic, Google AI Studio, xAI, and Groq. Supports auto top-up to prevent service interruptions.',
+      description: 'Unified Billing eliminates provider API keys entirely. Load credits into your Cloudflare account; AI Gateway uses Cloudflare-managed provider credentials automatically. A single Cloudflare invoice covers supported providers including OpenAI, Anthropic, Google AI Studio, Google Vertex AI, xAI, and Groq.',
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/features/unified-billing/',
     },
     {
       id: 'spend-limits',
-      label: 'Unified Billing Limits & ZDR',
-      sublabel: 'Budgets + eligible ZDR routes',
+      label: 'Spend Limits',
+      sublabel: 'Cost-based budgets by identity',
       icon: '\u{1F6E1}',
       type: 'cloudflare',
       column: 'center',
       product: 'AI Gateway Spend Limits',
-      description: 'Set spend limits on Unified Billing credits — daily, weekly, or monthly caps. When a limit is reached, AI Gateway automatically stops processing requests until the period resets or the limit is raised. Zero Data Retention (ZDR) routes Unified Billing traffic through provider endpoints that do not retain prompts or responses. ZDR is currently supported for OpenAI and Anthropic.',
-      docsUrl: 'https://developers.cloudflare.com/ai-gateway/features/unified-billing/',
+      description: 'Set cost-based budgets over fixed or rolling windows, scoped by model, provider, or custom metadata such as cf.user_id, team, or application. Limits work for Unified Billing and BYOK where pricing is known. When any applicable rule is over budget, AI Gateway returns 429. Enforcement is eventually consistent.',
+      docsUrl: 'https://developers.cloudflare.com/ai-gateway/features/spend-limits/',
     },
     {
       id: 'analytics',
@@ -86,6 +106,17 @@ export const uc8 = {
       product: 'AI Gateway Analytics',
       description: 'AI Gateway logs every request with provider, model, token counts (input + output), latency, cost, and cache status. Unified Billing requests show credit deductions in real time via the Credits Available dashboard. Use Logpush to export logs to R2, S3, Datadog, or your SIEM for cost attribution and audit.',
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/observability/analytics/',
+    },
+    {
+      id: 'user-insights',
+      label: 'User Insights',
+      sublabel: 'Behavioral anomaly visibility',
+      icon: '\u{1F50D}',
+      type: 'cloudflare',
+      column: 'center',
+      product: 'AI Gateway User Insights',
+      description: 'User Insights builds a rolling behavioral baseline for each person or agent from session cost, then surfaces identities that exceed both their own pattern and an account-level threshold. It supports investigation; it does not determine intent or block requests.',
+      docsUrl: 'https://blog.cloudflare.com/identity-aware-ai-gateway/',
     },
     // Right column — Providers supported by Unified Billing and BYOK
     {
@@ -136,7 +167,9 @@ export const uc8 = {
   ],
 
   edges: [
-    { id: 'e-app-aig',        from: 'app-dev',        to: 'aig',            label: 'cf-aig-authorization', direction: 'ltr' },
+    { id: 'e-app-access',     from: 'app-dev',        to: 'access',         label: 'SSO',                  direction: 'ltr' },
+    { id: 'e-access-aig',     from: 'access',         to: 'aig',            label: 'cf.user_id',           direction: 'ltr' },
+    { id: 'e-service-aig',    from: 'service-workload', to: 'aig',          label: 'Gateway auth',         direction: 'ltr' },
     { id: 'e-aig-byok',       from: 'aig',            to: 'byok',           label: 'BYOK path',            direction: 'ltr' },
     { id: 'e-aig-ub',         from: 'aig',            to: 'unified-billing', label: '',                    direction: 'ltr' },
     { id: 'e-byok-spend',     from: 'byok',           to: 'spend-limits',   label: '',                     direction: 'ltr' },
@@ -148,24 +181,26 @@ export const uc8 = {
     { id: 'e-spend-groq',     from: 'spend-limits',   to: 'groq',           label: '',                     direction: 'ltr' },
     { id: 'e-openai-analytics', from: 'openai',       to: 'analytics',      label: 'Usage + cost',         direction: 'rtl' },
     { id: 'e-analytics-app',  from: 'analytics',      to: 'app-dev',        label: 'Response',             direction: 'rtl' },
+    { id: 'e-analytics-service', from: 'analytics',   to: 'service-workload', label: '',                   direction: 'rtl' },
+    { id: 'e-analytics-insights', from: 'analytics',  to: 'user-insights',  label: 'Sessions',             direction: 'ltr' },
   ],
 
   steps: [
     {
-      title: 'App sends request — no provider API key required',
-      product: 'Cloudflare AI Gateway',
-      description: 'Your application sends an LLM request to the AI Gateway unified endpoint, authenticated only with a Cloudflare API token (cf-aig-authorization header). No per-provider API keys are required in application code, environment variables, or CI/CD pipelines. Only the base URL changes — full API compatibility is preserved.',
-      why: 'Removing provider keys from application code eliminates a major credential leak vector — no keys in Git history, leaked env files, or compromised CI runners.',
-      activeNodes: ['app-dev', 'aig'],
-      activeEdges: ['e-app-aig'],
-      docsUrl: 'https://developers.cloudflare.com/ai-gateway/configuration/authentication/',
-      owasp: ['LLM02:2025 Sensitive Information Disclosure'],
+      title: 'People and services authenticate on separate paths',
+      product: 'Cloudflare Access + AI Gateway',
+      description: 'Interactive users authenticate to an Access-protected custom domain, and AI Gateway records the valid Access subject as cf.user_id. Applications and service agents authenticate directly with gateway credentials or Access service tokens. Because service tokens have no user subject, they do not receive cf.user_id; attach custom metadata for workload attribution.',
+      why: 'Human identity and workload identity are different governance units. Keeping both paths explicit prevents service traffic from being mistaken for a verified person while preserving per-user and per-application controls.',
+      activeNodes: ['app-dev', 'service-workload', 'access', 'aig'],
+      activeEdges: ['e-app-access', 'e-access-aig', 'e-service-aig'],
+      docsUrl: 'https://developers.cloudflare.com/ai-gateway/configuration/cloudflare-access/',
+      owasp: ['LLM02:2025 Sensitive Information Disclosure', 'ASI03 Identity & Privilege Abuse'],
     },
     {
       title: 'BYOK: provider keys stored in Secrets Store',
       product: 'AI Gateway BYOK',
       description: 'With Bring Your Own Key (BYOK), your provider API keys are stored in Cloudflare Secrets Store and referenced by name in the AI Gateway Provider Keys section (e.g., ANTHROPIC_KEY_1). The gateway injects the credential at request time — the application code never receives or handles the key value. Key rotation requires no application changes.',
-      why: 'Secrets Store centralizes credential management: one place to rotate, audit, and control access to every AI provider key across all your applications. Per-key rate and budget controls are unlocked via Dynamic Routing.',
+      why: 'Secrets Store centralizes credential management, while AI Gateway can apply cost-based spend limits to BYOK traffic when model pricing is known.',
       activeNodes: ['aig', 'byok'],
       activeEdges: ['e-aig-byok'],
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/',
@@ -183,11 +218,11 @@ export const uc8 = {
     {
       title: 'Spend limits prevent unexpected charges',
       product: 'AI Gateway Spend Limits',
-      description: 'Spend limits cap Unified Billing credit consumption on a daily, weekly, or monthly basis. When a limit is reached, AI Gateway automatically stops processing requests until the period resets or you raise the limit. Auto top-up can reload credits automatically to prevent service interruption when a soft threshold is crossed.',
-      why: 'Runaway AI agents, traffic spikes, or misconfigured applications can generate massive unexpected bills. Spend limits provide a hard financial guardrail without requiring any application-side logic.',
+      description: 'Spend limits track actual dollar cost, not request count. Define a budget over a fixed or rolling window and scope it by any combination of model, provider, and custom metadata. With Access, split on cf.user_id to give each authenticated user an independent budget. When an applicable rule is over budget, AI Gateway returns 429 until the window resets. Concurrent bursts can briefly exceed a limit because enforcement is eventually consistent.',
+      why: 'A runaway agent, expensive model, or misconfigured application can now be bounded centrally for both Unified Billing and BYOK requests where model pricing is known.',
       activeNodes: ['byok', 'unified-billing', 'spend-limits'],
       activeEdges: ['e-byok-spend', 'e-ub-spend'],
-      docsUrl: 'https://developers.cloudflare.com/ai-gateway/features/unified-billing/',
+      docsUrl: 'https://developers.cloudflare.com/ai-gateway/features/spend-limits/',
       owasp: ['LLM10:2025 Unbounded Consumption', 'ASI08 Cascading Failures'],
     },
     {
@@ -214,10 +249,20 @@ export const uc8 = {
       product: 'AI Gateway Analytics',
       description: 'Every request is logged with provider, model, token counts (input + output), latency, cost in credits (Unified Billing), and cache status. The Credits Available card in the AI Gateway dashboard shows remaining balance in real time. Logpush streams logs to R2, S3, Datadog, or your SIEM for cost attribution, chargeback reporting, and audit.',
       why: 'Centralized cost and usage analytics across all AI providers gives engineering and finance teams visibility into AI spend — without polling each provider\'s billing API or reconciling multiple invoices.',
-      activeNodes: ['openai', 'analytics', 'app-dev'],
-      activeEdges: ['e-openai-analytics', 'e-analytics-app'],
+      activeNodes: ['openai', 'analytics', 'app-dev', 'service-workload'],
+      activeEdges: ['e-openai-analytics', 'e-analytics-app', 'e-analytics-service'],
       docsUrl: 'https://developers.cloudflare.com/ai-gateway/observability/analytics/',
       owasp: ['LLM10:2025 Unbounded Consumption', 'ASI10 Rogue Agents'],
+    },
+    {
+      title: 'User Insights surfaces unusual people and agents',
+      product: 'AI Gateway User Insights',
+      description: 'User Insights compares each identity\'s session cost with its rolling 30-day p95 baseline and an account-level threshold. Sessions that break both patterns are surfaced for investigation. User Insights works on traffic already flowing through AI Gateway and is available to AI Gateway customers at no additional cost.',
+      why: 'A trusted user or agent doing much more of an allowed action may not trip a policy. Behavioral visibility can expose a compromised credential, runaway agent, or inefficient workflow, but User Insights does not infer intent or block the identity by itself.',
+      activeNodes: ['analytics', 'user-insights', 'access'],
+      activeEdges: ['e-analytics-insights'],
+      docsUrl: 'https://blog.cloudflare.com/identity-aware-ai-gateway/',
+      owasp: ['ASI10 Rogue Agents'],
     },
   ],
 };

@@ -7,12 +7,13 @@
   <!-- Primary Meta Tags -->
   <title>AI Builder - Cloudflare AI Interactive Demos (Unofficial)</title>
   <meta name="title" content="AI Builder - Cloudflare AI Interactive Demos (Unofficial)">
-  <meta name="description" content="Unofficial educational demo: explore 9 interactive visual walkthroughs of building AI applications on Cloudflare — API management, dynamic routing, RAG, voice agents, chat, scheduling, web browsing, private networking, and durable long-running agents. Not affiliated with or endorsed by Cloudflare.">
-  <meta name="keywords" content="Cloudflare, AI builder, AI Gateway, Agents SDK, RAG, voice AI, AI chat, Workers AI, Vectorize, AI Search, Browser Run, Cloudflare Mesh, Workers VPC, Project Think, educational demo">
+  <meta name="description" content="Unofficial educational demo: explore 10 interactive visual walkthroughs of building AI applications on Cloudflare, including identity-aware AI Gateway controls, agents, and Cloudflare OS.">
+  <meta name="keywords" content="Cloudflare, Cloudflare OS, AI builder, AI Gateway, Agents SDK, RAG, voice AI, Workers AI, Browser Run, Workers VPC, Project Think, educational demo">
   <meta name="author" content="Community Demo (Not affiliated with Cloudflare.)">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0d1117">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="light dark">
+  <script src="/components/theme-controller.js"></script>
 
   <!-- Canonical URL -->
   <link rel="canonical" href="https://ai-security.automatic-demo.com/ai-builder">
@@ -21,7 +22,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ai-security.automatic-demo.com/ai-builder">
   <meta property="og:title" content="AI Builder - Cloudflare AI Interactive Demos (Unofficial)">
-  <meta property="og:description" content="Unofficial educational demo: explore 9 interactive visual walkthroughs of building AI applications on Cloudflare — API management, dynamic routing, RAG, voice agents, chat, scheduling, web browsing, private networking, and durable long-running agents. Not affiliated with or endorsed by Cloudflare.">
+  <meta property="og:description" content="Unofficial educational demo: explore 10 interactive visual walkthroughs of building AI applications on Cloudflare, including identity-aware AI Gateway controls, agents, and Cloudflare OS.">
   <meta property="og:image" content="https://ai-security.automatic-demo.com/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -32,7 +33,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://ai-security.automatic-demo.com/ai-builder">
   <meta name="twitter:title" content="AI Builder - Cloudflare AI Interactive Demos (Unofficial)">
-  <meta name="twitter:description" content="Unofficial educational demo: explore 7 interactive visual walkthroughs of building AI applications on Cloudflare. Not affiliated with or endorsed by Cloudflare.">
+  <meta name="twitter:description" content="Unofficial educational demo: explore 10 interactive visual walkthroughs of building AI applications on Cloudflare. Not affiliated with or endorsed by Cloudflare.">
   <meta name="twitter:image" content="https://ai-security.automatic-demo.com/og-image.png">
 
   <!-- Favicon -->
@@ -284,7 +285,7 @@
       font-weight: 500;
       margin-bottom: 0.5rem;
       width: fit-content;
-      background: rgba(255, 255, 255, 0.04);
+      background: var(--surface-soft);
       color: var(--text-muted);
       border: 1px solid var(--border-light);
       letter-spacing: 0.02em;
@@ -295,6 +296,10 @@
       font-size: 0.85em;
       opacity: 0.75;
     }
+
+    [data-theme="light"] .uc-card-flow-type.human-ai { color: #1d4ed8; }
+    [data-theme="light"] .uc-card-flow-type.agent-resource { color: #047857; }
+    [data-theme="light"] .uc-card-flow-type.both-flows { color: #6d28d9; }
 
     .landing-footer {
       padding: clamp(0.625rem, 1.5vw, 1rem) clamp(1rem, 3vw, 2rem);
@@ -338,7 +343,7 @@
     <main class="landing-main">
       <h1 class="landing-title">Cloudflare <span>AI Builder</span></h1>
       <p class="landing-subtitle">
-        Interactive visual walkthroughs of how to build AI applications and agents on Cloudflare &mdash; from API key management and dynamic routing to RAG pipelines, voice agents, persistent chat, autonomous scheduling, web-browsing agents, private networking, and durable long-running agents.
+        Interactive visual walkthroughs of how to build AI applications and agents on Cloudflare &mdash; from identity-aware model controls and RAG to durable agents, private networking, and Cloudflare OS.
       </p>
 
       <!-- Section 1: Developing with AI -->
@@ -354,14 +359,16 @@
           <span class="uc-card-number">Use Case 8</span>
           <span class="uc-card-audience">Developers / FinOps</span>
           <span class="uc-card-flow-type human-ai">&#128100; App / Dev &rarr; Cloudflare &rarr; &#129302; AI Provider</span>
-          <h3>API Key Management &amp; Unified Billing</h3>
-          <p>Centralize AI provider credentials via BYOK (Secrets Store), or eliminate provider keys with Unified Billing &mdash; single Cloudflare invoice, spend limits, and ZDR on eligible Unified Billing routes.</p>
+          <h3>Identity, Keys &amp; AI Spend Control</h3>
+          <p>Protect an AI Gateway custom domain with Access, attribute requests to verified users, set cost-based budgets for BYOK or Unified Billing, and investigate anomalous behavior with User Insights.</p>
           <div class="uc-card-products">
             <span class="product-tag">AI Gateway</span>
             <span class="product-tag">BYOK</span>
             <span class="product-tag">Secrets Store</span>
             <span class="product-tag">Unified Billing</span>
-            <span class="product-tag">Analytics</span>
+            <span class="product-tag">Access</span>
+            <span class="product-tag">Spend Limits</span>
+            <span class="product-tag">User Insights</span>
           </div>
           <span class="uc-card-cta">Explore flow <span class="arrow">&rarr;</span></span>
         </a>
@@ -389,7 +396,7 @@
       <!-- Section 2: Building AI Applications -->
       <div class="cards-section">
         <div class="cards-section-header">
-          <span class="cards-section-number">10 &ndash; 16</span>
+          <span class="cards-section-number">10 &ndash; 17</span>
           <span class="cards-section-title">Building AI Applications</span>
         </div>
         <div class="cards-grid">
@@ -495,13 +502,32 @@
           <span class="uc-card-audience">AI Engineers / Platform</span>
           <span class="uc-card-flow-type agent-resource">&#128225; Event &rarr; Think Agent (DO) &rarr; &#129527; Execution Ladder</span>
           <h3>Durable Long-Running Agents</h3>
-          <p>Build agents that survive crashes, hibernate when idle, and escalate through an execution ladder (Workspace &rarr; Isolate &rarr; npm &rarr; Browser &rarr; Sandbox) &mdash; with Project Think primitives: fibers, sub-agents via Facets, tree-structured sessions, and self-authored extensions.</p>
+          <p>Build agents that survive crashes, hibernate when idle, delegate to sub-agents, choose isolate or Linux execution with the preview @cloudflare/computer runtime, and expose every model call, tool, approval, and token through agent tracing.</p>
           <div class="uc-card-products">
             <span class="product-tag">Project Think</span>
             <span class="product-tag">Agents SDK</span>
             <span class="product-tag">Fibers</span>
             <span class="product-tag">Dynamic Workers</span>
             <span class="product-tag">Sandbox SDK</span>
+            <span class="product-tag">@cloudflare/computer</span>
+            <span class="product-tag">Agent Tracing</span>
+          </div>
+          <span class="uc-card-cta">Explore flow <span class="arrow">&rarr;</span></span>
+        </a>
+
+        <!-- UC17 -->
+        <a class="uc-card" href="/use-cases/uc17-cloudflare-os.html">
+          <span class="uc-card-number">Use Case 17 &middot; Featured Platform</span>
+          <span class="uc-card-audience">Developers / Platform</span>
+          <span class="uc-card-flow-type both-flows">&#128100; Employee &rarr; Cloudflare OS &rarr; &#9889; Apps / Workflows</span>
+          <h3>Cloudflare OS: Governed AI Workspaces &amp; Apps</h3>
+          <p>Give every employee a company-grounded agent workspace that can build secure apps and workflows. Gatekeepers keep credentials out of generated code, policy follows observed data, and AI Gateway centralizes models and spend.</p>
+          <div class="uc-card-products">
+            <span class="product-tag">Cloudflare OS</span>
+            <span class="product-tag">Gatekeepers</span>
+            <span class="product-tag">Dynamic Workers</span>
+            <span class="product-tag">DO Facets</span>
+            <span class="product-tag">AI Gateway</span>
           </div>
           <span class="uc-card-cta">Explore flow <span class="arrow">&rarr;</span></span>
         </a>
@@ -511,7 +537,7 @@
     </main>
 
     <footer class="landing-footer">
-      <p>For educational and demonstration purposes only. Not an official Cloudflare demo.</p>
+      <p>For educational and demonstration purposes only. Not an official Cloudflare demo.<span class="footer-update">Last Updated: <time datetime="2026-08-25">August 25, 2026</time></span></p>
       <p style="margin-top: 0.375rem;">Deployed on <a href="https://developers.cloudflare.com/workers/static-assets/" target="_blank" rel="noopener">Workers Static Assets</a> &middot; <a href="https://github.com/DavidJKTofan/cf-ai-security-visual-demo" target="_blank" rel="noopener">GitHub</a></p>
     </footer>
   </div>

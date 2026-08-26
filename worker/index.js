@@ -15,6 +15,7 @@ import { uc13 } from '../src/data/uc13-steps.js';
 import { uc14 } from '../src/data/uc14-steps.js';
 import { uc15 } from '../src/data/uc15-steps.js';
 import { uc16 } from '../src/data/uc16-steps.js';
+import { uc17 } from '../src/data/uc17-cloudflare-os-steps.js';
 
 const SITE_ORIGIN = 'https://ai-security.automatic-demo.com';
 
@@ -36,6 +37,7 @@ const USE_CASES = [
   useCase(uc14, 'UC14', 'AI Builder', '/use-cases/uc14-browser-agent.html', 'AI Engineers / Developers'),
   useCase(uc15, 'UC15', 'AI Builder', '/use-cases/uc15-private-networking.html', 'Platform / Security'),
   useCase(uc16, 'UC16', 'AI Builder', '/use-cases/uc16-durable-agents.html', 'AI Engineers / Platform'),
+  useCase(uc17, 'UC17', 'AI Builder', '/use-cases/uc17-cloudflare-os.html', 'Developers / Platform'),
 ];
 
 const USE_CASE_BY_PATH = new Map(USE_CASES.flatMap((item) => pathVariants(item.path).map((path) => [path, item])));
@@ -162,6 +164,7 @@ function renderHomeMarkdown() {
   const securityCases = USE_CASES.filter((item) => item.category === 'AI Security');
   const builderCases = USE_CASES.filter((item) => item.category === 'AI Builder');
   const referenceArchitecture = USE_CASES[0];
+  const cloudflareOs = USE_CASES.find((item) => item.number === 'UC17');
 
   return compactLines([
     '# Cloudflare AI Interactive Visual Demos (Unofficial)',
@@ -170,8 +173,9 @@ function renderHomeMarkdown() {
     '',
     'Canonical URL: ' + SITE_ORIGIN + '/',
     '',
-    '## Featured Reference Architecture',
+    '## Featured Platforms and Architectures',
     '',
+    useCaseListItem(cloudflareOs),
     useCaseListItem(referenceArchitecture),
     '',
     '## AI Security',
@@ -180,14 +184,14 @@ function renderHomeMarkdown() {
     '',
     '## AI Builder',
     '',
-    ...builderCases.map(useCaseListItem),
+    ...builderCases.filter((item) => item !== cloudflareOs).map(useCaseListItem),
   ]);
 }
 
 function renderCategoryMarkdown(category, cases) {
   const description = category === 'AI Security'
     ? 'Seven walkthroughs for discovering, governing, and protecting AI usage and AI-powered applications.'
-    : 'Nine walkthroughs for building AI applications and agentic systems on Cloudflare.';
+    : 'Ten walkthroughs for building AI applications and agentic systems on Cloudflare, including Cloudflare OS.';
 
   return compactLines([
     '# ' + category + ' Use Cases',
@@ -288,7 +292,17 @@ function useCaseListItem(item) {
 }
 
 function cleanText(value) {
-  return String(value || '').replace(/\n{3,}/g, '\n\n').trim();
+  const lines = String(value || '').replace(/\n{3,}/g, '\n\n').trim().split('\n');
+
+  return lines.reduce((output, line, index) => {
+    const isBullet = line.startsWith('• ');
+    const previousWasBullet = index > 0 && lines[index - 1].startsWith('• ');
+
+    if (isBullet && index > 0 && lines[index - 1].trim() && !previousWasBullet) output.push('');
+    if (!isBullet && previousWasBullet && line.trim()) output.push('');
+    output.push(isBullet ? '- ' + line.slice(2) : line);
+    return output;
+  }, []).join('\n').trim();
 }
 
 function compactLines(lines) {

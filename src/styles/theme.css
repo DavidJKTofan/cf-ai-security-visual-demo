@@ -1,5 +1,7 @@
 /* === Design Tokens === */
 :root {
+  color-scheme: dark;
+
   /* Cloudflare brand */
   --cf-orange: #F38020;
   --cf-orange-light: #F6A355;
@@ -11,11 +13,15 @@
   --bg-tertiary: #1c2333;
   --bg-card: #161b22;
   --bg-card-hover: #1c2333;
+  --surface-soft: rgba(13, 17, 23, 0.46);
+  --surface-glass: rgba(13, 17, 23, 0.72);
+  --surface-strong: rgba(22, 27, 34, 0.88);
+  --page-gradient: radial-gradient(circle at 8% 5%, rgba(243, 128, 32, 0.18), transparent 28rem), radial-gradient(circle at 88% 12%, rgba(69, 163, 255, 0.14), transparent 30rem), linear-gradient(180deg, #0d1117 0%, #0a0d13 100%);
 
   /* Text */
   --text-primary: #e6edf3;
   --text-secondary: #8b949e;
-  --text-muted: #6e7681;
+  --text-muted: #8b949e;
 
   /* Borders */
   --border-color: #30363d;
@@ -53,4 +59,49 @@
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --cf-orange: #a44807;
+  --cf-orange-light: #c86512;
+  --cf-orange-dark: #8f3f07;
+
+  --bg-primary: #f7f4ef;
+  --bg-secondary: #fffdf9;
+  --bg-tertiary: #f0ebe3;
+  --bg-card: #fffdf9;
+  --bg-card-hover: #f4eee5;
+  --surface-soft: rgba(255, 253, 249, 0.72);
+  --surface-glass: rgba(255, 253, 249, 0.88);
+  --surface-strong: rgba(255, 255, 255, 0.96);
+  --page-gradient: radial-gradient(circle at 8% 5%, rgba(243, 128, 32, 0.12), transparent 28rem), radial-gradient(circle at 88% 12%, rgba(37, 99, 235, 0.09), transparent 30rem), linear-gradient(180deg, #faf7f2 0%, #f2ede5 100%);
+
+  --text-primary: #172033;
+  --text-secondary: #475569;
+  --text-muted: #526173;
+
+  --border-color: #cbd5e1;
+  --border-light: #dde3ea;
+
+  --color-user: #1d4ed8;
+  --color-user-bg: rgba(29, 78, 216, 0.09);
+  --color-device: #1d4ed8;
+  --color-device-bg: rgba(29, 78, 216, 0.09);
+  --color-cloudflare: #a44807;
+  --color-cloudflare-bg: rgba(180, 83, 9, 0.09);
+  --color-ai-service: #047857;
+  --color-ai-service-bg: rgba(4, 120, 87, 0.09);
+  --color-resource: #6d28d9;
+  --color-resource-bg: rgba(109, 40, 217, 0.09);
+  --color-warning: #a16207;
+  --color-warning-bg: rgba(161, 98, 7, 0.09);
+  --color-coming-soon: #a16207;
+  --color-coming-soon-bg: rgba(161, 98, 7, 0.09);
+
+  --shadow-sm: 0 1px 2px rgba(71, 85, 105, 0.12);
+  --shadow-md: 0 4px 14px rgba(71, 85, 105, 0.14);
+  --shadow-lg: 0 12px 30px rgba(71, 85, 105, 0.18);
+  --shadow-glow-orange: 0 0 0 3px rgba(180, 83, 9, 0.12);
 }

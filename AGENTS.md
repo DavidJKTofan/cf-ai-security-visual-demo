@@ -2,14 +2,15 @@
 
 ## Project Overview
 
-Interactive visual demo of Cloudflare's AI platform: an interactive `/decision-map` plus **17 walkthroughs** total — 16 use cases (7 AI Security UC1–UC7 + 9 AI Builder UC8–UC16) plus **UC0**, a featured Reference Architecture that combines elements from every other UC into a single end-to-end walkthrough of how Cloudflare runs AI Code Review and its internal AI engineering stack on its own products. Deployed with Cloudflare Workers Static Assets and a small Worker script for Markdown-friendly alternate responses. Vanilla HTML/CSS/JS with ES modules — no frontend build step, no framework runtime.
+Interactive visual demo of Cloudflare's AI platform: an interactive `/decision-map` plus **18 walkthroughs** total — 17 use cases (7 AI Security UC1–UC7 + 10 AI Builder UC8–UC17) plus **UC0**, a featured Reference Architecture that combines UC1–UC16 into an end-to-end walkthrough of how Cloudflare runs AI Code Review and its internal AI engineering stack. UC17 separately covers the Cloudflare OS platform. Deployed with Cloudflare Workers Static Assets and a small Worker script for Markdown-friendly alternate responses. Vanilla HTML/CSS/JS with ES modules — no frontend build step, no framework runtime.
 
 ## Key Architecture Decisions
 
 - **Workers Static Assets + small Worker script**: Wrangler uploads `src/` via `assets.directory`. `worker/index.js` uses the `ASSETS` binding and selectively runs first for landing/category/use-case routes to add Markdown alternates and serve `.md`, `?format=markdown`, or Markdown-oriented `Accept` requests.
 - **Vanilla JS with ES modules**: All component JS uses `export`/`import` syntax loaded via `<script type="module">`.
 - **Modular data-driven design**: Each use case is defined by a data file (`src/data/ucN-steps.js`) containing nodes, edges, and steps. The shared `FlowEngine` renders any data file without modification.
-- **Decision-map page is standalone**: `src/decision-map/index.html` is a self-contained static page with inline CSS/JS. It explains when to use AI Gateway, SWG, MCP Server Portal, CASB, AI Security for Apps, Developer Platform, and Workers VPC, plus a bottom full-customer route-lane architecture.
+- **Decision-map page is standalone**: `src/decision-map/index.html` is a self-contained static page with inline CSS/JS. It explains when to use AI Gateway, SWG, MCP Server Portal, CASB, AI Security for Apps, Cloudflare OS, Developer Platform, and Workers VPC, plus a bottom full-customer route-lane architecture.
+- **Shared color theme**: `src/components/theme-controller.js` applies the saved light/dark preference before CSS paint, follows the OS preference until the user chooses a theme, updates `theme-color`, and injects an accessible header toggle. Tokens and light-mode contrast overrides live in `src/styles/theme.css`.
 
 ## Project Structure
 
@@ -47,27 +48,28 @@ This project uses [Workers Static Assets](https://developers.cloudflare.com/work
 - https://developers.cloudflare.com/workers/vite-plugin/
 - https://developers.cloudflare.com/workers/best-practices/workers-best-practices/
 
-Current deployment uses `main: ./worker/index.js`, `assets.directory: ./src`, `assets.binding: ASSETS`, and selected `assets.run_worker_first` routes. Do not remove the Worker script unless Markdown alternate responses are intentionally removed. The Cloudflare Vite plugin is not currently needed because the frontend has no build step; consider it only if the project moves to Vite/framework tooling.
+Current deployment uses `main: ./worker/index.js`, `assets.directory: ./src`, `assets.binding: ASSETS`, and selected `assets.run_worker_first` routes. The compatibility date is reviewed periodically and observability enables full logs plus sampled traces. Do not remove the Worker script unless Markdown alternate responses are intentionally removed. The Cloudflare Vite plugin is not currently needed because the frontend has no build step; consider it only if the project moves to Vite/framework tooling.
 
 ## Landing Page Structure
 
-The site has a decision-map-first landing model with a featured reference architecture and two category cards:
+The site has a decision-map-first landing model with featured Cloudflare OS and internal engineering architecture cards plus two category cards:
 
-- `src/index.html` — top-level page; features the **UC0 Reference Architecture** hero card and cards for `/decision-map`, `/ai-security`, and `/ai-builder`
+- `src/index.html` — top-level page; features **UC17 Cloudflare OS** and the **UC0 Reference Architecture**, plus cards for `/decision-map`, `/ai-security`, and `/ai-builder`
 - `src/decision-map/index.html` — interactive visual decision map and full customer architecture route lanes
 - `src/ai-security.html` — lists the 7 AI security UCs (UC1–UC7)
-- `src/ai-builder.html` — lists the 9 AI builder UCs (UC8–UC16), grouped into two sections:
+- `src/ai-builder.html` — lists the 10 AI builder UCs (UC8–UC17), grouped into two sections:
   - **Developing with AI** (UC8–UC9)
-  - **Building AI Applications** (UC10–UC16)
+  - **Building AI Applications** (UC10–UC17)
 
-All UC detail pages live under `src/use-cases/ucN-*.html`. UC0 (Reference Architecture) back-links to `/`; UC1–UC7 pages back-link to `/ai-security`; UC8–UC16 pages back-link to `/ai-builder`.
+All UC detail pages live under `src/use-cases/ucN-*.html`. UC0 (Reference Architecture) back-links to `/`; UC1–UC7 pages back-link to `/ai-security`; UC8–UC17 pages back-link to `/ai-builder`.
 
 ## UC0 Reference Architecture (the comprehensive walkthrough)
 
-UC0 ("Cloudflare's Internal AI Engineering Stack") is the featured end-to-end walkthrough that combines elements from every other UC into a single coherent reference architecture. It mirrors the two Agents Week blog posts:
+UC0 ("Cloudflare's Internal AI Engineering Stack") is the featured end-to-end walkthrough that combines elements from UC1–UC16 into a single coherent reference architecture. It mirrors the two Agents Week blog posts and the later Engineering Codex update:
 
 - https://blog.cloudflare.com/ai-code-review/
 - https://blog.cloudflare.com/internal-ai-engineering-stack/
+- https://blog.cloudflare.com/engineering-standards-enforcement/
 
 **Narrative:** A Cloudflare engineer opens a merge request, which triggers every layer of the AI engineering stack — Access → Proxy Worker → Coordinator → Sub-reviewers → MCP Portal → Backstage → Codex/AGENTS.md → AI Gateway → Frontier providers / Workers AI → Cache + Failback → MR comment.
 
@@ -155,7 +157,7 @@ Current assignments:
 | UC5 Self-Hosted Agents | Platform / AI Engineers |
 | UC6 Code Execution | AI Engineers / AppSec |
 | UC7 Multi-Agent | AI Engineers / Platform |
-| UC8 Billing & Keys | Developers / FinOps |
+| UC8 Identity, Keys & Spend | Developers / FinOps |
 | UC9 Dynamic Routing | Developers / Platform |
 | UC10 RAG | AI Engineers / Developers |
 | UC11 Voice Agent | Developers |
@@ -164,6 +166,7 @@ Current assignments:
 | UC14 Browser Agent | AI Engineers / Developers |
 | UC15 Private Networking | Platform / Security |
 | UC16 Durable Agents | AI Engineers / Platform |
+| UC17 Cloudflare OS | Developers / Platform |
 
 ## Product Accuracy (MANDATORY)
 
@@ -242,10 +245,10 @@ UC2 ("Govern AI Agents & MCP") covers securing agentic AI communication — user
 - **AI Gateway** — Cost controls, rate limiting, caching, logging for LLM calls
 
 **Center column (Cloudflare governance layer):**
-- **Cloudflare Gateway** — Secure Web Gateway with HTTP inspection and DLP scanning of MCP portal traffic
-- **Worker Isolate** — Dynamic Workers / Codemode sandbox for isolated MCP tool execution
-- **MCP Server Portal** — Centralized MCP gateway with tool curation, per-tool toggles, audit logging, Logpush
-- **Remote MCP Servers** — Deployed globally on Cloudflare Workers (Agents SDK, McpAgent, Durable Objects)
+- **Cloudflare Gateway** — Protocol-aware MCP discovery (`experimental.is_mcp`), Traffic Source classification, HTTP inspection, and DLP on compatible portal traffic
+- **Worker Isolate** — Dynamic Workers / Code Mode sandbox for isolated MCP tool execution
+- **MCP Server Portal** — Centralized MCP gateway with tool curation, per-tool toggles, manual OAuth clients, audit logging, Logpush
+- **Remote MCP Servers** — Stateless `createMcpHandler` Workers by default; Durable Objects only when the application needs coordinated state
 - **ZTNA (Access)** — SSO + MFA, OAuth 2.1 provider, per-server Access policies
 
 **Right column (Downstream Services):**
@@ -256,11 +259,11 @@ UC2 ("Govern AI Agents & MCP") covers securing agentic AI communication — user
 
 1. **User → MCP Clients** → User connects via MCP client application to portal URL
 2. **LLMs → AI Gateway** → LLM inference calls routed through AI Gateway for cost controls and logging
-3. **MCP Clients → Cloudflare Gateway** → Gateway inspects MCP traffic with DLP profiles (credentials, financial data, PII)
-4. **Gateway → Worker Isolate** → Codemode sandboxes tool execution in isolated V8 isolates with network isolation
-5. **Gateway → MCP Server Portal** → Portal aggregates MCP servers, curates tools, logs invocations
+3. **MCP Clients → Cloudflare Gateway** → Gateway detects inspected MCP protocol traffic and distinguishes direct traffic from `mcp_portal` traffic
+4. **Gateway → Worker Isolate** → Portal Code Mode keeps the model-facing tool surface small and runs generated JavaScript in a Dynamic Worker
+5. **Gateway → MCP Server Portal** → Portal aggregates servers, curates tools, supports manual OAuth clients, and logs invocations; compatible upstream calls can route through Gateway DLP
 6. **ZTNA (Access) → MCP Portal** → Access enforces SSO + MFA and per-server Access policies
-7. **MCP Portal → Remote MCP Servers → SaaS/Internal** → Remote MCP server executes tool against downstream services
+7. **MCP Portal → Remote MCP Servers → SaaS/Internal** → Stateless Worker handler executes the tool against downstream services
 
 **Observability & response (steps 8–9):**
 
@@ -272,7 +275,8 @@ Key product notes:
 - DLP for MCP portal traffic: GA via Gateway routing (https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/mcp-portals/#route-portal-traffic-through-gateway)
 - AI Gateway: all plans (https://developers.cloudflare.com/ai-gateway/)
 - Dynamic Workers / Codemode: open beta (https://developers.cloudflare.com/dynamic-workers/)
-- Remote MCP Servers on Workers: (https://developers.cloudflare.com/agents/guides/remote-mcp-server/)
+- MCP SDK v2 handler and migration: https://developers.cloudflare.com/agents/model-context-protocol/guides/migrate-to-mcp-sdk-v2/
+- `McpAgent` is deprecated and feature-frozen; use `createMcpHandler` for stateless MCP SDK v2 servers
 - Note: DLP AI prompt profiles do NOT apply to MCP server portal traffic per docs
 
 ## UC3 Flow Order (verified)
@@ -319,7 +323,7 @@ UC4 ("Protect AI-Powered Apps") covers protecting YOUR AI-powered application fr
 1. **End User** — legitimate users of your AI-powered app
 2. **Attacker** — malicious actors attempting prompt injection, model theft, abuse
 
-**Security stack (steps 1–10):**
+**Security stack (steps 1–11):**
 
 1. **External requests → Cloudflare Edge** → All traffic (legitimate and malicious) hits Cloudflare's edge
 2. **DDoS Protection** → Volumetric attack mitigation (always-on, L3/L4/L7)
@@ -330,7 +334,8 @@ UC4 ("Protect AI-Powered Apps") covers protecting YOUR AI-powered application fr
 7. **API Shield** → Schema validation, mTLS, JWT validation; API Discovery (ML-based) with cf-llm label for GenAI endpoints; API Posture Management auto-labels risk signals
 8. **Your AI Application** → Clean requests reach your origin AI app
 9. **Sensitive Data Detection** → WAF managed ruleset scans response bodies for PII, financial data, secrets (zero latency, log-only)
-10. **Security Analytics** → Centralized logging/dashboard for all security events; filter on cf-llm for AI-specific visibility
+10. **Response delivered** → Scanned response returns through Cloudflare to the user
+11. **Security Analytics** → Centralized logging/dashboard for all security events; filter on cf-llm for AI-specific visibility
 
 Key corrections made:
 - Sensitive Data Detection is part of the WAF node (not a separate node) — response routes back to WAF for the SDD step
@@ -396,44 +401,50 @@ UC7 ("Secure AI-to-AI Communication") covers multi-agent orchestration with Clou
 
 **Architecture:** Orchestrator Agent -> Access + mTLS -> MCP Portal -> Specialized Agents (Durable Objects) -> Shared AI Gateway -> Workflows -> Results
 
-**Orchestration path (steps 1–8):**
+**Orchestration path (steps 1–10):**
 
 1. **Task triggers workflow** → Human, cron, or webhook triggers orchestrator agent (Agents SDK on Durable Objects)
 2. **Agent identity verified** → mTLS certificates or service tokens (Client ID + Client Secret) for machine-to-machine auth
-3. **MCP Portal routes tool calls** → Centralized discovery, per-tool authorization, audit logging
+3. **MCP Portal routes tool calls** → Centralized discovery, per-upstream-server Access policy, curated tool exposure, audit logging
 4. **Agents execute with shared AI Gateway** → Per-agent cost allocation, Dynamic Routing for model selection
 5. **Agents share knowledge via AI Search** → Managed search service (uses Vectorize, Workers AI, R2) for RAG patterns
 6. **Async communication via Queues** → Decoupled, reliable message passing between agents
 7. **Workflows guarantee execution** → Durable multi-step tasks with retries, waitForEvent, persistent state
-8. **Results returned** → Orchestrator aggregates results from all specialized agents
+8. **Agent tracing explains every turn** → Correlates model calls, tools, approvals, sub-agents, token use, and Workers operations
+9. **Coming Soon: gRPC and inbound TCP** → Future transport for existing agent services through Workers, Containers, and Spectrum
+10. **Results returned** → Orchestrator aggregates results from all specialized agents
 
 Key product notes:
 - Agents SDK: each agent is a Durable Object with SQL database, WebSocket connections, scheduling
 - mTLS and service tokens for machine-to-machine agent authentication
 - Workflows: durable execution that survives failures, supports human-in-the-loop via waitForEvent
 - Queues: prevents cascading failures through asynchronous message passing
+- Agent Tracing: trace waterfall and recorded session replay; payload recording is off by default
+- gRPC/inbound TCP is not generally available and must remain labeled Coming Soon
 
 ## UC8 Flow Order (verified)
 
-UC8 ("API Key Management & Unified Billing") centralizes AI provider credential management and billing through AI Gateway.
+UC8 ("Identity, Keys & AI Spend Control") puts verified identity, provider credentials, cost-based budgets, and behavioral insights behind one AI Gateway.
 
-**Architecture:** App / Developer -> AI Gateway (cf-aig-authorization) -> BYOK (Secrets Store) or Unified Billing -> Spend Limits + ZDR -> Provider -> Analytics
+**Architecture:** Interactive user -> Access -> AI Gateway (`cf.user_id`), or service workload -> gateway authentication + custom metadata -> AI Gateway -> BYOK (Secrets Store) or Unified Billing -> Spend Limits + ZDR -> Provider -> Analytics -> User Insights
 
-**Flow (steps 1–7):**
+**Flow (steps 1–8):**
 
-1. **App sends request** → `cf-aig-authorization` header only; no provider keys in app code
+1. **People and services authenticate separately** → Access-authenticated people receive `cf.user_id`; service-token requests do not and should use custom metadata for workload attribution
 2. **BYOK path** → Provider keys stored in Secrets Store, referenced by name in AI Gateway Provider Keys
 3. **Unified Billing path** → Cloudflare-managed provider credentials; single Cloudflare invoice
-4. **Spend limits** → Daily / weekly / monthly caps; auto top-up option
+4. **Spend limits** → Dollar-cost budgets over fixed or rolling windows, scoped by model, provider, custom metadata, or `cf.user_id`; over-budget requests return 429
 5. **Zero Data Retention (ZDR)** → Unified Billing routes through ZDR-capable endpoints (OpenAI, Anthropic)
 6. **Request forwarded to provider** → AI Gateway injects credentials; full provider API compatibility
 7. **Usage and cost logged** → Per-request provider, model, token count, latency, cost; Logpush to R2/S3/SIEM
+8. **User Insights surfaces anomalies** → Session cost compared with identity and account baselines for investigation; this is visibility, not automatic blocking
 
 Key product notes:
-- Unified Billing: open beta; supports OpenAI, Anthropic, Google AI Studio, Google Vertex AI, xAI, Groq (https://developers.cloudflare.com/ai-gateway/features/unified-billing/)
-- BYOK via Secrets Store: GA (https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/)
+- Unified Billing supports third-party providers and can also pay for Workers AI when the gateway's Workers AI billing setting is set to Unified billing (https://developers.cloudflare.com/ai-gateway/features/unified-billing/)
+- BYOK via Secrets Store: https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/
 - ZDR: currently supported for OpenAI and Anthropic with Unified Billing credentials; does not control AI Gateway's own logging
-- Workers AI models (prefix `@cf/`) are NOT charged via Unified Billing — they bill via Workers AI pricing
+- Workers AI uses its standard billing by default; a gateway can opt into prepaid AI Gateway credits for Workers AI inference
+- Spend-limit enforcement is eventually consistent, so concurrent bursts can briefly exceed a budget
 
 ## UC9 Flow Order (verified)
 
@@ -609,17 +620,18 @@ UC16 ("Durable Long-Running Agents") introduces the Project Think primitives: fi
 
 **Architecture:** User / Event -> Think Agent (Durable Object + SQLite) -> `runFiber()` for durable execution, `Session API` for tree conversations, `subAgent()` for delegation -> Execution Ladder: Workspace (Tier 0) -> Dynamic Worker Isolate + npm (Tier 1–2) -> Browser Run (Tier 3) -> Sandbox SDK (Tier 4) -> Self-Authored Extensions.
 
-**Flow (steps 1–9):**
+**Flow (steps 1–10):**
 
 1. **Event wakes the agent from hibernation** → HTTP, WebSocket, DO alarm, email, or RPC from parent; platform loads state, hands agent the event
 2. **Session API loads the conversation tree** → Tree-structured messages (parent_id per message), forking, non-destructive compaction, FTS5 search, persistent memory via context blocks + `set_context`
 3. **Durable execution via `runFiber()`** → Registered in SQLite, checkpointable via `ctx.stash({...})`, recoverable via `onFiberRecovered`; SDK keeps agent alive automatically during fiber
-4. **Tier 0: Workspace** → Durable virtual filesystem (SQLite + R2) via `@cloudflare/shell`; `createWorkspaceTools(this.workspace)` wired into tool set
+4. **Workspace and computer selection** → `@cloudflare/computer` supplies one persistent filesystem and AI SDK-compatible tools with an isolate or full Linux backend
 5. **Tier 1–2: Sandboxed code + npm** → Code Mode (`@cloudflare/codemode`) runs LLM-generated JS in Dynamic Worker V8 isolate with `globalOutbound: null`; `@cloudflare/worker-bundler` fetches + bundles npm packages on demand
-6. **Tier 3–4: Browser Run + Sandbox SDK** → Browser Run (Tier 3) via CDP for non-agent-friendly sites; Sandbox SDK (Tier 4, GA) for full containers with git/compilers/test runners synced bidirectionally with Workspace
+6. **Tier 3–4: Browser Run + Sandbox SDK** → Browser Run (Tier 3) via CDP for non-agent-friendly sites; Sandbox SDK (Tier 4) for full containers with git/compilers/test runners synced bidirectionally with Workspace
 7. **Sub-agents delegate work with typed RPC** → `this.subAgent(ResearchAgent, "research")` spawns child DOs colocated via Facets; own isolated SQLite; function-call RPC latency; TypeScript catches misuse at compile time
 8. **Self-authored extensions** → Agent authors TypeScript with declared permissions; `ExtensionManager` bundles + loads into Dynamic Worker + registers tools; persists in DO storage through hibernation
-9. **Agent responds via resumable stream, then hibernates** → Stream Manager buffers in DO for reconnects; zero cost when idle; wakes on next trigger with all state intact
+9. **Agent tracing makes long-running work inspectable** → Correlated turns, tools, approvals, sub-agents, cost, and platform operations
+10. **Agent responds via resumable stream, then hibernates** → Stream Manager buffers in DO for reconnects; zero cost when idle; wakes on next trigger with all state intact
 
 Key product notes:
 - Project Think: experimental; API surface stable but evolving (https://github.com/cloudflare/agents/blob/main/docs/think/index.md)
@@ -629,19 +641,57 @@ Key product notes:
 - Sessions: https://developers.cloudflare.com/agents/api-reference/sessions/
 - Scaling math: 10,000 agents × 1% activity = ~100 active DO instances at any moment (vs. 10,000 always-on VMs)
 - Think speaks the same WebSocket protocol as `@cloudflare/ai-chat`; existing UI components work unchanged
-- Sandbox SDK: GA as of Agents Week (https://blog.cloudflare.com/sandbox-ga/)
+- `@cloudflare/computer`: preview package that unifies persistent workspace tools with isolate and container execution (https://developers.cloudflare.com/changelog/post/2026-08-03-cloudflare-computer/)
+- Sandbox SDK: https://developers.cloudflare.com/sandbox/
 - Lifecycle hooks: `beforeTurn`, `beforeToolCall`, `afterToolCall`, `onStepFinish`, `onChatResponse`
+
+## UC17 Flow Order (verified)
+
+UC17 ("Cloudflare OS: Governed AI Workspaces & Apps") gives employees a browser workspace where agents can create documents, apps, and workflows under identity, capability, and information-flow controls.
+
+**Architecture:** Employee -> Access -> Agent Workspace -> Gatekeepers / MCP Server Portal / AI Gateway / Dynamic Worker + Durable Object Facet -> systems of record, models, and generated outputs. An observed-resource graph rechecks policy when work is shared.
+
+**Flow (steps 1–10):**
+
+1. **Employee enters a company-grounded workspace** → Access-authenticated browser workspace with curated context and skills
+2. **Agents and apps begin with no resource access** → Capabilities are granted explicitly as typed bindings, not broad credentials
+3. **Gatekeepers mediate resources and side effects** → Service-specific Workers enforce resource and action policy
+4. **Existing MCP servers connect through a governed portal** → One managed endpoint with Access, curated tools, and audit logging
+5. **Every inference call passes through AI Gateway** → Central model choice, logs, cost attribution, rate limits, and spend limits
+6. **Agent turns a conversation into a full-stack app** → Sandboxed client plus Dynamic Worker server and isolated Facet state
+7. **Mostly deterministic work becomes a reusable workflow** → Model judgment is retained only where it adds value
+8. **Policy follows what the agent has observed** → Resource observations remain attached to work and outputs
+9. **Sharing re-evaluates the collaborator** → The viewer's permissions are checked; the creator's access is not transferred
+10. **Open-source platform available to deploy today** → Core and starter repositories are public; managed and container-backed experiences remain roadmap items
+
+Key product notes:
+- Public sources: https://blog.cloudflare.com/cloudflare-os/, https://blog.cloudflare.com/how-we-use-ai-with-cloudflare-os/, https://github.com/cloudflare/cloudflare-os
+- Gatekeepers hold credentials outside model context and can scope, mask, rate-limit, approve, and record access
+- Generated server code runs in Dynamic Workers with global outbound networking disabled; Durable Object Facets isolate app state
+- Cloudflare OS is distinct from UC0, which documents Cloudflare's internal AI engineering stack
 
 ## Design Tokens
 
 - Primary: `#F38020` (Cloudflare orange)
 - Background: `#0d1117` (dark)
+- Light background: `#f7f4ef`; light mode uses darker semantic accents for WCAG-friendly text contrast
 - Node types: `user` `#3B82F6` | `cloudflare` `#F38020` | `ai` `#10B981` | `resource` `#8B5CF6` | `coming-soon` `#EAB308` (amber)
 - Font: Inter / system-sans
 
+## Theme And Responsive UI
+
+- Every HTML page loads `/components/theme-controller.js` before styles paint and declares `color-scheme: light dark`.
+- The theme toggle is injected into `.landing-header`, `.map-header`, or `.diagram-header`, persists to `localStorage` under `cf-ai-theme`, and remains a 44px accessible target.
+- `theme.css` owns semantic dark/light tokens. Page-specific CSS must consume tokens such as `--bg-card`, `--surface-soft`, and `--text-secondary`; do not add dark-only surface colors.
+- Desktop walkthroughs use normal document scrolling. The diagram canvas and playback controls stay sticky while long explanations scroll to the footer; dense canvases may still scroll internally.
+- `FlowEngine` routes long same-column edges through side lanes, full-width response paths around the perimeter, and positions labels against node/label collision boxes. Preserve this shared routing instead of adding per-use-case CSS offsets.
+- Disclaimer footers show `Last Updated` with a semantic `<time datetime="YYYY-MM-DD">` value. Update the shared legend and landing-page dates together when content is materially refreshed.
+- At `<=1024px`, walkthroughs stack canvas and panel and allow document scrolling. At phone widths, the three-column diagram intentionally scrolls horizontally while step text remains full-width below it.
+- Validate at minimum: 1512x982 MacBook Pro, 1024x768 tablet, 430x932 phone, 360x800 compact phone, and 3840x2160 4K. Test both themes, keyboard focus, theme persistence, horizontal overflow, and long step text.
+
 ## OWASP Framework Mappings
 
-Two OWASP frameworks are mapped to Cloudflare product nodes across all 7 use cases. Labels appear in the step info panel as blue badges.
+Two OWASP frameworks are mapped to Cloudflare product nodes across all 17 use cases. Labels appear in the step info panel as blue badges.
 
 ### Frameworks
 
@@ -734,16 +784,18 @@ Two OWASP frameworks are mapped to Cloudflare product nodes across all 7 use cas
 | 4 | AI Gateway (shared) | LLM10, LLM03 | — |
 | 6 | Queues (async) | — | ASI08 |
 | 7 | Workflows (durable) | — | ASI08 |
+| 8 | Agent Tracing | — | ASI08, ASI10 |
 
 ### UC8 OWASP Mappings
 
 | Step | Product | LLM Labels | ASI Labels |
 |------|---------|------------|------------|
-| 1 | AI Gateway (cf-aig-authorization) | LLM02 | — |
+| 1 | Access + AI Gateway identity | LLM02 | ASI03 |
 | 2 | BYOK / Secrets Store | LLM02 | — |
 | 4 | Spend Limits | LLM10 | ASI08 |
 | 5 | Zero Data Retention | LLM02 | — |
 | 7 | Analytics & Cost Logs | LLM10 | ASI10 |
+| 8 | User Insights | — | ASI10 |
 
 ### UC9 OWASP Mappings
 
@@ -819,12 +871,26 @@ Two OWASP frameworks are mapped to Cloudflare product nodes across all 7 use cas
 | 6 | Tier 3–4: Browser Run + Sandbox SDK | — | ASI05 |
 | 7 | Sub-agents (Facets + typed RPC) | — | ASI02, ASI04 |
 | 8 | Self-authored extensions | LLM06 | ASI05 |
+| 9 | Agent Tracing | — | ASI08, ASI10 |
+
+### UC17 OWASP Mappings
+
+| Step | Product | LLM Labels | ASI Labels |
+|------|---------|------------|------------|
+| 1 | Cloudflare Access | — | ASI03 |
+| 2 | Cloudflare OS capability model | LLM02 | ASI02 |
+| 3 | Gatekeepers | — | ASI02, ASI03 |
+| 4 | MCP Server Portal | — | ASI02, ASI04 |
+| 5 | AI Gateway | LLM10 | ASI10 |
+| 6 | Dynamic Workers + DO Facets | LLM06 | ASI05 |
+| 8 | Observed Resource Graph | LLM02 | ASI03 |
+| 9 | Sharing policy re-evaluation | — | ASI03 |
 
 ### ASI Label Rationale
 
 - **ASI01 Agent Goal Hijack** → Products that detect prompt injection / jailbreak (DLP AI Prompt Protection, Guardrails, AI Security for Apps) — prompt injection is the primary vector for hijacking agent goals
-- **ASI02 Tool Misuse & Exploitation** → Products that enforce per-tool authorization, rate limiting, or schema validation (Access policies, MCP Portal tool curation, AI Gateway rate limiting, API Shield)
-- **ASI03 Identity & Privilege Abuse** → Products that enforce identity verification and per-action authorization (Access, Access policies with per-tool re-evaluation)
+- **ASI02 Tool Misuse & Exploitation** → Products that constrain tool exposure or actions, apply rate limits, or validate schemas (Gatekeepers, MCP Portal tool curation, AI Gateway rate limiting, API Shield)
+- **ASI03 Identity & Privilege Abuse** → Products that enforce identity verification and resource/action authorization (Access, Gatekeepers, observed-resource policy)
 - **ASI04 Agentic Supply Chain Vulnerabilities** → Products that centralize gateway control or provide multi-provider fallback (MCP Portal, Dynamic Routing)
 - **ASI05 Unexpected Code Execution (RCE)** → Sandboxed execution environments (Workers isolate runtime)
 - **ASI08 Cascading Failures** → Observability that detects failure propagation (audit logging)

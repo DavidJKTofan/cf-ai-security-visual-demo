@@ -4,15 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Durable Long-Running Agents - Cloudflare AI (Unofficial)</title>
-  <meta name="description" content="Unofficial educational demo: interactive flow diagram of building durable long-running AI agents with Project Think — fibers, sub-agents, sessions, execution ladder, and self-authored extensions. Not affiliated with or endorsed by Cloudflare.">
+  <meta name="description" content="Unofficial educational demo: build durable long-running AI agents with Project Think, preview @cloudflare/computer execution, sub-agents, and Agent Tracing. Not affiliated with or endorsed by Cloudflare.">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0d1117">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="light dark">
+  <script src="/components/theme-controller.js"></script>
   <link rel="canonical" href="https://ai-security.automatic-demo.com/use-cases/uc16-durable-agents.html">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://ai-security.automatic-demo.com/use-cases/uc16-durable-agents.html">
   <meta property="og:title" content="Durable Long-Running Agents - Cloudflare AI (Unofficial)">
-  <meta property="og:description" content="Unofficial educational demo: interactive flow diagram of building durable long-running AI agents with Project Think — fibers, sub-agents, sessions, execution ladder, and self-authored extensions.">
+  <meta property="og:description" content="Unofficial educational demo: build durable long-running AI agents with Project Think, preview @cloudflare/computer execution, sub-agents, and Agent Tracing.">
   <meta property="og:image" content="https://ai-security.automatic-demo.com/og-image.png">
   <meta property="og:site_name" content="Cloudflare AI Security (Unofficial Demo)">
   <meta name="twitter:card" content="summary_large_image">
@@ -39,7 +40,7 @@
       </div>
     </div>
 
-    <div class="diagram-content">
+    <div class="diagram-content" role="main">
       <div class="diagram-canvas">
         <div class="flow-container">
           <svg class="flow-edges"></svg>
@@ -63,7 +64,7 @@
           <button class="btn btn-secondary" data-action="prev" disabled>&larr;</button>
           <button class="btn btn-secondary" data-action="next">&rarr;</button>
           <button class="btn btn-secondary" data-action="reset">Reset</button>
-          <span class="step-counter">0 / 9</span>
+          <span class="step-counter">0 / 10</span>
         </div>
         <div class="panel-step-info">
           <div class="step-info-placeholder">

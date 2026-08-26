@@ -29,6 +29,47 @@ body {
   overscroll-behavior-y: contain;
 }
 
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-width: auto;
+  margin-left: auto;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.theme-toggle::before {
+  content: "\263E";
+  color: var(--cf-orange);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+[data-theme="light"] .theme-toggle::before {
+  content: "\2600";
+}
+
+.theme-toggle:hover {
+  color: var(--text-primary);
+  border-color: var(--cf-orange);
+  transform: translateY(-1px);
+}
+
+.theme-toggle:active {
+  transform: translateY(0);
+}
+
 a {
   color: var(--cf-orange);
   text-decoration: none;
@@ -74,6 +115,15 @@ img {
   display: block;
 }
 
+.footer-update {
+  display: inline-flex;
+  margin-left: 0.5rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
 /* Reduced motion preference — respect user OS setting */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -115,4 +165,20 @@ img {
 ::-webkit-scrollbar-thumb {
   background: var(--border-color);
   border-radius: 3px;
+}
+
+@media (max-width: 48rem) {
+  .theme-toggle {
+    width: 2.75rem;
+    padding-inline: 0;
+  }
+
+  .theme-toggle-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
 }

@@ -10,6 +10,8 @@
  *   https://developers.cloudflare.com/workflows/
  *   https://developers.cloudflare.com/cloudflare-one/access-controls/service-credentials/service-tokens/
  *   https://developers.cloudflare.com/learning-paths/mtls/concepts/mtls-cloudflare/
+ *   https://developers.cloudflare.com/agents/runtime/operations/observability/tracing/
+ *   https://blog.cloudflare.com/grpc-workers/
  */
 
 export const uc7 = {
@@ -57,7 +59,7 @@ export const uc7 = {
       type: 'cloudflare',
       column: 'center',
       product: 'Cloudflare MCP Server Portal',
-      description: 'Centralized discovery and routing hub for agent-to-agent tool calls. Each agent exposes its capabilities as MCP tools. The portal provides a single endpoint for tool discovery, per-agent authorization, and audit logging.',
+      description: 'Centralized discovery and routing hub for agent tool calls. Each agent can expose capabilities as MCP tools. The portal provides one endpoint, per-server Access policy, tool curation, OAuth handling, and audit logging.',
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/mcp-portals/',
     },
     {
@@ -127,6 +129,28 @@ export const uc7 = {
       description: 'Asynchronous message passing between agents. Decouples agent communication for reliability — if an agent is busy or temporarily unavailable, messages are queued and delivered when the agent is ready.',
       docsUrl: 'https://developers.cloudflare.com/queues/',
     },
+    {
+      id: 'agent-tracing',
+      label: 'Agent Tracing',
+      sublabel: 'Turns, tools, models, approvals',
+      icon: '\u{1F50D}',
+      type: 'cloudflare',
+      column: 'right',
+      product: 'Cloudflare Agents',
+      description: 'The Agents dashboard shows agents, sessions, runs, traces, and token usage. A trace waterfall correlates model calls, tool execution, approvals, sub-agent work, and Workers runtime operations. Payload recording is off by default, and traces can be exported to OTLP-compatible destinations.',
+      docsUrl: 'https://developers.cloudflare.com/agents/runtime/operations/observability/tracing/',
+    },
+    {
+      id: 'grpc',
+      label: 'gRPC / Inbound TCP',
+      sublabel: 'Coming Soon',
+      icon: '\u{1F4E1}',
+      type: 'coming-soon',
+      column: 'right',
+      product: 'Cloudflare Workers + Containers',
+      description: 'Coming Soon and not generally available: Spectrum can pass inbound TCP sockets to a Worker connect(socket) handler; sockets can flow to Durable Objects or Containers. Containers can host full-duplex gRPC, while Workers can serve unary/server-streaming gRPC and call external gRPC through automatic gRPC-web translation.',
+      docsUrl: 'https://blog.cloudflare.com/grpc-workers/',
+    },
   ],
 
   edges: [
@@ -143,6 +167,8 @@ export const uc7 = {
     { id: 'e-a-queues', from: 'agent-a', to: 'queues', label: 'Async msg', direction: 'ltr' },
     { id: 'e-queues-b', from: 'queues', to: 'agent-b', label: '', direction: 'ltr' },
     { id: 'e-workflow-orch', from: 'workflow', to: 'orchestrator', label: 'Result', direction: 'rtl' },
+    { id: 'e-agents-tracing', from: 'agent-b', to: 'agent-tracing', label: 'Traces', direction: 'ltr' },
+    { id: 'e-agent-grpc', from: 'agent-b', to: 'grpc', label: 'Optional transport', direction: 'ltr' },
   ],
 
   steps: [
@@ -168,8 +194,8 @@ export const uc7 = {
     {
       title: 'MCP Portal routes agent tool calls',
       product: 'Cloudflare MCP Server Portal',
-      description: 'The MCP Server Portal serves as the discovery and routing hub for agent-to-agent communication. Each agent exposes its capabilities as MCP tools. The portal enforces per-tool authorization — Agent A may call some tools on Agent B but not others. All interactions are logged.',
-      why: 'Centralized tool discovery prevents agents from needing to know each other\'s direct endpoints. Per-tool authorization ensures least privilege. Audit logging provides visibility into the full agent interaction graph.',
+      description: 'The MCP Server Portal serves as a discovery and routing hub for tool calls. Each agent can expose capabilities as MCP tools. Access policy applies per upstream server, while portal administrators curate which tools are exposed and can turn individual tools on or off. Portal activity is logged.',
+      why: 'Centralized discovery prevents every agent from maintaining direct tool endpoints. Server-level identity policy plus curated tool exposure reduces ambient capability and creates an auditable approved path.',
       activeNodes: ['cf-access-mtls', 'mcp-portal', 'agent-a', 'agent-b'],
       activeEdges: ['e-access-portal', 'e-portal-a', 'e-portal-b'],
       docsUrl: 'https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/mcp-portals/',
@@ -213,6 +239,25 @@ export const uc7 = {
       activeEdges: ['e-a-workflow', 'e-b-workflow'],
       docsUrl: 'https://developers.cloudflare.com/workflows/',
       owasp: ['ASI08 Cascading Failures'],
+    },
+    {
+      title: 'Agent tracing explains every turn',
+      product: 'Cloudflare Agent Tracing',
+      description: 'Enable Workers tracing to see each agent turn with nested model calls, tool runs, approval requests, sub-agent activity, token usage, and underlying Workers operations. Session replay presents recorded activity across turns, while the trace waterfall shows timing and causality. Message and tool payload recording is off by default; OpenTelemetry-compatible spans can be exported through OTLP.',
+      why: 'Multi-agent failures are difficult to reconstruct from application logs alone. A shared trace connects the orchestrator, tools, sub-agents, model cost, and platform calls without making sensitive payload storage the default.',
+      activeNodes: ['agent-a', 'agent-b', 'agent-tracing'],
+      activeEdges: ['e-agents-tracing'],
+      docsUrl: 'https://developers.cloudflare.com/agents/runtime/operations/observability/tracing/',
+      owasp: ['ASI10 Rogue Agents', 'ASI08 Cascading Failures'],
+    },
+    {
+      title: 'Coming Soon: gRPC and inbound TCP for existing agent services',
+      product: 'Workers + Containers + Spectrum',
+      description: 'The public announcement describes an inbound connect(socket) Worker handler through Spectrum. A Worker can route a TCP socket to another Worker, Durable Object, or Container. Containers can run full-duplex bidirectional gRPC servers in any supported language; Workers can implement unary and server-streaming APIs or call external gRPC servers through gRPC-web translation.',
+      why: 'This creates a future path for low-latency voice systems and existing gRPC-based services to participate in a Cloudflare-hosted agent architecture without rewriting their protocol. It is not generally available and is shown as Coming Soon.',
+      activeNodes: ['agent-b', 'grpc'],
+      activeEdges: ['e-agent-grpc'],
+      docsUrl: 'https://blog.cloudflare.com/grpc-workers/',
     },
     {
       title: 'Results returned to orchestrator',

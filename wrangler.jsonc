@@ -2,7 +2,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "cf-ai-security-visual-demo",
 	"main": "./worker/index.js",
-	"compatibility_date": "2026-05-20",
+	"compatibility_date": "2026-08-25",
 	"assets": {
 		"directory": "./src",
 		"binding": "ASSETS",
@@ -15,7 +15,15 @@
 		]
 	},
 	"observability": {
-		"enabled": true
+		"enabled": true,
+		"logs": {
+			"enabled": true,
+			"head_sampling_rate": 1
+		},
+		"traces": {
+			"enabled": true,
+			"head_sampling_rate": 0.01
+		}
 	},
 	"workers_dev": false,
 	"routes": [
