@@ -367,10 +367,13 @@
 
 .btn-primary {
   background: var(--cf-orange);
-  color: #fff;
+  color: #21150b;
 }
 .btn-primary:hover {
   background: var(--cf-orange-dark);
+}
+[data-theme="light"] .btn-primary {
+  color: #fff;
 }
 .btn-primary:disabled {
   opacity: 0.4;
@@ -759,22 +762,72 @@
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 0.75rem 0.875rem;
+  padding: 0.875rem 1rem;
   box-shadow: var(--shadow-lg);
-  max-width: min(17.5rem, 80vw);
+  width: min(24rem, calc(100vw - 1rem));
+  max-width: none;
+  max-height: calc(100dvh - 1rem);
   min-width: 11.25rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.tooltip-card h4 {
+.tooltip-card h2 {
   font-size: clamp(0.75rem, 1.4vw, 0.875rem);
   color: var(--text-primary);
   margin-bottom: 0.25rem;
 }
 
-.tooltip-card p {
+.tooltip-product {
+  flex: none;
+  margin-bottom: 0.5rem;
+  color: var(--cf-orange);
+  font-size: 0.8125rem;
+}
+
+.tooltip-description {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-right: 0.375rem;
   font-size: clamp(0.625rem, 1.2vw, 0.75rem);
   color: var(--text-secondary);
   line-height: 1.55;
+}
+
+.tooltip-description:focus-visible {
+  outline: 2px solid var(--cf-orange);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.tooltip-description.is-scrollable {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 1rem), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 1rem), transparent 100%);
+  padding-bottom: 1rem;
+}
+
+.tooltip-description p + ul {
+  margin-top: 0.625rem;
+}
+
+.tooltip-description ul {
+  padding-left: 1.1rem;
+}
+
+.tooltip-description li + li {
+  margin-top: 0.5rem;
+}
+
+.tooltip-description li::marker {
+  color: var(--cf-orange);
+}
+
+.tooltip-description strong {
+  color: var(--text-primary);
+  font-weight: 650;
 }
 
 .tooltip-card .tooltip-link {
@@ -785,6 +838,7 @@
   font-size: clamp(0.5625rem, 1.1vw, 0.6875rem);
   color: var(--cf-orange);
   pointer-events: auto;
+  flex: none;
 }
 
 /* ===================================================================
@@ -997,6 +1051,7 @@
   .tooltip-card {
     max-width: 100%;
     width: 100%;
+    max-height: min(70dvh, 36rem);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   }
 }

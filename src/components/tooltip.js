@@ -55,9 +55,9 @@ export class Tooltip {
     const card = this._el.querySelector('.tooltip-card');
 
     card.innerHTML = `
-      <h4>${node.label}</h4>
-      ${node.product ? `<div style="font-size: 0.8125rem; color: var(--cf-orange); margin-bottom: 0.375rem;">${node.product}</div>` : ''}
-      <p>${node.description || ''}</p>
+      <h2>${node.label}</h2>
+      ${node.product ? `<div class="tooltip-product">${node.product}</div>` : ''}
+      <div class="tooltip-description">${this._formatDescription(node.description)}</div>
       ${node.docsUrl ? `<a class="tooltip-link" href="${node.docsUrl}" target="_blank" rel="noopener">View docs &#8599;</a>` : ''}
     `;
 
@@ -68,11 +68,15 @@ export class Tooltip {
     } else {
       // Desktop: position near the target element
       const rect = targetEl.getBoundingClientRect();
-      const tooltipWidth = Math.min(260, window.innerWidth * 0.8);
+      this._el.style.left = '0px';
+      this._el.style.top = '0px';
+      const tooltipRect = card.getBoundingClientRect();
+      const tooltipWidth = tooltipRect.width;
+      const tooltipHeight = tooltipRect.height;
 
       // Decide placement: try right, then left
       let left = rect.right + 12;
-      let top = rect.top + rect.height / 2 - 40;
+      let top = rect.top + rect.height / 2 - tooltipHeight / 2;
 
       if (left + tooltipWidth > window.innerWidth) {
         left = rect.left - tooltipWidth - 12;
@@ -81,8 +85,9 @@ export class Tooltip {
       // Ensure tooltip stays within viewport
       left = Math.max(8, Math.min(left, window.innerWidth - tooltipWidth - 8));
 
-      // Keep in viewport vertically
-      top = Math.max(8, Math.min(top, window.innerHeight - 200));
+      // Keep the complete card in the viewport. Long descriptions scroll
+      // inside the card while the title and docs link remain visible.
+      top = Math.max(8, Math.min(top, window.innerHeight - tooltipHeight - 8));
 
       this._el.style.left = `${left}px`;
       this._el.style.top = `${top}px`;
@@ -90,7 +95,25 @@ export class Tooltip {
 
     this._el.classList.add('visible');
     this._el.setAttribute('aria-hidden', 'false');
+    const description = card.querySelector('.tooltip-description');
+    const isScrollable = description.scrollHeight > description.clientHeight + 1;
+    description.classList.toggle('is-scrollable', isScrollable);
+    description.tabIndex = isScrollable ? 0 : -1;
+    if (isScrollable) description.setAttribute('aria-label', 'Scrollable node description');
     this._visible = true;
+  }
+
+  _formatDescription(value) {
+    const parts = String(value || '').split(/\s*•\s*/).filter(Boolean);
+    if (parts.length <= 1) return `<p>${parts[0] || ''}</p>`;
+
+    return `<p>${parts.shift()}</p><ul>${parts.map(part => {
+      const separator = part.indexOf(' · ');
+      const content = separator > 0
+        ? `<strong>${part.slice(0, separator)}</strong>${part.slice(separator)}`
+        : part;
+      return `<li>${content}</li>`;
+    }).join('')}</ul>`;
   }
 
   hide() {

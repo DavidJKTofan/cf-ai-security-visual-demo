@@ -27,7 +27,7 @@ export class Legend {
       <div class="legend-meta">
         <span>Disclaimer: Educational demo only</span>
         <span aria-hidden="true">&middot;</span>
-        <span>Last Updated: <time datetime="2026-08-25">August 25, 2026</time></span>
+        <span>Last Updated: <time datetime="2026-08">August 2026</time></span>
       </div>
     `;
   }
